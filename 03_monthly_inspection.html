@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Monthly Inspection</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input::placeholder{color:rgba(255,255,255,.6);}
+.header-meta select option{color:#000;}
+.tab-bar{display:flex;overflow-x:auto;background:var(--green-light);scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;position:relative;}
+.tab-btn.active{color:white;border-bottom-color:var(--gold);}
+.tab-btn .badge{position:absolute;top:5px;right:6px;width:8px;height:8px;border-radius:50%;background:var(--red);display:none;}
+.tab-btn .badge.show{display:block;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;}
+.card-head span{font-size:12px;color:var(--muted);}
+.card-body{padding:4px 0;}
+.check-row{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid #f0ece6;}
+.check-row:last-child{border-bottom:none;}
+.check-label{flex:1;font-size:13px;line-height:1.4;}
+.check-btns{display:flex;gap:5px;flex-shrink:0;}
+.check-btns button{padding:5px 10px;border-radius:16px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-pass.active{background:var(--green);border-color:var(--green);color:white;}
+.btn-fail.active{background:var(--red);border-color:var(--red);color:white;}
+.fail-extra{background:var(--red-light);padding:8px 16px 10px;display:none;}
+.fail-extra.show{display:block;}
+.fail-extra textarea{width:100%;border:1px solid #f5c6c3;border-radius:6px;padding:7px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;background:white;}
+.sev-row{display:flex;gap:6px;margin-bottom:6px;align-items:center;}
+.sev-label{font-size:12px;color:var(--muted);margin-right:4px;}
+.sev-btn{padding:4px 10px;border-radius:12px;border:1px solid var(--border);background:none;font-size:11px;font-weight:600;cursor:pointer;}
+.sev-btn.active-M{background:#f5a623;border-color:#f5a623;color:white;}
+.sev-btn.active-MA{background:#e07b00;border-color:#e07b00;color:white;}
+.sev-btn.active-C{background:var(--red);border-color:var(--red);color:white;}
+.progress-bar{height:4px;background:#e0ddd8;border-radius:2px;margin:0 16px 12px;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.submit-btn{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.review-stat{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0ece6;font-size:14px;}
+.review-stat:last-child{border-bottom:none;}
+.stat-val{font-weight:600;}
+.stat-val.good{color:var(--green);}
+.stat-val.bad{color:var(--red);}
+.review-issue{background:var(--red-light);border-radius:8px;padding:10px 12px;margin-bottom:8px;font-size:13px;}
+.review-issue .issue-item{font-weight:600;margin-bottom:2px;}
+.review-issue .issue-sev{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;background:var(--red);color:white;margin-left:6px;}
+input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>Harvest Ridge</h1>
+  <div class="sub">Monthly Facility Inspection</div>
+  <div class="header-meta">
+    <input type="date" id="formDate">
+    <select id="auditor">
+      <option value="">Select Auditor</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+    </select>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="taббtn-food-defense" onclick="switchTab('food-defense',this)">Food Defense<span class="badge" id="badge-food-defense"></span></button>
+  <button class="tab-btn" id="tabbtn-food-safety" onclick="switchTab('food-safety',this)">Food Safety<span class="badge" id="badge-food-safety"></span></button>
+  <button class="tab-btn" id="tabbtn-cleanliness" onclick="switchTab('cleanliness',this)">Cleanliness<span class="badge" id="badge-cleanliness"></span></button>
+  <button class="tab-btn" id="tabbtn-equipment" onclick="switchTab('equipment',this)">Equipment<span class="badge" id="badge-equipment"></span></button>
+  <button class="tab-btn" id="tabbtn-pest" onclick="switchTab('pest',this)">Pest Control<span class="badge" id="badge-pest"></span></button>
+  <button class="tab-btn" id="tabbtn-review" onclick="switchTab('review',this)">Submit</button>
+</div>
+
+<div class="content">
+
+<div class="section active" id="tab-food-defense"></div>
+<div class="section" id="tab-food-safety"></div>
+<div class="section" id="tab-cleanliness"></div>
+<div class="section" id="tab-equipment"></div>
+<div class="section" id="tab-pest"></div>
+
+<div class="section" id="tab-review">
+  <div class="card">
+    <div class="card-head">Inspection Summary</div>
+    <div class="card-body" style="padding:0 16px;">
+      <div id="review-stats"></div>
+    </div>
+  </div>
+  <div id="review-issues"></div>
+  <button class="submit-btn" id="submitBtn" onclick="submitAll()">Submit to Google Sheets</button>
+  <div style="height:32px;"></div>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+
+const CATEGORIES = {
+  'food-defense': {
+    label:'Food Defense',
+    items:[
+      'Exterior doors secured and monitored',
+      'Visitor log in use and up to date',
+      'Restricted areas properly marked',
+      'Ingredients and packaging secured',
+      'Security cameras functional',
+      'Employee badges / access control in use',
+      'No unauthorized personnel observed'
+    ]
+  },
+  'food-safety': {
+    label:'Food Safety & GMP',
+    items:[
+      'Handwashing stations stocked and accessible',
+      'Employees following handwashing procedures',
+      'No food / drink in production areas',
+      'Proper PPE being worn (hairnets, gloves)',
+      'Allergen controls in place',
+      'Temperature logs current and complete',
+      'MSDS / SDS sheets accessible',
+      'Corrective action log up to date',
+      'Training records current'
+    ]
+  },
+  'cleanliness': {
+    label:'Cleanliness',
+    items:[
+      'Processing room floors clean and dry',
+      'Walls and ceilings free of buildup',
+      'Equipment surfaces clean before startup',
+      'Drains clear and functional',
+      'Waste containers emptied and clean',
+      'Break room / restrooms clean and stocked',
+      'Warehouse aisles clear',
+      'Outside grounds free of debris'
+    ]
+  },
+  'equipment': {
+    label:'Equipment',
+    items:[
+      'All magnets checked and initialed',
+      'Scales calibrated and accurate',
+      'Conveyor belts in good condition',
+      'Roller mill operating properly',
+      'Augers and elevators functioning',
+      'Dust collection system operating',
+      'Emergency stop buttons functional',
+      'No exposed wiring or safety hazards',
+      'Maintenance log current'
+    ]
+  },
+  'pest': {
+    label:'Pest Control',
+    items:[
+      'No evidence of rodent activity',
+      'No evidence of insect activity',
+      'Bait stations checked and recorded',
+      'Exterior entry points sealed',
+      'Dock doors sealed properly',
+      'Pest control log current',
+      'No live pests observed'
+    ]
+  }
+};
+
+const state = {};
+
+function buildCategory(catId) {
+  const cat = CATEGORIES[catId];
+  const section = document.getElementById('tab-'+catId);
+  section.innerHTML = `<div class="section-note">Tap ✓ Pass or ✗ Fail for each item. If fail, select severity and describe the issue.</div>`;
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <div class="card-head">${cat.label} <span id="prog-${catId}">0 / ${cat.items.length}</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="fill-${catId}" style="width:0%"></div></div>
+    <div class="card-body" id="list-${catId}"></div>
+  `;
+  section.appendChild(card);
+
+  state[catId] = {};
+  cat.items.forEach((item, i) => {
+    state[catId][i] = {label:item, result:'', severity:'', comment:''};
+    const wrap = document.createElement('div');
+
+    const row = document.createElement('div');
+    row.className = 'check-row';
+    row.innerHTML = `
+      <div class="check-label">${item}</div>
+      <div class="check-btns">
+        <button class="btn-pass" id="p-${catId}-${i}" onclick="setItem('${catId}',${i},'pass')">✓</button>
+        <button class="btn-fail" id="f-${catId}-${i}" onclick="setItem('${catId}',${i},'fail')">✗</button>
+      </div>
+    `;
+
+    const extra = document.createElement('div');
+    extra.className = 'fail-extra';
+    extra.id = `ex-${catId}-${i}`;
+    extra.innerHTML = `
+      <div class="sev-row">
+        <span class="sev-label">Severity:</span>
+        <button class="sev-btn" id="sev-M-${catId}-${i}" onclick="setSev('${catId}',${i},'M')">M – Minor</button>
+        <button class="sev-btn" id="sev-MA-${catId}-${i}" onclick="setSev('${catId}',${i},'MA')">MA – Major</button>
+        <button class="sev-btn" id="sev-C-${catId}-${i}" onclick="setSev('${catId}',${i},'C')">C – Critical</button>
+      </div>
+      <textarea rows="2" placeholder="Describe the issue..." oninput="state['${catId}'][${i}].comment=this.value"></textarea>
+    `;
+
+    wrap.appendChild(row);
+    wrap.appendChild(extra);
+    document.getElementById(`list-${catId}`).appendChild(wrap);
+  });
+}
+
+function setItem(catId, i, val) {
+  state[catId][i].result = val;
+  document.getElementById(`p-${catId}-${i}`).classList.toggle('active', val==='pass');
+  document.getElementById(`f-${catId}-${i}`).classList.toggle('active',  val==='fail');
+  const ex = document.getElementById(`ex-${catId}-${i}`);
+  ex.className = 'fail-extra' + (val==='fail'?' show':'');
+  updateProgress(catId);
+}
+
+function setSev(catId, i, sev) {
+  state[catId][i].severity = sev;
+  ['M','MA','C'].forEach(s => {
+    const btn = document.getElementById(`sev-${s}-${catId}-${i}`);
+    btn.className = 'sev-btn' + (s===sev?` active-${s}`:'');
+  });
+}
+
+function updateProgress(catId) {
+  const items = state[catId];
+  const total = Object.keys(items).length;
+  const done = Object.values(items).filter(v=>v.result).length;
+  const fails = Object.values(items).filter(v=>v.result==='fail').length;
+  document.getElementById(`prog-${catId}`).textContent = `${done} / ${total}`;
+  document.getElementById(`fill-${catId}`).style.width = `${(done/total)*100}%`;
+  const badge = document.getElementById(`badge-${catId}`);
+  if(badge) badge.className = 'badge' + (fails>0?' show':'');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  if(name==='review') buildReview();
+  window.scrollTo(0,0);
+}
+
+function buildReview() {
+  let total=0, done=0, fails=[];
+  Object.entries(state).forEach(([catId, items]) => {
+    Object.values(items).forEach(v => {
+      total++;
+      if(v.result) done++;
+      if(v.result==='fail') fails.push({cat: CATEGORIES[catId].label, ...v});
+    });
+  });
+  const pct = total>0 ? Math.round((done-fails.length)/done*100)||0 : 0;
+  document.getElementById('review-stats').innerHTML = `
+    <div class="review-stat"><span>Items Checked</span><span class="stat-val">${done} / ${total}</span></div>
+    <div class="review-stat"><span>Pass Rate</span><span class="stat-val ${pct>=80?'good':'bad'}">${pct}%</span></div>
+    <div class="review-stat"><span>Non-Conformances</span><span class="stat-val ${fails.length>0?'bad':'good'}">${fails.length}</span></div>
+  `;
+  const issueDiv = document.getElementById('review-issues');
+  issueDiv.innerHTML = fails.length>0 ? '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Issues Found</div>' : '';
+  fails.forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'review-issue';
+    d.innerHTML = `<div class="issue-item">${f.cat}: ${f.label}${f.severity?`<span class="issue-sev">${f.severity}</span>`:''}</div><div style="color:var(--muted);font-size:12px;">${f.comment||'No description'}</div>`;
+    issueDiv.appendChild(d);
+  });
+}
+
+async function submitAll() {
+  const date = document.getElementById('formDate').value;
+  const auditor = document.getElementById('auditor').value;
+  if(!date||!auditor){showToast('Please select date and auditor',true);return;}
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Date','Auditor','Category','Item','Result','Severity','Comment'];
+  const rows = [];
+
+  Object.entries(state).forEach(([catId, items]) => {
+    Object.values(items).forEach(v => {
+      rows.push([ts, date, auditor, CATEGORIES[catId].label, v.label, v.result, v.severity, v.comment]);
+    });
+  });
+
+  try {
+    for(const row of rows){
+      await fetch(SCRIPT_URL,{
+        method:'POST',mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({tab:'MonthlyInspection', headers, row})
+      });
+    }
+    showToast('✓ Submitted to Google Sheets!',false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false;
+    btn.textContent='Submit to Google Sheets';
+  }
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// INIT
+document.getElementById('formDate').value=new Date().toISOString().split('T')[0];
+Object.keys(CATEGORIES).forEach(buildCategory);
+document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+document.getElementById('tab-food-defense').style.display='block';
+</script>
+</body>
+</html>
