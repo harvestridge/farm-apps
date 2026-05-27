@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Master Cleaning Schedule</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input::placeholder{color:rgba(255,255,255,.6);}
+.header-meta select option{color:#000;}
+.tab-bar{display:flex;background:var(--green-light);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
+.tab-btn.active{color:white;border-bottom-color:var(--gold);}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;}
+.card-head .prog{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;}
+.progress-wrap{background:#e0ddd8;height:4px;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.task-row{padding:10px 16px;border-bottom:0.5px solid #f0ece6;}
+.task-row:last-child{border-bottom:none;}
+.task-top{display:flex;align-items:flex-start;gap:8px;}
+.task-label{flex:1;font-size:13px;font-weight:500;line-height:1.5;padding-top:3px;}
+.pf-btns{display:flex;gap:5px;flex-shrink:0;}
+.pf-btns button{padding:5px 10px;border-radius:14px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-pass.sel{background:var(--green);border-color:var(--green);color:white;}
+.btn-fail.sel{background:var(--red);border-color:var(--red);color:white;}
+.task-extra{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.task-extra input,.task-extra select,.task-extra textarea{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:white;width:100%;}
+.task-extra textarea{grid-column:1/-1;resize:none;}
+.task-extra input:focus,.task-extra select:focus,.task-extra textarea:focus{border-color:var(--green);outline:none;}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.verif-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.verif-body{padding:14px 16px;}
+.field-group{margin-bottom:12px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:none;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+<div class="app-header">
+  <h1>Harvest Ridge</h1>
+  <div class="sub">Master Cleaning Schedule</div>
+  <div class="header-meta">
+    <input type="date" id="formDate">
+    <select id="supervisor">
+      <option value="">Select Supervisor</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+    </select>
+  </div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('monthly',this)">Monthly</button>
+  <button class="tab-btn" onclick="switchTab('yearly',this)">Yearly</button>
+</div>
+<div class="content">
+  <div class="section active" id="tab-monthly">
+    <div class="section-note">Log cleaning tasks for each area. Assign each task, mark Pass/Fail, add initials and notes.</div>
+    <div id="monthly-sections"></div>
+    <div class="verif-card">
+      <div class="card-head">Supervisor Sign-Off</div>
+      <div class="verif-body">
+        <div class="field-group"><div class="field-label">Overall Notes</div><textarea id="monthly-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
+        <div class="field-group"><div class="field-label">Verified By</div><select id="monthly-verified"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
+      </div>
+    </div>
+    <button class="submit-btn" id="monthlySubmitBtn" onclick="submitCleaning('monthly')">Submit to Google Sheets</button>
+  </div>
+  <div class="section" id="tab-yearly">
+    <div class="section-note">Log annual deep cleaning tasks. Assign each task, mark Pass/Fail, add initials and notes.</div>
+    <div id="yearly-sections"></div>
+    <div class="verif-card">
+      <div class="card-head">Supervisor Sign-Off</div>
+      <div class="verif-body">
+        <div class="field-group"><div class="field-label">Overall Notes</div><textarea id="yearly-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
+        <div class="field-group"><div class="field-label">Verified By</div><select id="yearly-verified"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
+      </div>
+    </div>
+    <button class="submit-btn" id="yearlySubmitBtn" onclick="submitCleaning('yearly')">Submit to Google Sheets</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+const EMPLOYEES=['Tyler','Allen','Andy','Tim','Aaron'];
+const MONTHLY_SECTIONS=[{id:'processing',label:'Processing Room',icon:'🏭',tasks:['Sweep underneath all machinery','Clean off top of all equipment including catwalks','Dust walls','Clean all thresholds and manual doors','Clean inside of all overhead doors','Clean plexi windows','Deep clean plant office including handwashing area']},{id:'warehouse',label:'Warehouse',icon:'🏪',tasks:['Blow down fork trucks','Clean plastic curtains','Clean large overhead doors','Clean tunnel and tool area','Clean thresholds and manual doors','Clean trashcan','Clean dock area including rails']},{id:'outside',label:'Outside',icon:'🌿',tasks:['Clean outside of overhead doors','Clean bootscrapers / remove excess dirt','Clean outside conveyor waste bucket','Clean out hammermill room','Remove all debris/growth from perimeter','Remove all debris from drain area','Clean batco belt conveyor']}];
+const YEARLY_SECTIONS=[{id:'yearly-deep',label:'Annual Deep Clean',icon:'✨',tasks:['Clean ceilings','Clean overhead structures','Deep clean walls','Clean dock doors']}];
+const state={};
+function buildSections(sections,containerId){const container=document.getElementById(containerId);container.innerHTML='';sections.forEach(section=>{state[section.id]=section.tasks.map(t=>({task:t,result:'',assignedTo:'',initials:'',notes:''}));const card=document.createElement('div');card.className='card';card.innerHTML=`<div class="card-head">${section.icon} ${section.label}<span class="prog" id="prog-${section.id}">0 / ${section.tasks.length}</span></div><div class="progress-wrap"><div class="progress-fill" id="fill-${section.id}" style="width:0%"></div></div><div id="list-${section.id}"></div>`;container.appendChild(card);section.tasks.forEach((task,i)=>{const empOptions=EMPLOYEES.map(e=>`<option value="${e}">${e}</option>`).join('');const row=document.createElement('div');row.className='task-row';row.innerHTML=`<div class="task-top"><div class="task-label">${task}</div><div class="pf-btns"><button class="btn-pass" id="pass-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Pass')">✓</button><button class="btn-fail" id="fail-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Fail')">✗</button></div></div><div class="task-extra"><select id="assigned-${section.id}-${i}" onchange="state['${section.id}'][${i}].assignedTo=this.value"><option value="">Assigned to...</option>${empOptions}</select><input type="text" maxlength="6" placeholder="Initials" id="init-${section.id}-${i}" oninput="state['${section.id}'][${i}].initials=this.value"><textarea rows="1" placeholder="Notes (optional)" id="notes-${section.id}-${i}" oninput="state['${section.id}'][${i}].notes=this.value"></textarea></div>`;document.getElementById(`list-${section.id}`).appendChild(row);});});}
+function setResult(sectionId,i,val){state[sectionId][i].result=val;document.getElementById(`pass-${sectionId}-${i}`).className='btn-pass'+(val==='Pass'?' sel':'');document.getElementById(`fail-${sectionId}-${i}`).className='btn-fail'+(val==='Fail'?' sel':'');updateProgress(sectionId);}
+function updateProgress(sectionId){const items=state[sectionId];const total=items.length;const done=items.filter(v=>v.result).length;document.getElementById(`prog-${sectionId}`).textContent=`${done} / ${total}`;document.getElementById(`fill-${sectionId}`).style.width=`${(done/total)*100}%`;}
+function switchTab(name,btn){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).style.display='block';btn.classList.add('active');window.scrollTo(0,0);}
+async function submitCleaning(type){const date=document.getElementById('formDate').value;const supervisor=document.getElementById('supervisor').value;if(!date||!supervisor){showToast('Please select date and supervisor',true);return;}const btn=document.getElementById(type+'SubmitBtn');btn.disabled=true;btn.textContent='Submitting...';const verifiedBy=document.getElementById(`${type}-verified`).value;const overallNotes=document.getElementById(`${type}-notes`).value;const ts=new Date().toLocaleString();const tab=type==='monthly'?'CleaningMonthly':'CleaningYearly';const headers=['Timestamp','Date','Supervisor','Section','Task','Result','Assigned To','Initials','Notes','Verified By','Overall Notes'];const rows=[];const sections=type==='monthly'?MONTHLY_SECTIONS:YEARLY_SECTIONS;sections.forEach(section=>{state[section.id].forEach(item=>{rows.push([ts,date,supervisor,section.label,item.task,item.result,item.assignedTo,item.initials,item.notes,verifiedBy,overallNotes]);});});try{for(const row of rows){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab,headers,row})});}showToast('✓ Submitted to Google Sheets!',false);btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Submit to Google Sheets';}}
+function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3000);}
+document.getElementById('formDate').value=new Date().toISOString().split('T')[0];
+buildSections(MONTHLY_SECTIONS,'monthly-sections');
+buildSections(YEARLY_SECTIONS,'yearly-sections');
+document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+document.getElementById('tab-monthly').style.display='block';
+</script>
+</body>
+</html>
