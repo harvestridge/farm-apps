@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Glass & Brittle Plastics</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input::placeholder{color:rgba(255,255,255,.6);}
+.header-meta select option{color:#000;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.zone-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:14px;overflow:hidden;}
+.zone-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.zone-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;}
+.zone-title{font-size:14px;font-weight:600;color:var(--text);}
+.zone-tag{font-size:11px;font-weight:400;color:var(--muted);margin-left:2px;}
+.zone-prog{font-size:12px;color:var(--muted);margin-left:auto;}
+.progress-wrap{background:#e0ddd8;height:5px;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.item-row{padding:10px 16px;border-bottom:0.5px solid #f0ece6;}
+.item-row:last-child{border-bottom:none;}
+.item-top{display:flex;align-items:center;gap:8px;}
+.item-label{flex:1;font-size:13px;font-weight:500;line-height:1.4;}
+.acc-btns{display:flex;gap:6px;flex-shrink:0;}
+.acc-btns button{padding:5px 12px;border-radius:16px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-acc.sel{background:var(--green);border-color:var(--green);color:white;}
+.btn-rej.sel{background:var(--red);border-color:var(--red);color:white;}
+.item-extra{display:none;margin-top:8px;gap:8px;flex-direction:column;}
+.item-extra.show{display:flex;}
+.item-extra textarea{width:100%;border:1px solid #f5c6c3;border-radius:6px;padding:7px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;background:#fff9f9;}
+.extra-label{font-size:11px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.submit-btn{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+<div class="app-header">
+  <h1>Harvest Ridge</h1>
+  <div class="sub">Glass &amp; Brittle Plastics Inspection</div>
+  <div class="header-meta">
+    <input type="date" id="formDate">
+    <select id="inspector">
+      <option value="">Select Inspector</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+    </select>
+  </div>
+</div>
+<div class="content">
+  <div class="section-note">Inspect all glass and brittle plastic items in each zone. Tap Acc or Rej for each item. Rejected items will prompt for a comment and corrective action.</div>
+  <div id="zones-container"></div>
+  <button class="submit-btn" id="submitBtn" onclick="submitAll()">Submit to Google Sheets</button>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+const ZONES = [
+  {id:'blue',label:'Processing Room',tag:'Blue',color:'#2563EB',items:['Lights (4)','Hose Reel (1)','Corner Broom (1)','Short Push Broom (1)','Shovels (2)','Dustpan (1)','Plant Wall Dusters (2)','Swiffer (1)','Duster (1)','Cameras (6)','Air Compressor Pressure Gauge (1)','Air Compressor Oil Sight Glass (1)','T.V. Monitor (1)','Vacuum (2)','Red Air Compressor Drainage Bucket (1)']},
+  {id:'orange',label:'Processing Room',tag:'Orange',color:'#EA580C',items:['Camera (6)','Corner Broom (1)','Garage Door Opener (1)','Control Panel (1)','Vacuum (1)','Crusher Plastic Cover (1)','Curtain','Air Compressor Pressure Gauge (1)','Air Compressor Oil Sight Glass (1)','Push Broom (1)','Eye Cover (1)','Legs Plexi Windows (2)']},
+  {id:'white',label:'Eye Room',tag:'White',color:'#9CA3AF',items:['Camera (1)','Corner Broom (1 up, 1 down)','Vacuum (1)','Dustpan (1 up, 1 down)','Short Push Broom (1)','Eye Cover (1)','Plexi Window (1)']},
+  {id:'gray',label:'Plant Office',tag:'Gray',color:'#4B5563',items:['T.V. Monitor (1)','Door Window (1)','Soap Dispenser (1)','Paper Towel Dispenser (1)','Corner Broom (1)','Dust Pan (1)','Sink Cupboard (1)','Bug Light (1)','Eye Wash (1)','Face Shields (4)','iPad (1)','Thermostat (1)','Lights (2)']},
+  {id:'yellow',label:'Warehouse West',tag:'Yellow',color:'#CA8A04',items:['Shovel (1)','Bug Light (1)','Lights (12)','Light Above Desk (1)','Fan Control','Camera (1)','Temp Gauge (2)','Corner Broom (1)']},
+  {id:'green',label:'Tunnel',tag:'Green',color:'#16A34A',items:['Corner Broom (1)','Curtain','Dustpan (1)','Blower','Vacuum (1) — hose (1), extensions (2), attachments (2)','Floor Sweeper','Battery / Charger (2)','Forklift Gauge Cover (2)']},
+  {id:'red',label:'Dock Area',tag:'Red',color:'#DC2626',items:['Shovel (1)','Corner Broom (1)','Camera Internet Service Box','Camera (2)','Work Lights','Overhead Light']}
+];
+const state = {};
+function buildZones() {
+  const container = document.getElementById('zones-container');
+  ZONES.forEach(zone => {
+    state[zone.id] = zone.items.map(label => ({label, result:'', comment:'', corrective:''}));
+    const card = document.createElement('div');
+    card.className = 'zone-card';
+    card.innerHTML = `<div class="zone-head"><div class="zone-dot" style="background:${zone.color};"></div><div class="zone-title">${zone.label} <span class="zone-tag">(${zone.tag})</span></div><div class="zone-prog" id="prog-${zone.id}">0 / ${zone.items.length}</div></div><div class="progress-wrap"><div class="progress-fill" id="fill-${zone.id}" style="width:0%;"></div></div><div id="list-${zone.id}"></div>`;
+    container.appendChild(card);
+    zone.items.forEach((label, i) => {
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `<div class="item-top"><div class="item-label">${label}</div><div class="acc-btns"><button class="btn-acc" id="acc-${zone.id}-${i}" onclick="setResult('${zone.id}',${i},'Acceptable')">✓ Acc</button><button class="btn-rej" id="rej-${zone.id}-${i}" onclick="setResult('${zone.id}',${i},'Rejected')">✗ Rej</button></div></div><div class="item-extra" id="extra-${zone.id}-${i}"><div><div class="extra-label">Comment</div><textarea rows="2" placeholder="Describe the issue..." oninput="state['${zone.id}'][${i}].comment=this.value"></textarea></div><div><div class="extra-label">Corrective Action</div><textarea rows="2" placeholder="What was done to fix it..." oninput="state['${zone.id}'][${i}].corrective=this.value"></textarea></div></div>`;
+      document.getElementById(`list-${zone.id}`).appendChild(row);
+    });
+  });
+}
+function setResult(zoneId, i, val) {
+  state[zoneId][i].result = val;
+  document.getElementById(`acc-${zoneId}-${i}`).className = 'btn-acc'+(val==='Acceptable'?' sel':'');
+  document.getElementById(`rej-${zoneId}-${i}`).className = 'btn-rej'+(val==='Rejected'?' sel':'');
+  document.getElementById(`extra-${zoneId}-${i}`).className = 'item-extra'+(val==='Rejected'?' show':'');
+  updateProgress(zoneId);
+}
+function updateProgress(zoneId) {
+  const items = state[zoneId];
+  const total = items.length;
+  const done = items.filter(v=>v.result).length;
+  document.getElementById(`prog-${zoneId}`).textContent = `${done} / ${total}`;
+  document.getElementById(`fill-${zoneId}`).style.width = `${(done/total)*100}%`;
+}
+async function submitAll() {
+  const date = document.getElementById('formDate').value;
+  const inspector = document.getElementById('inspector').value;
+  if(!date||!inspector){showToast('Please select date and inspector',true);return;}
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Date','Inspector','Zone','Zone Color','Item','Result','Comment','Corrective Action'];
+  const rows = [];
+  ZONES.forEach(zone => {
+    state[zone.id].forEach(item => {
+      rows.push([ts,date,inspector,zone.label,zone.tag,item.label,item.result,item.comment,item.corrective]);
+    });
+  });
+  try {
+    for(const row of rows){
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'GlassBrittlePlastics',headers,row})});
+    }
+    showToast('✓ Submitted to Google Sheets!',false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false;
+    btn.textContent='Submit to Google Sheets';
+  }
+}
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+document.getElementById('formDate').value=new Date().toISOString().split('T')[0];
+buildZones();
+</script>
+</body>
+</html>
