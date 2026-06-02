@@ -84,9 +84,13 @@ textarea{resize:none;}
 .mov-type.in{color:var(--green);}
 .mov-type.out{color:var(--red);}
 .mov-totes{font-weight:600;}
+.loading{text-align:center;padding:30px 20px;color:var(--muted);}
+.loading .spinner{font-size:28px;animation:spin 1s linear infinite;display:inline-block;margin-bottom:8px;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
+
 <div class="app-header">
   <h1>Harvest Ridge</h1>
   <div class="sub">Warehouse Management</div>
@@ -95,12 +99,16 @@ textarea{resize:none;}
     <button class="sync-btn" onclick="loadInventoryFromSheets()">↻ Refresh</button>
   </div>
 </div>
+
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('grading',this)">Grading</button>
   <button class="tab-btn" onclick="switchTab('inventory',this)">Inventory</button>
   <button class="tab-btn" onclick="switchTab('shipments',this)">Shipments</button>
 </div>
+
 <div class="content">
+
+  <!-- GRADING TAB -->
   <div class="section active" id="tab-grading">
     <div class="section-note">Complete a grading sheet for each incoming lot. Select crop type to load the correct grade fields.</div>
     <div class="card">
@@ -108,20 +116,42 @@ textarea{resize:none;}
       <div class="card-body">
         <div class="two-col">
           <div class="field-group"><div class="field-label">Date Graded</div><input type="date" id="g-date"></div>
-          <div class="field-group"><div class="field-label">Inspected By</div><select id="g-inspector"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option></select></div>
+          <div class="field-group"><div class="field-label">Inspected By</div>
+            <select id="g-inspector"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option></select>
+          </div>
         </div>
         <div class="field-group"><div class="field-label">Lot #</div><input type="text" id="g-lot" placeholder="e.g. BB26-001"></div>
         <div class="two-col">
-          <div class="field-group"><div class="field-label">Crop Type</div><select id="g-crop" onchange="loadGradeFields()"><option value="">Select crop...</option><option value="Corn">Org Yellow Corn</option><option value="Blue Corn">Org Blue Corn</option><option value="Soybean">Org Soybean</option><option value="Dry Bean">Org Dry Bean</option><option value="Black Bean">Org Black Beans</option><option value="Navy Bean">Org Navy Beans</option><option value="Pinto Bean">Org Pinto Beans</option><option value="Kidney Bean">Org Kidney Beans</option><option value="Small Red Bean">Org Small Red Beans</option><option value="Spelt">Org Spelt</option><option value="Wheat">Org Wheat</option><option value="Rye">Org Rye</option><option value="Peas">Org Peas</option><option value="Other">Other</option></select></div>
+          <div class="field-group"><div class="field-label">Crop Type</div>
+            <select id="g-crop" onchange="loadGradeFields()">
+              <option value="">Select crop...</option>
+              <option value="Corn">Org Yellow Corn</option>
+              <option value="Blue Corn">Org Blue Corn</option>
+              <option value="Soybean">Org Soybean</option>
+              <option value="Dry Bean">Org Dry Bean</option>
+              <option value="Black Bean">Org Black Beans</option>
+              <option value="Navy Bean">Org Navy Beans</option>
+              <option value="Pinto Bean">Org Pinto Beans</option>
+              <option value="Kidney Bean">Org Kidney Beans</option>
+              <option value="Small Red Bean">Org Small Red Beans</option>
+              <option value="Spelt">Org Spelt</option>
+              <option value="Wheat">Org Wheat</option>
+              <option value="Rye">Org Rye</option>
+              <option value="Peas">Org Peas</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
           <div class="field-group"><div class="field-label">Grower</div><input type="text" id="g-grower" placeholder="e.g. HRP, CWF..."></div>
         </div>
         <div class="field-group"><div class="field-label">Sample #</div><input type="text" id="g-sample" placeholder="e.g. 001"></div>
       </div>
     </div>
+
     <div class="card" id="grade-fields-card" style="display:none;">
       <div class="card-head">Grade Results <span style="font-size:11px;color:var(--muted);font-weight:400;text-transform:none;">400g sample</span></div>
       <div class="card-body" id="grade-fields-body"></div>
     </div>
+
     <div class="card">
       <div class="card-head">Tote Count & Weight</div>
       <div class="card-body">
@@ -132,6 +162,7 @@ textarea{resize:none;}
         <div class="field-group"><div class="field-label">Notes</div><textarea id="g-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
       </div>
     </div>
+
     <div class="card">
       <div class="card-head">Approval Status</div>
       <div class="card-body">
@@ -144,13 +175,23 @@ textarea{resize:none;}
     </div>
     <button class="submit-btn" id="gradeSubmitBtn" onclick="submitGrading()">Submit Grading Sheet</button>
   </div>
+
+  <!-- INVENTORY TAB -->
   <div class="section" id="tab-inventory">
     <div class="inv-filter">
       <input type="text" id="inv-search" placeholder="Search lot # or crop..." oninput="renderInventory()">
-      <select id="inv-filter-status" onchange="renderInventory()"><option value="">All Statuses</option><option value="Approved">Approved</option><option value="Pending">Pending</option><option value="Rejected">Rejected</option><option value="Depleted">Depleted</option></select>
+      <select id="inv-filter-status" onchange="renderInventory()">
+        <option value="">All Statuses</option>
+        <option value="Approved">Approved</option>
+        <option value="Pending">Pending</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Depleted">Depleted</option>
+      </select>
     </div>
     <div id="inventory-list"></div>
   </div>
+
+  <!-- SHIPMENTS TAB -->
   <div class="section" id="tab-shipments">
     <div id="ship-list-view">
       <div class="section-note">Select a lot to log an outgoing shipment. Totes will be deducted from inventory.</div>
@@ -161,23 +202,320 @@ textarea{resize:none;}
       <div id="ship-detail-content"></div>
     </div>
   </div>
+
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const GRADE_FIELDS={'Corn':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Broken/Cracked',unit:'%'},{label:'Different Colored',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Immature/Undersized',unit:'%'},{label:'Pieces per Ounce',unit:'ct'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Blue Corn':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Broken/Cracked',unit:'%'},{label:'Different Colored',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Immature/Undersized',unit:'%'},{label:'Pieces per Ounce',unit:'ct'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Soybean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Immature',unit:'%'},{label:'Soybeans of Other Color',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Dry Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Black Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Navy Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Pinto Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Kidney Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Small Red Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Spelt':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Wheat':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Rye':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Peas':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],'Other':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}]};
-let gradeStatus='';let gradeValues={};let inventory={};
-async function loadInventoryFromSheets(){document.getElementById('sync-status').textContent='⏳ Syncing...';try{const gradingResp=await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`);const gradingRows=JSON.parse(await gradingResp.text());const shipResp=await fetch(`${SCRIPT_URL}?tab=WarehouseShipments`);const shipRows=JSON.parse(await shipResp.text());inventory={};if(gradingRows.length>1){for(let i=1;i<gradingRows.length;i++){const r=gradingRows[i];const date=r[1],inspector=r[2],lotNum=r[3],sampleNum=r[4],crop=r[5],grower=r[6],status=r[7],totes=parseInt(r[8])||0,lbs=parseInt(r[9])||0,notes=r[10];if(!lotNum)continue;if(!inventory[lotNum]){inventory[lotNum]={lotNum,crop,grower,status,createdDate:date,inspector,sampleNum,totesIn:0,lbsIn:0,totesRemaining:0,lbsRemaining:0,notes,movements:[]};}inventory[lotNum].totesIn+=totes;inventory[lotNum].lbsIn+=lbs;inventory[lotNum].totesRemaining+=totes;inventory[lotNum].lbsRemaining+=lbs;inventory[lotNum].status=status;inventory[lotNum].movements.push({type:'IN',date,totes,lbs,by:inspector,notes});}}if(shipRows.length>1){for(let i=1;i<shipRows.length;i++){const r=shipRows[i];const date=r[1],lotNum=r[2],totes=parseInt(r[5])||0,lbs=parseInt(r[6])||0,buyer=r[7],bol=r[8],invoice=r[9],by=r[12],notes=r[13];if(!lotNum||!inventory[lotNum])continue;inventory[lotNum].totesRemaining=Math.max(0,inventory[lotNum].totesRemaining-totes);inventory[lotNum].lbsRemaining=Math.max(0,inventory[lotNum].lbsRemaining-lbs);if(inventory[lotNum].totesRemaining===0)inventory[lotNum].status='Depleted';inventory[lotNum].movements.push({type:'OUT',date,totes,lbs,by,buyer,bol,invoice,notes});}}const count=Object.keys(inventory).length;const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});document.getElementById('sync-status').textContent=`✓ ${count} lots synced at ${ts}`;renderInventory();renderShipList();}catch(err){document.getElementById('sync-status').textContent='⚠ Sync failed — check connection';showToast('Could not load inventory',true);}}
-function loadGradeFields(){const crop=document.getElementById('g-crop').value;const card=document.getElementById('grade-fields-card');const body=document.getElementById('grade-fields-body');if(!crop){card.style.display='none';return;}card.style.display='block';const fields=GRADE_FIELDS[crop]||GRADE_FIELDS['Other'];gradeValues={};body.innerHTML='';fields.forEach((f,i)=>{gradeValues[f.label]='';const row=document.createElement('div');row.className='grade-row';row.innerHTML=`<div class="grade-label">${f.label}</div><input class="grade-input" type="text" placeholder="—" id="gf-${i}" oninput="gradeValues['${f.label}']=this.value"><div class="grade-unit">${f.unit}</div>`;body.appendChild(row);});}
-function setGradeStatus(val){gradeStatus=val;['approved','pending','rejected'].forEach(s=>{document.getElementById(`sbtn-${s}`).className='status-btn'+(s===val.toLowerCase()?` sel-${s}`:'');});}
-async function submitGrading(){const date=document.getElementById('g-date').value;const inspector=document.getElementById('g-inspector').value;const lot=document.getElementById('g-lot').value.trim();const crop=document.getElementById('g-crop').value;const grower=document.getElementById('g-grower').value.trim();const totes=parseInt(document.getElementById('g-totes').value)||0;const lbs=parseInt(document.getElementById('g-lbs').value)||0;const notes=document.getElementById('g-notes').value;const sampleNum=document.getElementById('g-sample').value;if(!date||!inspector||!lot||!crop||!grower||!gradeStatus||totes<1){showToast('Please fill all required fields',true);return;}const btn=document.getElementById('gradeSubmitBtn');btn.disabled=true;btn.textContent='Submitting...';const ts=new Date().toLocaleString();const gradeHeaders=['Timestamp','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes',...Object.keys(gradeValues)];const gradeRow=[ts,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,...Object.values(gradeValues)];try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseGrading',headers:gradeHeaders,row:gradeRow})});await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes'],row:[ts,date,lot,crop,'IN',totes,lbs,inspector,notes]})});showToast(`✓ ${lot} submitted! Refreshing...`,false);btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';setTimeout(async()=>{document.getElementById('g-lot').value='';document.getElementById('g-crop').value='';document.getElementById('g-grower').value='';document.getElementById('g-sample').value='';document.getElementById('g-totes').value='';document.getElementById('g-lbs').value='';document.getElementById('g-notes').value='';document.getElementById('grade-fields-card').style.display='none';gradeStatus='';['approved','pending','rejected'].forEach(s=>document.getElementById(`sbtn-${s}`).className='status-btn');btn.disabled=false;btn.textContent='Submit Grading Sheet';btn.style.background='';await loadInventoryFromSheets();},2000);}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Submit Grading Sheet';}}
-function renderInventory(){const search=(document.getElementById('inv-search')?.value||'').toLowerCase();const statusFilter=document.getElementById('inv-filter-status')?.value||'';const list=document.getElementById('inventory-list');let lots=Object.values(inventory);if(search)lots=lots.filter(l=>l.lotNum.toLowerCase().includes(search)||l.crop.toLowerCase().includes(search)||(l.grower||'').toLowerCase().includes(search));if(statusFilter)lots=lots.filter(l=>l.status===statusFilter);if(lots.length===0){list.innerHTML='<div class="empty-state"><div class="big">📦</div><p>No lots found.<br>Grade incoming product to add inventory.</p></div>';return;}list.innerHTML='';lots.reverse().forEach(lot=>{const statusClass=lot.status==='Approved'?'pill-approved':lot.status==='Pending'?'pill-pending':lot.status==='Rejected'?'pill-rejected':'pill-depleted';const div=document.createElement('div');div.className='lot-card';div.innerHTML=`<div class="lot-head"><div><div class="lot-num">${lot.lotNum}</div><div class="lot-crop">${lot.crop} · ${lot.grower}</div></div><div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span></div></div><div class="lot-body"><div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Left</div></div><div class="lot-stat"><div class="lot-stat-val">${lot.totesIn}</div><div class="lot-stat-label">Totes In</div></div><div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Left</div></div></div><div style="padding:0 16px 12px;">${(lot.movements||[]).map(m=>`<div class="movement-row"><span class="mov-date">${m.date}</span><span class="mov-type ${m.type==='IN'?'in':'out'}">${m.type==='IN'?'↑ IN':'↓ OUT'} ${m.by||''}</span><span class="mov-totes">${m.type==='IN'?'+':'−'}${m.totes} totes</span></div>`).join('')}</div>`;list.appendChild(div);});}
-function showShipList(){document.getElementById('ship-list-view').style.display='block';document.getElementById('ship-detail-view').style.display='none';renderShipList();}
-function renderShipList(){const list=document.getElementById('ship-lots-list');const available=Object.values(inventory).filter(l=>l.totesRemaining>0&&l.status==='Approved');if(available.length===0){list.innerHTML='<div class="empty-state"><div class="big">🚚</div><p>No approved lots with totes remaining.</p></div>';return;}list.innerHTML='';available.forEach(lot=>{const div=document.createElement('div');div.className='ship-lot-row';div.onclick=()=>showShipDetail(lot.lotNum);div.innerHTML=`<div class="ship-lot-info"><div class="ship-lot-num">${lot.lotNum}</div><div class="ship-lot-meta">${lot.crop} · ${lot.grower} · ${(lot.lbsRemaining||0).toLocaleString()} lbs</div></div><div class="ship-lot-totes">${lot.totesRemaining} totes ›</div>`;list.appendChild(div);});}
-function showShipDetail(lotNum){const lot=inventory[lotNum];document.getElementById('ship-list-view').style.display='none';document.getElementById('ship-detail-view').style.display='block';document.getElementById('ship-detail-content').innerHTML=`<div class="card"><div class="card-head">${lot.lotNum} — ${lot.crop}</div><div class="card-body"><div class="three-col" style="margin-bottom:4px;"><div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Available</div></div><div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Available</div></div><div class="lot-stat"><div class="lot-stat-val" style="font-size:13px;">${lot.grower}</div><div class="lot-stat-label">Grower</div></div></div></div></div><div class="card"><div class="card-head">Log Outgoing Shipment</div><div class="card-body"><div class="field-group"><div class="field-label">Ship Date</div><input type="date" id="sh-date" value="${new Date().toISOString().split('T')[0]}"></div><div class="two-col"><div class="field-group"><div class="field-label">Totes Out</div><input type="number" id="sh-totes" min="1" max="${lot.totesRemaining}" placeholder="0"></div><div class="field-group"><div class="field-label">Lbs Out</div><input type="number" id="sh-lbs" min="0" placeholder="0"></div></div><div class="field-group"><div class="field-label">Buyer</div><input type="text" id="sh-buyer" placeholder="e.g. Amy's, HCI, Cargill..."></div><div class="two-col"><div class="field-group"><div class="field-label">BOL #</div><input type="text" id="sh-bol" placeholder="e.g. 03211"></div><div class="field-group"><div class="field-label">Invoice #</div><input type="text" id="sh-invoice" placeholder="e.g. HRP26-7"></div></div><div class="two-col"><div class="field-group"><div class="field-label">PO #</div><input type="text" id="sh-po" placeholder="Optional"></div><div class="field-group"><div class="field-label">Contract #</div><input type="text" id="sh-contract" placeholder="Optional"></div></div><div class="field-group"><div class="field-label">Shipped By</div><select id="sh-by"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option></select></div><div class="field-group"><div class="field-label">Notes</div><textarea id="sh-notes" rows="2" placeholder="Any notes..."></textarea></div></div></div><button class="submit-btn" id="shipSubmitBtn" onclick="submitShipment('${lotNum}')">Log Shipment & Deduct Inventory</button>`;}
-async function submitShipment(lotNum){const date=document.getElementById('sh-date').value;const totes=parseInt(document.getElementById('sh-totes').value)||0;const lbs=parseInt(document.getElementById('sh-lbs').value)||0;const buyer=document.getElementById('sh-buyer').value.trim();const bol=document.getElementById('sh-bol').value.trim();const invoice=document.getElementById('sh-invoice').value.trim();const po=document.getElementById('sh-po').value.trim();const contract=document.getElementById('sh-contract').value.trim();const by=document.getElementById('sh-by').value;const notes=document.getElementById('sh-notes').value;const lot=inventory[lotNum];if(!date||totes<1||!buyer||!by){showToast('Please fill required fields',true);return;}if(totes>lot.totesRemaining){showToast(`Only ${lot.totesRemaining} totes available`,true);return;}const btn=document.getElementById('shipSubmitBtn');btn.disabled=true;btn.textContent='Submitting...';const ts=new Date().toLocaleString();const headers=['Timestamp','Date','Lot #','Crop','Grower','Totes Out','Lbs Out','Buyer','BOL #','Invoice #','PO #','Contract #','Shipped By','Notes'];const row=[ts,date,lotNum,lot.crop,lot.grower,totes,lbs,buyer,bol,invoice,po,contract,by,notes];try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseShipments',headers,row})});await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes','Buyer'],row:[ts,date,lotNum,lot.crop,'OUT',totes,lbs,by,notes,buyer]})});showToast(`✓ ${totes} totes shipped from ${lotNum}!`,false);btn.textContent='✓ Logged!';btn.style.background='#1a5c1a';setTimeout(async()=>{await loadInventoryFromSheets();showShipList();},2000);}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Log Shipment & Deduct Inventory';}}
-function switchTab(name,btn){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).style.display='block';btn.classList.add('active');if(name==='inventory')renderInventory();if(name==='shipments')renderShipList();window.scrollTo(0,0);}
-function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3500);}
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+
+const GRADE_FIELDS = {
+  'Corn':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Broken/Cracked',unit:'%'},{label:'Different Colored',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Immature/Undersized',unit:'%'},{label:'Pieces per Ounce',unit:'ct'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Blue Corn':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Broken/Cracked',unit:'%'},{label:'Different Colored',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Immature/Undersized',unit:'%'},{label:'Pieces per Ounce',unit:'ct'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Soybean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Immature',unit:'%'},{label:'Soybeans of Other Color',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Dry Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Black Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Navy Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Pinto Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Kidney Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Small Red Bean':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Splits',unit:'%'},{label:'Damaged',unit:'%'},{label:'Beans of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Spelt':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Wheat':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Rye':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Shrunken/Broken',unit:'%'},{label:'Damaged',unit:'%'},{label:'Off Colored',unit:'%'},{label:'Grain of Other Classes',unit:'%'},{label:'Metal/Glass/Plastic',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Peas':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
+  'Other':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Damaged',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}]
+};
+
+let gradeStatus = '';
+let gradeValues = {};
+let inventory = {}; // keyed by lot #
+
+// ===== LOAD INVENTORY FROM SHEETS =====
+async function loadInventoryFromSheets() {
+  document.getElementById('sync-status').textContent = '⏳ Syncing...';
+  try {
+    // Load grading (IN movements)
+    const gradingResp = await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`);
+    const gradingText = await gradingResp.text();
+    const gradingRows = JSON.parse(gradingText);
+
+    // Load shipments (OUT movements)
+    const shipResp = await fetch(`${SCRIPT_URL}?tab=WarehouseShipments`);
+    const shipText = await shipResp.text();
+    const shipRows = JSON.parse(shipText);
+
+    inventory = {};
+
+    // Process grading rows (skip header row 0)
+    if(gradingRows.length > 1) {
+      for(let i = 1; i < gradingRows.length; i++) {
+        const r = gradingRows[i];
+        const ts=r[0],date=r[1],inspector=r[2],lotNum=r[3],sampleNum=r[4],crop=r[5],grower=r[6],status=r[7],totes=parseInt(r[8])||0,lbs=parseInt(r[9])||0,notes=r[10];
+        let gradeData={};try{gradeData=JSON.parse(r[11]||'{}');}catch(e){}
+        if(!lotNum) continue;
+        if(!inventory[lotNum]) {
+          inventory[lotNum] = {lotNum,crop,grower,status,createdDate:date,inspector,sampleNum,totesIn:0,lbsIn:0,totesRemaining:0,lbsRemaining:0,notes,gradeData,movements:[]};
+        }
+        inventory[lotNum].totesIn += totes;
+        inventory[lotNum].lbsIn += lbs;
+        inventory[lotNum].totesRemaining += totes;
+        inventory[lotNum].lbsRemaining += lbs;
+        inventory[lotNum].status = status;
+        inventory[lotNum].movements.push({type:'IN',date,totes,lbs,by:inspector,notes});
+      }
+    }
+
+    // Process shipment rows (subtract OUT movements)
+    if(shipRows.length > 1) {
+      for(let i = 1; i < shipRows.length; i++) {
+        const r = shipRows[i];
+        const ts=r[0],date=r[1],lotNum=r[2],crop=r[3],grower=r[4],totes=parseInt(r[5])||0,lbs=parseInt(r[6])||0,buyer=r[7],bol=r[8],invoice=r[9],po=r[10],contract=r[11],by=r[12],notes=r[13];
+        if(!lotNum || !inventory[lotNum]) continue;
+        inventory[lotNum].totesRemaining = Math.max(0, inventory[lotNum].totesRemaining - totes);
+        inventory[lotNum].lbsRemaining = Math.max(0, inventory[lotNum].lbsRemaining - lbs);
+        if(inventory[lotNum].totesRemaining === 0) inventory[lotNum].status = 'Depleted';
+        inventory[lotNum].movements.push({type:'OUT',date,totes,lbs,by,buyer,bol,invoice,notes});
+      }
+    }
+
+    const count = Object.keys(inventory).length;
+    const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    document.getElementById('sync-status').textContent = `✓ ${count} lots synced at ${ts}`;
+    renderInventory();
+    renderShipList();
+  } catch(err) {
+    document.getElementById('sync-status').textContent = '⚠ Sync failed — check connection';
+    showToast('Could not load inventory', true);
+  }
+}
+
+// ===== GRADE FIELDS =====
+function loadGradeFields() {
+  const crop = document.getElementById('g-crop').value;
+  const card = document.getElementById('grade-fields-card');
+  const body = document.getElementById('grade-fields-body');
+  if(!crop){card.style.display='none';return;}
+  card.style.display='block';
+  const fields = GRADE_FIELDS[crop]||GRADE_FIELDS['Other'];
+  gradeValues = {};
+  body.innerHTML = '';
+  fields.forEach((f,i) => {
+    gradeValues[f.label] = '';
+    const row = document.createElement('div');
+    row.className = 'grade-row';
+    row.innerHTML = `<div class="grade-label">${f.label}</div><input class="grade-input" type="text" placeholder="—" id="gf-${i}" oninput="gradeValues['${f.label}']=this.value"><div class="grade-unit">${f.unit}</div>`;
+    body.appendChild(row);
+  });
+}
+
+function setGradeStatus(val) {
+  gradeStatus = val;
+  ['approved','pending','rejected'].forEach(s => {
+    document.getElementById(`sbtn-${s}`).className = 'status-btn'+(s===val.toLowerCase()?` sel-${s}`:'');
+  });
+}
+
+async function submitGrading() {
+  const date=document.getElementById('g-date').value;
+  const inspector=document.getElementById('g-inspector').value;
+  const lot=document.getElementById('g-lot').value.trim();
+  const crop=document.getElementById('g-crop').value;
+  const grower=document.getElementById('g-grower').value.trim();
+  const totes=parseInt(document.getElementById('g-totes').value)||0;
+  const lbs=parseInt(document.getElementById('g-lbs').value)||0;
+  const notes=document.getElementById('g-notes').value;
+  const sampleNum=document.getElementById('g-sample').value;
+
+  if(!date||!inspector||!lot||!crop||!grower||!gradeStatus||totes<1){
+    showToast('Please fill all required fields',true);return;
+  }
+
+  const btn=document.getElementById('gradeSubmitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  const ts=new Date().toLocaleString();
+  const gradeHeaders=['Timestamp','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes','GradeData'];
+  const gradeRow=[ts,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,JSON.stringify(gradeValues)];
+
+  try {
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseGrading',headers:gradeHeaders,row:gradeRow})});
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes'],row:[ts,date,lot,crop,'IN',totes,lbs,inspector,notes]})});
+
+    showToast(`✓ ${lot} submitted! Refreshing inventory...`,false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+
+    // Reset form
+    setTimeout(async ()=>{
+      document.getElementById('g-lot').value='';
+      document.getElementById('g-crop').value='';
+      document.getElementById('g-grower').value='';
+      document.getElementById('g-sample').value='';
+      document.getElementById('g-totes').value='';
+      document.getElementById('g-lbs').value='';
+      document.getElementById('g-notes').value='';
+      document.getElementById('grade-fields-card').style.display='none';
+      gradeStatus='';
+      ['approved','pending','rejected'].forEach(s=>document.getElementById(`sbtn-${s}`).className='status-btn');
+      btn.disabled=false;btn.textContent='Submit Grading Sheet';btn.style.background='';
+      await loadInventoryFromSheets();
+    },2000);
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false;btn.textContent='Submit Grading Sheet';
+  }
+}
+
+// ===== INVENTORY =====
+function renderInventory() {
+  const search=(document.getElementById('inv-search')?.value||'').toLowerCase();
+  const statusFilter=document.getElementById('inv-filter-status')?.value||'';
+  const list=document.getElementById('inventory-list');
+  let lots=Object.values(inventory);
+  if(search) lots=lots.filter(l=>l.lotNum.toLowerCase().includes(search)||l.crop.toLowerCase().includes(search)||(l.grower||'').toLowerCase().includes(search));
+  if(statusFilter) lots=lots.filter(l=>l.status===statusFilter);
+  if(lots.length===0){
+    list.innerHTML='<div class="empty-state"><div class="big">📦</div><p>No lots found.<br>Grade incoming product to add inventory.</p></div>';return;
+  }
+  list.innerHTML='';
+  lots.reverse().forEach(lot=>{
+    const statusClass=lot.status==='Approved'?'pill-approved':lot.status==='Pending'?'pill-pending':lot.status==='Rejected'?'pill-rejected':'pill-depleted';
+    const div=document.createElement('div');
+    div.className='lot-card';
+    div.innerHTML=`
+      <div class="lot-head">
+        <div><div class="lot-num">${lot.lotNum}</div><div class="lot-crop">${lot.crop} · ${lot.grower}</div></div>
+        <div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span></div>
+      </div>
+      <div class="lot-body">
+        <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Left</div></div>
+        <div class="lot-stat"><div class="lot-stat-val">${lot.totesIn}</div><div class="lot-stat-label">Totes In</div></div>
+        <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Left</div></div>
+      </div>
+      <div style="padding:0 16px 12px;">
+        ${(lot.movements||[]).map(m=>`<div class="movement-row"><span class="mov-date">${m.date}</span><span class="mov-type ${m.type==='IN'?'in':'out'}">${m.type==='IN'?'↑ IN':'↓ OUT'} ${m.by||''}</span><span class="mov-totes">${m.type==='IN'?'+':'−'}${m.totes} totes</span></div>`).join('')}
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+// ===== SHIPMENTS =====
+function showShipList(){
+  document.getElementById('ship-list-view').style.display='block';
+  document.getElementById('ship-detail-view').style.display='none';
+  renderShipList();
+}
+
+function renderShipList(){
+  const list=document.getElementById('ship-lots-list');
+  const available=Object.values(inventory).filter(l=>l.totesRemaining>0&&l.status==='Approved');
+  if(available.length===0){
+    list.innerHTML='<div class="empty-state"><div class="big">🚚</div><p>No approved lots with totes remaining.</p></div>';return;
+  }
+  list.innerHTML='';
+  available.forEach(lot=>{
+    const div=document.createElement('div');
+    div.className='ship-lot-row';
+    div.onclick=()=>showShipDetail(lot.lotNum);
+    div.innerHTML=`<div class="ship-lot-info"><div class="ship-lot-num">${lot.lotNum}</div><div class="ship-lot-meta">${lot.crop} · ${lot.grower} · ${(lot.lbsRemaining||0).toLocaleString()} lbs</div></div><div class="ship-lot-totes">${lot.totesRemaining} totes ›</div>`;
+    list.appendChild(div);
+  });
+}
+
+function showShipDetail(lotNum){
+  const lot=inventory[lotNum];
+  document.getElementById('ship-list-view').style.display='none';
+  document.getElementById('ship-detail-view').style.display='block';
+  document.getElementById('ship-detail-content').innerHTML=`
+    <div class="card">
+      <div class="card-head">${lot.lotNum} — ${lot.crop}</div>
+      <div class="card-body">
+        <div class="three-col" style="margin-bottom:4px;">
+          <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Available</div></div>
+          <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Available</div></div>
+          <div class="lot-stat"><div class="lot-stat-val" style="font-size:13px;">${lot.grower}</div><div class="lot-stat-label">Grower</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">Log Outgoing Shipment</div>
+      <div class="card-body">
+        <div class="field-group"><div class="field-label">Ship Date</div><input type="date" id="sh-date" value="${new Date().toISOString().split('T')[0]}"></div>
+        <div class="two-col">
+          <div class="field-group"><div class="field-label">Totes Out</div><input type="number" id="sh-totes" min="1" max="${lot.totesRemaining}" placeholder="0"></div>
+          <div class="field-group"><div class="field-label">Lbs Out</div><input type="number" id="sh-lbs" min="0" placeholder="0"></div>
+        </div>
+        <div class="field-group"><div class="field-label">Buyer</div><input type="text" id="sh-buyer" placeholder="e.g. Amy's, HCI, Cargill..."></div>
+        <div class="two-col">
+          <div class="field-group"><div class="field-label">BOL #</div><input type="text" id="sh-bol" placeholder="e.g. 03211"></div>
+          <div class="field-group"><div class="field-label">Invoice #</div><input type="text" id="sh-invoice" placeholder="e.g. HRP26-7"></div>
+        </div>
+        <div class="two-col">
+          <div class="field-group"><div class="field-label">PO #</div><input type="text" id="sh-po" placeholder="Optional"></div>
+          <div class="field-group"><div class="field-label">Contract #</div><input type="text" id="sh-contract" placeholder="Optional"></div>
+        </div>
+        <div class="field-group"><div class="field-label">Shipped By</div>
+          <select id="sh-by"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option></select>
+        </div>
+        <div class="field-group"><div class="field-label">Notes</div><textarea id="sh-notes" rows="2" placeholder="Any notes..."></textarea></div>
+      </div>
+    </div>
+    <button class="submit-btn" id="shipSubmitBtn" onclick="submitShipment('${lotNum}')">Log Shipment & Deduct Inventory</button>
+  `;
+}
+
+async function submitShipment(lotNum){
+  const date=document.getElementById('sh-date').value;
+  const totes=parseInt(document.getElementById('sh-totes').value)||0;
+  const lbs=parseInt(document.getElementById('sh-lbs').value)||0;
+  const buyer=document.getElementById('sh-buyer').value.trim();
+  const bol=document.getElementById('sh-bol').value.trim();
+  const invoice=document.getElementById('sh-invoice').value.trim();
+  const po=document.getElementById('sh-po').value.trim();
+  const contract=document.getElementById('sh-contract').value.trim();
+  const by=document.getElementById('sh-by').value;
+  const notes=document.getElementById('sh-notes').value;
+  const lot=inventory[lotNum];
+
+  if(!date||totes<1||!buyer||!by){showToast('Please fill required fields',true);return;}
+  if(totes>lot.totesRemaining){showToast(`Only ${lot.totesRemaining} totes available`,true);return;}
+
+  const btn=document.getElementById('shipSubmitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+
+  const ts=new Date().toLocaleString();
+  const headers=['Timestamp','Date','Lot #','Crop','Grower','Totes Out','Lbs Out','Buyer','BOL #','Invoice #','PO #','Contract #','Shipped By','Notes'];
+  const row=[ts,date,lotNum,lot.crop,lot.grower,totes,lbs,buyer,bol,invoice,po,contract,by,notes];
+
+  try {
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseShipments',headers,row})});
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes','Buyer'],row:[ts,date,lotNum,lot.crop,'OUT',totes,lbs,by,notes,buyer]})});
+    showToast(`✓ ${totes} totes shipped from ${lotNum}!`,false);
+    btn.textContent='✓ Logged!';btn.style.background='#1a5c1a';
+    setTimeout(async()=>{await loadInventoryFromSheets();showShipList();},2000);
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false;btn.textContent='Log Shipment & Deduct Inventory';
+  }
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  if(name==='inventory')renderInventory();
+  if(name==='shipments')renderShipList();
+  window.scrollTo(0,0);
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3500);
+}
+
 document.getElementById('g-date').value=new Date().toISOString().split('T')[0];
 document.querySelectorAll('.section').forEach(s=>s.style.display='none');
 document.getElementById('tab-grading').style.display='block';
