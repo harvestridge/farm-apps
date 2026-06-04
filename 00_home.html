@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – App Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:14px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:24px 20px 20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1;}
+.app-header .sub{font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
+.app-header .date{font-size:12px;opacity:.6;margin-top:8px;}
+.content{padding:20px 16px;max-width:600px;margin:0 auto;}
+.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px 4px;}
+.app-btn{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;text-decoration:none;color:var(--text);transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.app-btn:active{background:#f0ede8;transform:scale(0.98);}
+.app-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.app-info{flex:1;}
+.app-name{font-size:15px;font-weight:600;margin-bottom:2px;}
+.app-desc{font-size:12px;color:var(--muted);line-height:1.4;}
+.app-arrow{font-size:20px;color:var(--muted);flex-shrink:0;}
+.green-icon{background:var(--green-pale);}
+.gold-icon{background:#fef3c7;}
+.blue-icon{background:#eff6ff;}
+.red-icon{background:#fdecea;}
+.footer{text-align:center;margin-top:30px;font-size:11px;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app-header">
+  <h1>Harvest Ridge</h1>
+  <div class="sub">Processing Apps</div>
+  <div class="date" id="today-date"></div>
+</div>
+<div class="content">
+  <div class="section-label">📋 Daily & Processing</div>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/01_daily_processing.html"><div class="app-icon green-icon">📋</div><div class="app-info"><div class="app-name">Daily Processing Sheet</div><div class="app-desc">Pre-Op, magnets, production log, knife inspection, Post-Op</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/02_packaging_inspection.html"><div class="app-icon green-icon">📦</div><div class="app-info"><div class="app-name">Packaging Inspection</div><div class="app-desc">Incoming packaging material receiving inspection</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/03_monthly_inspection.html"><div class="app-icon green-icon">🗓️</div><div class="app-info"><div class="app-name">Monthly Inspection</div><div class="app-desc">Food defense, food safety, cleanliness, equipment, pest control</div></div><div class="app-arrow">›</div></a>
+  <div class="section-label">🛡️ Food Safety</div>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/04_wood_register.html"><div class="app-icon gold-icon">🪵</div><div class="app-info"><div class="app-name">Wood Register</div><div class="app-desc">5 zone inspection — processing, warehouse, dock</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/05_glass_brittle_plastics.html"><div class="app-icon gold-icon">🔍</div><div class="app-info"><div class="app-name">Glass & Brittle Plastics</div><div class="app-desc">7 zone inspection — all glass and brittle plastic items</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/08_cleaning_schedule.html"><div class="app-icon gold-icon">🧹</div><div class="app-info"><div class="app-name">Master Cleaning Schedule</div><div class="app-desc">Monthly and yearly cleaning tasks — processing, warehouse, outside</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/09_chemical_inventory.html"><div class="app-icon gold-icon">🧪</div><div class="app-info"><div class="app-name">Chemical Inventory</div><div class="app-desc">Quarterly usage log — food grade and non-food grade chemicals</div></div><div class="app-arrow">›</div></a>
+  <div class="section-label">🔧 Maintenance</div>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/06_work_orders.html"><div class="app-icon blue-icon">🔧</div><div class="app-info"><div class="app-name">Work Orders</div><div class="app-desc">Report issues, track repairs, manager sign-off</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/07_pm_schedule.html"><div class="app-icon blue-icon">⚙️</div><div class="app-info"><div class="app-name">PM Schedule</div><div class="app-desc">Preventative maintenance — 32 pieces of equipment, vehicles</div></div><div class="app-arrow">›</div></a>
+  <div class="section-label">🏭 Warehouse</div>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/10_warehouse.html"><div class="app-icon red-icon">🌾</div><div class="app-info"><div class="app-name">Warehouse Management</div><div class="app-desc">Grading, live inventory, outgoing shipments</div></div><div class="app-arrow">›</div></a>
+  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/11_coa_generator.html"><div class="app-icon red-icon">📄</div><div class="app-info"><div class="app-name">COA Generator</div><div class="app-desc">Certificate of Analysis — 8 customer templates, auto-fills from grading</div></div><div class="app-arrow">›</div></a>
+  <div class="footer">Harvest Ridge Processing · Caro MI · All data saved to Google Sheets</div>
+</div>
+<script>
+const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const now=new Date();
+document.getElementById('today-date').textContent=`${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+</script>
+</body>
+</html>
