@@ -125,4 +125,159 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
 const PRE_OP=[
-  "OFFICE — Handwash station clean and stocked with paper towel, soap, hot water, trash can
+  "OFFICE — Handwash station clean and stocked with paper towel, soap, hot water, trash can emptied",
+  "OFFICE — Correct labels and packing material is staged",
+  "OFFICE — No food or beverages, counter clean",
+  "PROCESSING ROOM — All food contact surfaces are clean and in good repair",
+  "PROCESSING ROOM — All non-food contact areas clean and in good repair",
+  "PROCESSING ROOM — All cleaning equipment stored properly in designated location",
+  "OUTSIDE — Outside Bin, Conveyor, Legs clean and in good repair",
+  "OUTSIDE — No damage, pest activity, or evidence of tampering to structure or surrounding areas",
+  "WAREHOUSE — All equipment/tools clean and in good repair",
+  "WAREHOUSE — Clean, organized, product labeled, and stored in proper location"
+];
+const POST_OP=[
+  "OFFICE — Handwash station clean and stocked with paper towel, soap, hot water, trash can emptied",
+  "OFFICE — All paperwork complete",
+  "PROCESSING ROOM — All food contact surfaces are clean and in good repair",
+  "PROCESSING ROOM — All non-food contact areas clean and in good repair",
+  "PROCESSING ROOM — All cleaning equipment stored properly in designated location",
+  "PROCESSING ROOM — All in process product ran through line",
+  "OUTSIDE — Outside Bin, Conveyor, Legs clean and in good repair",
+  "OUTSIDE — No damage, pest activity, or evidence of tampering to structure or surrounding areas",
+  "WAREHOUSE — All equipment/tools clean and in good repair",
+  "WAREHOUSE — Clean, organized, product labeled, and stored in proper location",
+  "GENERAL — All equipment powered down, doors secured, lights off"
+];
+const MAGNETS=["Outside Plate","Main Line","Roller Mill","Self-Cleaning Magnet","Crush Line"];
+const EMPLOYEES=["Tyler","Allen","Andy","Tim","Aaron"];
+let preopState={},postopState={},magnetState={},knifeState={},taskRows=0;
+
+function makeCheckList(items,stateObj,containerId){
+  const container=document.getElementById(containerId);
+  items.forEach((label,i)=>{
+    stateObj[i]={label,result:'',initials:'',comment:''};
+    const wrapper=document.createElement('div');
+    const row=document.createElement('div');
+    row.className='check-row';
+    row.innerHTML=`
+      <span class="check-label">${label}</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn-pass check-btns" id="pass-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'pass')">✓ Pass</button>
+        <button class="btn-fail check-btns" id="fail-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'fail')">✗ Fail</button>
+        <input type="text" placeholder="Initials" maxlength="6" id="init-${containerId}-${i}" style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;" oninput="stateObj[${i}].initials=this.value">
+      </div>
+    `;
+    const extra=document.createElement('div');
+    extra.className='fail-extra';
+    extra.id=`extra-${containerId}-${i}`;
+    extra.innerHTML=`<textarea rows="2" placeholder="Describe issue / corrective action..." id="comment-${containerId}-${i}" oninput="stateObj[${i}].comment=this.value"></textarea>`;
+    wrapper.appendChild(row);
+    wrapper.appendChild(extra);
+    container.appendChild(wrapper);
+  });
+}
+
+function setCheck(containerId,i,val){
+  const stateObj=containerId==='preop-list'?preopState:postopState;
+  stateObj[i].result=val;
+  document.getElementById(`pass-${containerId}-${i}`).classList.toggle('active',val==='pass');
+  document.getElementById(`fail-${containerId}-${i}`).classList.toggle('active',val==='fail');
+  document.getElementById(`extra-${containerId}-${i}`).style.display=val==='fail'?'block':'none';
+}
+
+function renderMagnets(){
+  const list=document.getElementById('magnet-list');
+  MAGNETS.forEach((m,i)=>{
+    magnetState[i]={label:m,start:'',mid:'',end:''};
+    const row=document.createElement('div');
+    row.className='magnet-grid';
+    row.innerHTML=`<div style="font-size:13px;font-weight:500;">${m}</div><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].start=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].mid=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].end=this.value" style="text-align:center;">`;
+    list.appendChild(row);
+  });
+}
+
+function addTaskRow(){
+  const tbody=document.getElementById('task-body');
+  const i=taskRows++;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></td><td><input type="text" placeholder="Lot #" id="t-lot-${i}"></td><td><input type="time" id="t-start-${i}"></td><td><input type="time" id="t-end-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-totes-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-lbs-${i}"></td>`;
+  tbody.appendChild(tr);
+}
+
+function renderKnives(){
+  const list=document.getElementById('knife-list');
+  EMPLOYEES.forEach((emp,i)=>{
+    knifeState[i]={name:emp,result:''};
+    const row=document.createElement('div');
+    row.className='check-row';
+    row.innerHTML=`<span class="check-label" style="font-size:15px;font-weight:600;">${emp}</span><div style="display:flex;gap:8px;margin-top:6px;"><button class="btn-pass check-btns" id="kpass-${i}" onclick="setKnife(${i},'pass')">✓ Pass</button><button class="btn-fail check-btns" id="kfail-${i}" onclick="setKnife(${i},'fail')">✗ Fail</button></div>`;
+    list.appendChild(row);
+  });
+}
+
+function setKnife(i,val){
+  knifeState[i].result=val;
+  document.getElementById(`kpass-${i}`).classList.toggle('active',val==='pass');
+  document.getElementById(`kfail-${i}`).classList.toggle('active',val==='fail');
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  if(name==='review')buildReview();
+  window.scrollTo(0,0);
+}
+
+function buildReview(){
+  const date=document.getElementById('formDate').value||'(no date)';
+  const op=document.getElementById('operatorName').value||'(no operator)';
+  const preIssues=Object.values(preopState).filter(v=>v.result==='fail').length;
+  const postIssues=Object.values(postopState).filter(v=>v.result==='fail').length;
+  document.getElementById('review-summary').innerHTML=`<b>Date:</b> ${date}<br><b>Operator:</b> ${op}<br><b>Pre-Op Issues:</b> ${preIssues}<br><b>Post-Op Issues:</b> ${postIssues}<br><b>Production Rows:</b> ${taskRows}<br><br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>`;
+}
+
+async function submitAll(){
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+  const date=document.getElementById('formDate').value;
+  const operator=document.getElementById('operatorName').value;
+  const ts=new Date().toLocaleString();
+  const preopData=PRE_OP.map((label,i)=>[ts,date,operator,'Pre-Op',label,preopState[i]?.result||'',document.getElementById(`init-preop-list-${i}`)?.value||'',document.getElementById(`comment-preop-list-${i}`)?.value||'']);
+  const postopData=POST_OP.map((label,i)=>[ts,date,operator,'Post-Op',label,postopState[i]?.result||'',document.getElementById(`init-postop-list-${i}`)?.value||'',document.getElementById(`comment-postop-list-${i}`)?.value||'']);
+  const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.start||'',magnetState[i]?.mid||'',magnetState[i]?.end||'']);
+  const taskData=[];
+  for(let i=0;i<taskRows;i++){taskData.push([ts,date,operator,document.getElementById(`t-task-${i}`)?.value||'',document.getElementById(`t-lot-${i}`)?.value||'',document.getElementById(`t-start-${i}`)?.value||'',document.getElementById(`t-end-${i}`)?.value||'',document.getElementById(`t-totes-${i}`)?.value||'',document.getElementById(`t-lbs-${i}`)?.value||'']);}
+  const knifeData=EMPLOYEES.map((emp,i)=>[ts,date,operator,emp,knifeState[i]?.result||'']);
+  const h1=['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
+  const h2=['Timestamp','Date','Operator','Magnet','Shift Start','Mid Shift','Shift End'];
+  const h3=['Timestamp','Date','Operator','Task','Lot #','Start Time','End Time','Totes','Lbs'];
+  const h4=['Timestamp','Date','Operator','Employee','Knife Result'];
+  try{
+    for(const row of [...preopData,...postopData]){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h1,row})});}
+    for(const row of magnetData){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h2,row})});}
+    for(const row of taskData){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h3,row})});}
+    for(const row of knifeData){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h4,row})});}
+    showToast('✓ Submitted to Google Sheets!',false);
+    btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';
+  }catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false;btn.textContent='Submit to Google Sheets';
+  }
+}
+
+function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3000);}
+
+document.getElementById('formDate').value=new Date().toISOString().split('T')[0];
+makeCheckList(PRE_OP,preopState,'preop-list');
+makeCheckList(POST_OP,postopState,'postop-list');
+renderMagnets();
+renderKnives();
+addTaskRow();addTaskRow();
+document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+document.getElementById('tab-preop').style.display='block';
+</script>
+</body>
+</html>
