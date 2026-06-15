@@ -42,10 +42,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 .magnet-head{font-size:10px;font-weight:600;color:var(--muted);text-align:center;line-height:1.3;}
 .magnet-select{width:100%;padding:5px 3px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;background:white;}
 .magnet-select.red-flag{border-color:var(--red);background:#fdecea;color:var(--red);font-weight:700;}
-.task-table{width:100%;border-collapse:collapse;font-size:13px;}
-.task-table th{background:var(--green-pale);padding:8px;text-align:left;font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;}
-.task-table td{padding:6px 4px;border-bottom:1px solid #f0ece6;}
-.task-table input{padding:6px;border:1px solid var(--border);border-radius:6px;width:100%;font-size:12px;}
+.task-table{width:100%;border-collapse:collapse;font-size:12px;}
+.task-table th{background:var(--green-pale);padding:6px 4px;text-align:left;font-size:10px;font-weight:600;color:var(--green);text-transform:uppercase;white-space:nowrap;}
+.task-table td{padding:4px 3px;border-bottom:1px solid #f0ece6;}
+.task-table input{padding:5px 4px;border:1px solid var(--border);border-radius:6px;width:100%;font-size:12px;}
 .add-row-btn{margin-top:8px;padding:8px 16px;background:var(--green-pale);border:1px dashed var(--green);border-radius:8px;color:var(--green);font-size:13px;font-weight:600;cursor:pointer;width:100%;}
 .submit-btn{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:background .2s;}
 .submit-btn:hover{background:var(--green-light);}
@@ -100,12 +100,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
   </div>
 </div>
 <div class="section" id="tab-production">
-  <div class="section-note">Log each processing run. Add rows as needed.</div>
+  <div class="section-note">Log each processing run. Add rows as needed. Total Totes auto-calculates from Beginning and Ending Tote #.</div>
   <div class="card">
     <div class="card-head">Production Log</div>
     <div class="card-body" style="overflow-x:auto;">
       <table class="task-table">
-        <thead><tr><th>Task / Product</th><th>Lot #</th><th>Start</th><th>End</th><th>Totes</th><th>Lbs</th></tr></thead>
+        <thead><tr>
+          <th>Task</th><th>Start Time</th><th>End Time</th><th>Pkg Lot #</th><th>Product Lot #</th>
+          <th>Beg Tote #</th><th>End Tote #</th><th>Total Totes</th><th>Tote Wt</th><th>Total Lbs</th><th>Init</th><th>Comments</th>
+        </tr></thead>
         <tbody id="task-body"></tbody>
       </table>
       <button class="add-row-btn" onclick="addTaskRow()">+ Add Row</button>
@@ -241,8 +244,28 @@ function addTaskRow(){
   const tbody=document.getElementById('task-body');
   const i=taskRows++;
   const tr=document.createElement('tr');
-  tr.innerHTML=`<td><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></td><td><input type="text" placeholder="Lot #" id="t-lot-${i}"></td><td><input type="time" id="t-start-${i}"></td><td><input type="time" id="t-end-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-totes-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-lbs-${i}"></td>`;
+  tr.id=`task-${i}`;
+  tr.innerHTML=`
+    <td><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></td>
+    <td><input type="time" id="t-start-${i}"></td>
+    <td><input type="time" id="t-end-${i}"></td>
+    <td><input type="text" placeholder="Pkg Lot #" id="t-pkglot-${i}"></td>
+    <td><input type="text" placeholder="Product Lot #" id="t-prodlot-${i}"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-begtote-${i}" oninput="calcTotes(${i})"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-endtote-${i}" oninput="calcTotes(${i})"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-totaltotes-${i}"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-toteweight-${i}"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-lbs-${i}"></td>
+    <td><input type="text" placeholder="Init" maxlength="6" id="t-init-${i}" style="width:60px;"></td>
+    <td><input type="text" placeholder="Comments" id="t-comments-${i}"></td>
+  `;
   tbody.appendChild(tr);
+}
+
+function calcTotes(i){
+  const beg=parseInt(document.getElementById(`t-begtote-${i}`)?.value)||0;
+  const end=parseInt(document.getElementById(`t-endtote-${i}`)?.value)||0;
+  if(end>=beg&&end>0) document.getElementById(`t-totaltotes-${i}`).value=end-beg+1;
 }
 
 function renderKnives(){
@@ -278,10 +301,8 @@ function buildReview(){
   const postIssues=Object.values(postopState).filter(v=>v.result==='fail').length;
   const pieces=MAGNETS.filter((_,i)=>magnetState[i]?.startFind==='Pieces'||magnetState[i]?.midFind==='Pieces'||magnetState[i]?.endFind==='Pieces').length;
   document.getElementById('review-summary').innerHTML=`
-    <b>Date:</b> ${date}<br>
-    <b>Operator:</b> ${op}<br>
-    <b>Pre-Op Issues:</b> ${preIssues}<br>
-    <b>Post-Op Issues:</b> ${postIssues}<br>
+    <b>Date:</b> ${date}<br><b>Operator:</b> ${op}<br>
+    <b>Pre-Op Issues:</b> ${preIssues}<br><b>Post-Op Issues:</b> ${postIssues}<br>
     <b>Production Rows:</b> ${taskRows}<br>
     ${pieces>0?`<span style="color:var(--red);font-weight:600;">⚠ ${pieces} magnet(s) found PIECES — review required!</span><br>`:''}
     <br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>
@@ -298,11 +319,26 @@ async function submitAll(){
   const postopData=POST_OP.map((label,i)=>[ts,date,operator,'Post-Op',label,postopState[i]?.result||'',document.getElementById(`init-postop-list-${i}`)?.value||'',document.getElementById(`comment-postop-list-${i}`)?.value||'']);
   const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.startInit||'',magnetState[i]?.startFind||'',magnetState[i]?.midInit||'',magnetState[i]?.midFind||'',magnetState[i]?.endInit||'',magnetState[i]?.endFind||'']);
   const taskData=[];
-  for(let i=0;i<taskRows;i++){taskData.push([ts,date,operator,document.getElementById(`t-task-${i}`)?.value||'',document.getElementById(`t-lot-${i}`)?.value||'',document.getElementById(`t-start-${i}`)?.value||'',document.getElementById(`t-end-${i}`)?.value||'',document.getElementById(`t-totes-${i}`)?.value||'',document.getElementById(`t-lbs-${i}`)?.value||'']);}
+  for(let i=0;i<taskRows;i++){
+    taskData.push([ts,date,operator,
+      document.getElementById(`t-task-${i}`)?.value||'',
+      document.getElementById(`t-start-${i}`)?.value||'',
+      document.getElementById(`t-end-${i}`)?.value||'',
+      document.getElementById(`t-pkglot-${i}`)?.value||'',
+      document.getElementById(`t-prodlot-${i}`)?.value||'',
+      document.getElementById(`t-begtote-${i}`)?.value||'',
+      document.getElementById(`t-endtote-${i}`)?.value||'',
+      document.getElementById(`t-totaltotes-${i}`)?.value||'',
+      document.getElementById(`t-toteweight-${i}`)?.value||'',
+      document.getElementById(`t-lbs-${i}`)?.value||'',
+      document.getElementById(`t-init-${i}`)?.value||'',
+      document.getElementById(`t-comments-${i}`)?.value||''
+    ]);
+  }
   const knifeData=EMPLOYEES.map((emp,i)=>[ts,date,operator,emp,knifeState[i]?.result||'']);
   const h1=['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
   const h2=['Timestamp','Date','Operator','Magnet','Start Initials','Start Findings','Mid Initials','Mid Findings','End Initials','End Findings'];
-  const h3=['Timestamp','Date','Operator','Task','Lot #','Start Time','End Time','Totes','Lbs'];
+  const h3=['Timestamp','Date','Operator','Task','Start Time','End Time','Pkg Lot #','Product Lot #','Beg Tote #','End Tote #','Total Totes','Tote Weight','Total Lbs','Initials','Comments'];
   const h4=['Timestamp','Date','Operator','Employee','Knife Result'];
   try{
     for(const row of [...preopData,...postopData]){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h1,row})});}
