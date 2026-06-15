@@ -6,12 +6,7 @@
 <title>Harvest Ridge – Daily Processing</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;
-  --gold:#c8960c;--red:#c0392b;--red-light:#fdecea;
-  --bg:#f4f1eb;--card:#ffffff;--border:#d6cfc4;
-  --text:#1a1a1a;--muted:#6b6b6b;--radius:12px;
-}
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#ffffff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 .app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
@@ -21,7 +16,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
 .header-meta input::placeholder{color:rgba(255,255,255,.6);}
 .header-meta select option{color:#000;}
-.tab-bar{display:flex;overflow-x:auto;background:var(--green-light);gap:0;scrollbar-width:none;}
+.tab-bar{display:flex;overflow-x:auto;background:var(--green-light);scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
 .tab-btn{flex:0 0 auto;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
 .tab-btn.active{color:white;border-bottom-color:var(--gold);}
@@ -33,21 +28,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .card-body{padding:12px 16px;}
 .check-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0ece6;}
 .check-row:last-child{border-bottom:none;}
-.check-label{flex:1;font-size:14px;}
-.check-btns{display:flex;gap:6px;}
-.check-btns button{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.check-label{flex:1;font-size:13px;line-height:1.4;}
+.check-btns{display:flex;gap:6px;flex-shrink:0;}
+.check-btns button{padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
 .btn-pass.active{background:#2d6a2d;border-color:#2d6a2d;color:white;}
 .btn-fail.active{background:var(--red);border-color:var(--red);color:white;}
-.initials-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
-.initials-row label{font-size:12px;color:var(--muted);}
-.initials-row input{width:60px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;}
 .fail-extra{background:var(--red-light);border-radius:8px;padding:10px;margin-top:8px;display:none;}
 .fail-extra textarea{width:100%;border:1px solid #f5c6c3;border-radius:6px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;background:white;}
-.field-group{margin-bottom:12px;}
 .field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
 input[type=text],input[type=number],input[type=time],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
-.magnet-grid{display:grid;grid-template-columns:1fr 80px 80px 80px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece6;font-size:13px;}
+.magnet-grid{display:grid;grid-template-columns:1fr 70px 70px 70px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece6;font-size:13px;}
 .magnet-grid:last-child{border-bottom:none;}
 .magnet-grid input{padding:7px;text-align:center;}
 .magnet-head{font-size:11px;font-weight:600;color:var(--muted);text-align:center;}
@@ -59,10 +50,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 .submit-btn{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:background .2s;}
 .submit-btn:hover{background:var(--green-light);}
 .submit-btn:disabled{background:#aaa;cursor:not-allowed;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;text-align:center;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
 .toast.show{opacity:1;}
 .toast.error{background:var(--red);}
 .section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.initials-input{width:64px;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -91,7 +83,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 <div class="content">
 
 <div class="section active" id="tab-preop">
-  <div class="section-note">Inspect each area before the shift begins. Tap ✓ or ✗ and add initials.</div>
+  <div class="section-note">Inspect each area before the shift begins. Tap Pass or Fail and add initials.</div>
   <div id="preop-list"></div>
 </div>
 
@@ -154,8 +146,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const PRE_OP=[
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+
+const PRE_OP = [
   "OFFICE — Handwash station clean and stocked with paper towel, soap, hot water, trash can emptied",
   "OFFICE — Correct labels and packing material is staged",
   "OFFICE — No food or beverages, counter clean",
@@ -167,7 +160,8 @@ const PRE_OP=[
   "WAREHOUSE — All equipment/tools clean and in good repair",
   "WAREHOUSE — Clean, organized, product labeled, and stored in proper location"
 ];
-const POST_OP=[
+
+const POST_OP = [
   "OFFICE — Handwash station clean and stocked with paper towel, soap, hot water, trash can emptied",
   "OFFICE — All paperwork complete",
   "PROCESSING ROOM — All food contact surfaces are clean and in good repair",
@@ -180,20 +174,221 @@ const POST_OP=[
   "WAREHOUSE — Clean, organized, product labeled, and stored in proper location",
   "GENERAL — All equipment powered down, doors secured, lights off"
 ];
-const MAGNETS=["Outside Plate","Main Line","Roller Mill","Self-Cleaning Magnet","Crush Line"];
-const EMPLOYEES=["Tyler","Allen","Andy","Tim","Aaron"];
-let preopState={},postopState={},magnetState={},knifeState={},taskRows=0;
-function makeCheckRow(label,stateObj,containerId,idx){const row=document.createElement('div');row.className='check-row';row.innerHTML=`<div class="check-label">${label}</div><div class="check-btns"><button class="btn-pass" id="pass-${containerId}-${idx}" onclick="setCheck('${containerId}','${idx}','pass')">✓ Pass</button><button class="btn-fail" id="fail-${containerId}-${idx}" onclick="setCheck('${containerId}','${idx}','fail')">✗ Fail</button></div><input placeholder="Initials" style="width:64px;padding:6px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;" id="init-${containerId}-${idx}">`;const extra=document.createElement('div');extra.className='fail-extra';extra.id=`extra-${containerId}-${idx}`;extra.innerHTML=`<textarea rows="2" placeholder="Describe issue / corrective action..." id="comment-${containerId}-${idx}"></textarea>`;const wrapper=document.createElement('div');wrapper.style.cssText='padding:0 0 4px;';wrapper.appendChild(row);wrapper.appendChild(extra);document.getElementById(containerId).appendChild(wrapper);stateObj[idx]={label,result:'',initials:'',comment:''};}
-function setCheck(container,idx,val){const stateObj=container==='preop-list'?preopState:postopState;stateObj[idx].result=val;document.getElementById(`pass-${container}-${idx}`).classList.toggle('active',val==='pass');document.getElementById(`fail-${container}-${idx}`).classList.toggle('active',val==='fail');document.getElementById(`extra-${container}-${idx}`).style.display=val==='fail'?'block':'none';}
-function renderMagnets(){const list=document.getElementById('magnet-list');MAGNETS.forEach((m,i)=>{magnetState[i]={label:m,start:'',mid:'',end:''};const row=document.createElement('div');row.className='magnet-grid';row.innerHTML=`<div style="font-size:13px;font-weight:500;">${m}</div><input type="text" placeholder="—" maxlength="4" oninput="magnetState[${i}].start=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="4" oninput="magnetState[${i}].mid=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="4" oninput="magnetState[${i}].end=this.value" style="text-align:center;">`;list.appendChild(row);});}
-function addTaskRow(){const tbody=document.getElementById('task-body');const i=taskRows++;const tr=document.createElement('tr');tr.innerHTML=`<td><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></td><td><input type="text" placeholder="Lot #" id="t-lot-${i}"></td><td><input type="time" id="t-start-${i}"></td><td><input type="time" id="t-end-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-totes-${i}"></td><td><input type="number" min="0" placeholder="0" id="t-lbs-${i}"></td>`;tbody.appendChild(tr);}
-function renderKnives(){const list=document.getElementById('knife-list');EMPLOYEES.forEach((emp,i)=>{knifeState[i]={name:emp,result:''};const row=document.createElement('div');row.className='check-row';row.innerHTML=`<div class="check-label" style="font-size:15px;font-weight:500;">${emp}</div><div class="check-btns"><button class="btn-pass" id="kpass-${i}" onclick="setKnife(${i},'pass')">✓ Pass</button><button class="btn-fail" id="kfail-${i}" onclick="setKnife(${i},'fail')">✗ Fail</button></div>`;list.appendChild(row);});}
-function setKnife(i,val){knifeState[i].result=val;document.getElementById(`kpass-${i}`).classList.toggle('active',val==='pass');document.getElementById(`kfail-${i}`).classList.toggle('active',val==='fail');}
-function switchTab(name,btn){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).style.display='block';btn.classList.add('active');if(name==='review')buildReview();window.scrollTo(0,0);}
-function buildReview(){const date=document.getElementById('formDate').value||'(no date)';const op=document.getElementById('operatorName').value||'(no operator)';const preIssues=Object.values(preopState).filter(v=>v.result==='fail').length;const postIssues=Object.values(postopState).filter(v=>v.result==='fail').length;document.getElementById('review-summary').innerHTML=`<b>Date:</b> ${date}<br><b>Operator:</b> ${op}<br><b>Pre-Op Issues:</b> ${preIssues}<br><b>Post-Op Issues:</b> ${postIssues}<br><b>Production Rows:</b> ${taskRows}<br><br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>`;}
-async function submitAll(){const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Submitting...';const date=document.getElementById('formDate').value;const operator=document.getElementById('operatorName').value;const ts=new Date().toLocaleString();const preopData=PRE_OP.map((label,i)=>[ts,date,operator,'Pre-Op',label,preopState[i]?.result||'',document.getElementById(`init-preop-list-${i}`)?.value||'',document.getElementById(`comment-preop-list-${i}`)?.value||'']);const postopData=POST_OP.map((label,i)=>[ts,date,operator,'Post-Op',label,postopState[i]?.result||'',document.getElementById(`init-postop-list-${i}`)?.value||'',document.getElementById(`comment-postop-list-${i}`)?.value||'']);const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.start||'',magnetState[i]?.mid||'',magnetState[i]?.end||'']);const taskData=[];for(let i=0;i<taskRows;i++){taskData.push([ts,date,operator,document.getElementById(`t-task-${i}`)?.value||'',document.getElementById(`t-lot-${i}`)?.value||'',document.getElementById(`t-start-${i}`)?.value||'',document.getElementById(`t-end-${i}`)?.value||'',document.getElementById(`t-totes-${i}`)?.value||'',document.getElementById(`t-lbs-${i}`)?.value||'']);}const knifeData=EMPLOYEES.map((emp,i)=>[ts,date,operator,emp,knifeState[i]?.result||'']);const blocks=[{tab:'DailyProcessing',headers:['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'],rows:[...preopData,...postopData]},{tab:'DailyProcessing',headers:['Timestamp','Date','Operator','Magnet','Shift Start','Mid Shift','Shift End'],rows:magnetData},{tab:'DailyProcessing',headers:['Timestamp','Date','Operator','Task','Lot #','Start Time','End Time','Totes','Lbs'],rows:taskData},{tab:'DailyProcessing',headers:['Timestamp','Date','Operator','Employee','Knife Result'],rows:knifeData}];try{for(const block of blocks){if(block.rows.length===0)continue;for(const row of block.rows){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:block.tab,headers:block.headers,row});}}}}showToast('✓ Submitted to Google Sheets!',false);btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Submit to Google Sheets';}}
-function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3000);}
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('formDate').value=new Date().toISOString().split('T')[0];PRE_OP.forEach((label,i)=>makeCheckRow(label,preopState,'preop-list',i));POST_OP.forEach((label,i)=>makeCheckRow(label,postopState,'postop-list',i));renderMagnets();renderKnives();addTaskRow();addTaskRow();document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.getElementById('tab-preop').style.display='block';});
+
+const MAGNETS = ["Outside Plate","Main Line","Roller Mill","Self-Cleaning Magnet","Crush Line"];
+const EMPLOYEES = ["Tyler","Allen","Andy","Tim","Aaron"];
+
+let preopState = {}, postopState = {}, magnetState = {}, knifeState = {}, taskRows = 0;
+
+function makeCheckList(items, stateObj, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  items.forEach((label, i) => {
+    stateObj[i] = {label, result:'', initials:'', comment:''};
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:4px;';
+
+    const row = document.createElement('div');
+    row.className = 'check-row';
+    row.innerHTML = `
+      <div class="check-label">${label}</div>
+      <div class="check-btns">
+        <button class="btn-pass" id="pass-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'pass')">✓ Pass</button>
+        <button class="btn-fail" id="fail-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'fail')">✗ Fail</button>
+      </div>
+      <input class="initials-input" type="text" placeholder="Init" maxlength="6" id="init-${containerId}-${i}" oninput="stateObj[${i}].initials=this.value">
+    `;
+
+    const extra = document.createElement('div');
+    extra.className = 'fail-extra';
+    extra.id = `extra-${containerId}-${i}`;
+    extra.innerHTML = `<textarea rows="2" placeholder="Describe issue / corrective action..." id="comment-${containerId}-${i}" oninput="stateObj[${i}].comment=this.value"></textarea>`;
+
+    wrapper.appendChild(row);
+    wrapper.appendChild(extra);
+    container.appendChild(wrapper);
+  });
+}
+
+function setCheck(containerId, i, val) {
+  const stateObj = containerId === 'preop-list' ? preopState : postopState;
+  stateObj[i].result = val;
+  document.getElementById(`pass-${containerId}-${i}`).classList.toggle('active', val==='pass');
+  document.getElementById(`fail-${containerId}-${i}`).classList.toggle('active', val==='fail');
+  document.getElementById(`extra-${containerId}-${i}`).style.display = val==='fail' ? 'block' : 'none';
+}
+
+function renderMagnets() {
+  const list = document.getElementById('magnet-list');
+  MAGNETS.forEach((m,i) => {
+    magnetState[i] = {label:m, start:'', mid:'', end:''};
+    const row = document.createElement('div');
+    row.className = 'magnet-grid';
+    row.innerHTML = `
+      <div style="font-size:13px;font-weight:500;">${m}</div>
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].start=this.value" style="text-align:center;">
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].mid=this.value" style="text-align:center;">
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].end=this.value" style="text-align:center;">
+    `;
+    list.appendChild(row);
+  });
+}
+
+function addTaskRow() {
+  const tbody = document.getElementById('task-body');
+  const i = taskRows++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></td>
+    <td><input type="text" placeholder="Lot #" id="t-lot-${i}"></td>
+    <td><input type="time" id="t-start-${i}"></td>
+    <td><input type="time" id="t-end-${i}"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-totes-${i}"></td>
+    <td><input type="number" min="0" placeholder="0" id="t-lbs-${i}"></td>
+  `;
+  tbody.appendChild(tr);
+}
+
+function renderKnives() {
+  const list = document.getElementById('knife-list');
+  EMPLOYEES.forEach((emp,i) => {
+    knifeState[i] = {name:emp, result:''};
+    const row = document.createElement('div');
+    row.className = 'check-row';
+    row.innerHTML = `
+      <div class="check-label" style="font-size:15px;font-weight:500;">${emp}</div>
+      <div class="check-btns">
+        <button class="btn-pass" id="kpass-${i}" onclick="setKnife(${i},'pass')">✓ Pass</button>
+        <button class="btn-fail" id="kfail-${i}" onclick="setKnife(${i},'fail')">✗ Fail</button>
+      </div>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function setKnife(i, val) {
+  knifeState[i].result = val;
+  document.getElementById(`kpass-${i}`).classList.toggle('active', val==='pass');
+  document.getElementById(`kfail-${i}`).classList.toggle('active', val==='fail');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  if(name==='review') buildReview();
+  window.scrollTo(0,0);
+}
+
+function buildReview() {
+  const date = document.getElementById('formDate').value || '(no date)';
+  const op = document.getElementById('operatorName').value || '(no operator)';
+  const preIssues = Object.values(preopState).filter(v=>v.result==='fail').length;
+  const postIssues = Object.values(postopState).filter(v=>v.result==='fail').length;
+  document.getElementById('review-summary').innerHTML = `
+    <b>Date:</b> ${date}<br>
+    <b>Operator:</b> ${op}<br>
+    <b>Pre-Op Issues:</b> ${preIssues}<br>
+    <b>Post-Op Issues:</b> ${postIssues}<br>
+    <b>Production Rows:</b> ${taskRows}<br><br>
+    <span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>
+  `;
+}
+
+async function submitAll() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const date = document.getElementById('formDate').value;
+  const operator = document.getElementById('operatorName').value;
+  const ts = new Date().toLocaleString();
+
+  const preopData = PRE_OP.map((label,i) => [
+    ts, date, operator, 'Pre-Op', label,
+    preopState[i]?.result||'',
+    document.getElementById(`init-preop-list-${i}`)?.value||'',
+    document.getElementById(`comment-preop-list-${i}`)?.value||''
+  ]);
+
+  const postopData = POST_OP.map((label,i) => [
+    ts, date, operator, 'Post-Op', label,
+    postopState[i]?.result||'',
+    document.getElementById(`init-postop-list-${i}`)?.value||'',
+    document.getElementById(`comment-postop-list-${i}`)?.value||''
+  ]);
+
+  const magnetData = MAGNETS.map((label,i) => [
+    ts, date, operator, label,
+    magnetState[i]?.start||'', magnetState[i]?.mid||'', magnetState[i]?.end||''
+  ]);
+
+  const taskData = [];
+  for(let i=0;i<taskRows;i++){
+    taskData.push([
+      ts, date, operator,
+      document.getElementById(`t-task-${i}`)?.value||'',
+      document.getElementById(`t-lot-${i}`)?.value||'',
+      document.getElementById(`t-start-${i}`)?.value||'',
+      document.getElementById(`t-end-${i}`)?.value||'',
+      document.getElementById(`t-totes-${i}`)?.value||'',
+      document.getElementById(`t-lbs-${i}`)?.value||''
+    ]);
+  }
+
+  const knifeData = EMPLOYEES.map((emp,i) => [
+    ts, date, operator, emp, knifeState[i]?.result||''
+  ]);
+
+  const headers_check = ['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
+  const headers_mag = ['Timestamp','Date','Operator','Magnet','Shift Start','Mid Shift','Shift End'];
+  const headers_task = ['Timestamp','Date','Operator','Task','Lot #','Start Time','End Time','Totes','Lbs'];
+  const headers_knife = ['Timestamp','Date','Operator','Employee','Knife Result'];
+
+  const allRows = [
+    ...[...preopData,...postopData].map(row=>({headers:headers_check,row})),
+    ...magnetData.map(row=>({headers:headers_mag,row})),
+    ...taskData.map(row=>({headers:headers_task,row})),
+    ...knifeData.map(row=>({headers:headers_knife,row}))
+  ];
+
+  try {
+    for(const item of allRows) {
+      await fetch(SCRIPT_URL, {
+        method:'POST',
+        mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({tab:'DailyProcessing', headers:item.headers, row:item.row})
+      });
+    }
+    showToast('✓ Submitted to Google Sheets!', false);
+    btn.textContent = '✓ Submitted!';
+    btn.style.background = '#1a5c1a';
+  } catch(err) {
+    showToast('Error — check connection', true);
+    btn.disabled = false;
+    btn.textContent = 'Submit to Google Sheets';
+  }
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(()=>t.className='toast', 3000);
+}
+
+// INIT
+document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+makeCheckList(PRE_OP, preopState, 'preop-list');
+makeCheckList(POST_OP, postopState, 'postop-list');
+renderMagnets();
+renderKnives();
+addTaskRow();
+addTaskRow();
+document.querySelectorAll('.section').forEach(s => s.style.display='none');
+document.getElementById('tab-preop').style.display='block';
 </script>
 </body>
 </html>
