@@ -18,7 +18,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .header-meta select option{color:#000;}
 .tab-bar{display:flex;overflow-x:auto;background:var(--green-light);scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:0 0 auto;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
+.tab-btn{flex:0 0 auto;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
 .tab-btn.active{color:white;border-bottom-color:var(--gold);}
 .content{padding:16px;max-width:680px;margin:0 auto;}
 .section{display:none;}
@@ -76,13 +76,14 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
   <button class="tab-btn" onclick="switchTab('prod2',this)">Line 2</button>
   <button class="tab-btn" onclick="switchTab('knives',this)">Knives</button>
   <button class="tab-btn" onclick="switchTab('postop',this)">Post-Op</button>
-  <button class="tab-btn" onclick="switchTab('review',this)">Submit</button>
+  <button class="tab-btn" onclick="switchTab('review',this)">Review</button>
 </div>
 <div class="content">
 
 <div class="section active" id="tab-preop">
   <div class="section-note">Inspect each area before the shift begins. Tap Pass or Fail and add initials.</div>
   <div class="card"><div class="card-body" id="preop-list"></div></div>
+  <button class="submit-btn" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-magnets">
@@ -102,36 +103,41 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
       <div id="magnet-list"></div>
     </div>
   </div>
+  <button class="submit-btn" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-prod1">
   <div class="section-note">Log production runs for <strong>Line 1</strong>. Add rows as needed.</div>
   <div id="task-body-1"></div>
   <button class="add-row-btn" onclick="addTaskRow(1)">+ Add Line 1 Run</button>
+  <button class="submit-btn" style="margin-top:8px;" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-prod2">
   <div class="section-note">Log production runs for <strong>Line 2</strong>. Add rows as needed.</div>
   <div id="task-body-2"></div>
   <button class="add-row-btn" onclick="addTaskRow(2)">+ Add Line 2 Run</button>
+  <button class="submit-btn" style="margin-top:8px;" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-knives">
   <div class="section-note">Record knife inspection for each employee. Use N/A if employee does not carry a knife.</div>
   <div class="card"><div class="card-head">Knife Inspection</div><div class="card-body" id="knife-list"></div></div>
+  <button class="submit-btn" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-postop">
   <div class="section-note">Inspect each area after the shift ends.</div>
   <div class="card"><div class="card-body" id="postop-list"></div></div>
+  <button class="submit-btn" onclick="submitAll()">Submit to Google Sheets</button>
 </div>
 
 <div class="section" id="tab-review">
   <div class="card">
-    <div class="card-head">Ready to Submit?</div>
+    <div class="card-head">Summary</div>
     <div class="card-body">
       <div id="review-summary" style="font-size:14px;line-height:2;margin-bottom:12px;"></div>
-      <button class="submit-btn" id="submitBtn" onclick="submitAll()">Submit to Google Sheets</button>
+      <button class="submit-btn" onclick="submitAll()">Submit to Google Sheets</button>
     </div>
   </div>
 </div>
@@ -241,8 +247,7 @@ function setMagnetFind(i,period,val){
   const keyMap={s:'startFind',m:'midFind',e:'endFind'};
   const idMap={s:`msf-${i}-s`,m:`msf-${i}-m`,e:`msf-${i}-e`};
   magnetState[i][keyMap[period]]=val;
-  const sel=document.getElementById(idMap[period]);
-  sel.className=val==='Pieces'?'magnet-select red-flag':'magnet-select';
+  document.getElementById(idMap[period]).className=val==='Pieces'?'magnet-select red-flag':'magnet-select';
 }
 
 function addTaskRow(line){
@@ -341,8 +346,8 @@ function buildReview(){
 }
 
 async function submitAll(){
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true;btn.textContent='Submitting...';
+  const btns=document.querySelectorAll('.submit-btn');
+  btns.forEach(b=>{b.disabled=true;b.textContent='Submitting...';});
   const date=document.getElementById('formDate').value;
   const operator=document.getElementById('operatorName').value;
   const ts=new Date().toLocaleString();
@@ -368,10 +373,10 @@ async function submitAll(){
     for(const row of taskData){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h3,row})});}
     for(const row of knifeData){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h4,row})});}
     showToast('✓ Submitted to Google Sheets!',false);
-    btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';
+    btns.forEach(b=>{b.textContent='✓ Submitted!';b.style.background='#1a5c1a';});
   }catch(err){
     showToast('Error — check connection',true);
-    btn.disabled=false;btn.textContent='Submit to Google Sheets';
+    btns.forEach(b=>{b.disabled=false;b.textContent='Submit to Google Sheets';b.style.background='';});
   }
 }
 
