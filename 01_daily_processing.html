@@ -18,7 +18,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .header-meta select option{color:#000;}
 .tab-bar{display:flex;overflow-x:auto;background:var(--green-light);scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:0 0 auto;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
+.tab-btn{flex:0 0 auto;padding:10px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
 .tab-btn.active{color:white;border-bottom-color:var(--gold);}
 .content{padding:16px;max-width:680px;margin:0 auto;}
 .section{display:none;}
@@ -29,7 +29,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .check-row{display:block;padding:12px 0;border-bottom:1px solid #f0ece6;}
 .check-row:last-child{border-bottom:none;}
 .check-label{font-size:13px;line-height:1.5;font-weight:500;margin-bottom:8px;display:block;}
-.check-btns{display:flex;gap:6px;}
 .check-btns button{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
 .btn-pass.active{background:#2d6a2d;border-color:#2d6a2d;color:white;}
 .btn-fail.active{background:var(--red);border-color:var(--red);color:white;}
@@ -73,7 +72,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('preop',this)">Pre-Op</button>
   <button class="tab-btn" onclick="switchTab('magnets',this)">Magnets</button>
-  <button class="tab-btn" onclick="switchTab('production',this)">Production</button>
+  <button class="tab-btn" onclick="switchTab('prod1',this)">Line 1</button>
+  <button class="tab-btn" onclick="switchTab('prod2',this)">Line 2</button>
   <button class="tab-btn" onclick="switchTab('knives',this)">Knives</button>
   <button class="tab-btn" onclick="switchTab('postop',this)">Post-Op</button>
   <button class="tab-btn" onclick="switchTab('review',this)">Submit</button>
@@ -104,10 +104,16 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
   </div>
 </div>
 
-<div class="section" id="tab-production">
-  <div class="section-note">Log each processing run. Add rows as needed. Total Totes auto-calculates from Beg and End Tote #.</div>
-  <div id="task-body"></div>
-  <button class="add-row-btn" onclick="addTaskRow()">+ Add Row</button>
+<div class="section" id="tab-prod1">
+  <div class="section-note">Log production runs for <strong>Line 1</strong>. Add rows as needed.</div>
+  <div id="task-body-1"></div>
+  <button class="add-row-btn" onclick="addTaskRow(1)">+ Add Line 1 Run</button>
+</div>
+
+<div class="section" id="tab-prod2">
+  <div class="section-note">Log production runs for <strong>Line 2</strong>. Add rows as needed.</div>
+  <div id="task-body-2"></div>
+  <button class="add-row-btn" onclick="addTaskRow(2)">+ Add Line 2 Run</button>
 </div>
 
 <div class="section" id="tab-knives">
@@ -239,15 +245,16 @@ function setMagnetFind(i,period,val){
   sel.className=val==='Pieces'?'magnet-select red-flag':'magnet-select';
 }
 
-function addTaskRow(){
-  const container=document.getElementById('task-body');
+function addTaskRow(line){
+  line=line||1;
+  const container=document.getElementById(`task-body-${line}`);
   const i=taskRows++;
   const card=document.createElement('div');
   card.className='card';
   card.style.marginBottom='10px';
   card.innerHTML=`
     <div class="card-head" style="display:flex;justify-content:space-between;align-items:center;">
-      <span>Run ${i+1}</span>
+      <span>Line ${line} — Run</span>
       <button onclick="this.closest('.card').remove();" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;">✕</button>
     </div>
     <div class="card-body">
@@ -321,11 +328,13 @@ function buildReview(){
   const op=document.getElementById('operatorName').value||'(no operator)';
   const preIssues=Object.values(preopState).filter(v=>v.result==='fail').length;
   const postIssues=Object.values(postopState).filter(v=>v.result==='fail').length;
+  const line1Runs=document.getElementById('task-body-1')?.children.length||0;
+  const line2Runs=document.getElementById('task-body-2')?.children.length||0;
   const pieces=MAGNETS.filter((_,i)=>magnetState[i]?.startFind==='Pieces'||magnetState[i]?.midFind==='Pieces'||magnetState[i]?.endFind==='Pieces').length;
   document.getElementById('review-summary').innerHTML=`
     <b>Date:</b> ${date}<br><b>Operator:</b> ${op}<br>
     <b>Pre-Op Issues:</b> ${preIssues}<br><b>Post-Op Issues:</b> ${postIssues}<br>
-    <b>Production Runs:</b> ${taskRows}<br>
+    <b>Line 1 Runs:</b> ${line1Runs}<br><b>Line 2 Runs:</b> ${line2Runs}<br>
     ${pieces>0?`<span style="color:var(--red);font-weight:600;">⚠ ${pieces} magnet(s) found PIECES — review required!</span><br>`:''}
     <br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>
   `;
@@ -342,13 +351,16 @@ async function submitAll(){
   const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.startInit||'',magnetState[i]?.startFind||'',magnetState[i]?.midInit||'',magnetState[i]?.midFind||'',magnetState[i]?.endInit||'',magnetState[i]?.endFind||'']);
   const taskData=[];
   for(let i=0;i<taskRows;i++){
+    if(!document.getElementById(`t-task-${i}`))continue;
     const el=id=>document.getElementById(id)?.value||'';
-    taskData.push([ts,date,operator,el(`t-task-${i}`),el(`t-start-${i}`),el(`t-end-${i}`),el(`t-pkglot-${i}`),el(`t-prodlot-${i}`),el(`t-begtote-${i}`),el(`t-endtote-${i}`),el(`t-totaltotes-${i}`),el(`t-toteweight-${i}`),el(`t-lbs-${i}`),el(`t-init-${i}`),el(`t-comments-${i}`)]);
+    const lineEl=document.getElementById(`t-task-${i}`)?.closest('.card')?.querySelector('.card-head span');
+    const lineName=lineEl?lineEl.textContent.trim():'';
+    taskData.push([ts,date,operator,lineName,el(`t-task-${i}`),el(`t-start-${i}`),el(`t-end-${i}`),el(`t-pkglot-${i}`),el(`t-prodlot-${i}`),el(`t-begtote-${i}`),el(`t-endtote-${i}`),el(`t-totaltotes-${i}`),el(`t-toteweight-${i}`),el(`t-lbs-${i}`),el(`t-init-${i}`),el(`t-comments-${i}`)]);
   }
   const knifeData=EMPLOYEES.map((emp,i)=>[ts,date,operator,emp,knifeState[i]?.result||'']);
   const h1=['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
   const h2=['Timestamp','Date','Operator','Magnet','Start Initials','Start Findings','Mid Initials','Mid Findings','End Initials','End Findings'];
-  const h3=['Timestamp','Date','Operator','Task','Start Time','End Time','Pkg Lot #','Product Lot #','Beg Tote #','End Tote #','Total Totes','Tote Weight','Total Lbs','Initials','Comments'];
+  const h3=['Timestamp','Date','Operator','Line','Task','Start Time','End Time','Pkg Lot #','Product Lot #','Beg Tote #','End Tote #','Total Totes','Tote Weight','Total Lbs','Initials','Comments'];
   const h4=['Timestamp','Date','Operator','Employee','Knife Result'];
   try{
     for(const row of [...preopData,...postopData]){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'DailyProcessing',headers:h1,row})});}
@@ -370,7 +382,7 @@ makeCheckList(PRE_OP,preopState,'preop-list');
 makeCheckList(POST_OP,postopState,'postop-list');
 renderMagnets();
 renderKnives();
-addTaskRow();addTaskRow();
+addTaskRow(1);addTaskRow(2);
 document.querySelectorAll('.section').forEach(s=>s.style.display='none');
 document.getElementById('tab-preop').style.display='block';
 </script>
