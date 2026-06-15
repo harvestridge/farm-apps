@@ -37,10 +37,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .fail-extra textarea{width:100%;border:1px solid #f5c6c3;border-radius:6px;padding:8px;font-size:13px;font-family:'DM Sans',sans-serif;resize:none;background:white;}
 input[type=text],input[type=number],input[type=time],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
-.magnet-grid{display:grid;grid-template-columns:1fr 70px 70px 70px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece6;font-size:13px;}
+.magnet-grid{display:grid;grid-template-columns:1fr 55px 100px 55px 100px 55px 100px;gap:5px;align-items:center;padding:10px 0;border-bottom:1px solid #f0ece6;font-size:13px;}
 .magnet-grid:last-child{border-bottom:none;}
-.magnet-grid input{padding:7px;text-align:center;}
-.magnet-head{font-size:11px;font-weight:600;color:var(--muted);text-align:center;}
+.magnet-head{font-size:10px;font-weight:600;color:var(--muted);text-align:center;line-height:1.3;}
+.magnet-select{width:100%;padding:5px 3px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;background:white;}
+.magnet-select.red-flag{border-color:var(--red);background:#fdecea;color:var(--red);font-weight:700;}
 .task-table{width:100%;border-collapse:collapse;font-size:13px;}
 .task-table th{background:var(--green-pale);padding:8px;text-align:left;font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;}
 .task-table td{padding:6px 4px;border-bottom:1px solid #f0ece6;}
@@ -81,11 +82,19 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
   <div class="card"><div class="card-body" id="preop-list"></div></div>
 </div>
 <div class="section" id="tab-magnets">
-  <div class="section-note">Record initials for each magnet check at start, mid, and end of shift.</div>
+  <div class="section-note">Record initials and findings for each magnet check. Pieces will flag red.</div>
   <div class="card">
     <div class="card-head">Magnet Checks</div>
-    <div class="card-body">
-      <div class="magnet-grid"><div></div><div class="magnet-head">Start</div><div class="magnet-head">Mid</div><div class="magnet-head">End</div></div>
+    <div class="card-body" style="overflow-x:auto;">
+      <div class="magnet-grid" style="background:var(--green-pale);border-radius:6px;padding:6px 4px;margin-bottom:4px;">
+        <div style="font-size:11px;font-weight:600;color:var(--green);">Magnet</div>
+        <div class="magnet-head">Start<br>Initials</div>
+        <div class="magnet-head">Start<br>Findings</div>
+        <div class="magnet-head">Mid<br>Initials</div>
+        <div class="magnet-head">Mid<br>Findings</div>
+        <div class="magnet-head">End<br>Initials</div>
+        <div class="magnet-head">End<br>Findings</div>
+      </div>
       <div id="magnet-list"></div>
     </div>
   </div>
@@ -189,12 +198,43 @@ function setCheck(containerId,i,val){
 function renderMagnets(){
   const list=document.getElementById('magnet-list');
   MAGNETS.forEach((m,i)=>{
-    magnetState[i]={label:m,start:'',mid:'',end:''};
+    magnetState[i]={label:m,startInit:'',startFind:'',midInit:'',midFind:'',endInit:'',endFind:''};
     const row=document.createElement('div');
     row.className='magnet-grid';
-    row.innerHTML=`<div style="font-size:13px;font-weight:500;">${m}</div><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].start=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].mid=this.value" style="text-align:center;"><input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].end=this.value" style="text-align:center;">`;
+    row.innerHTML=`
+      <div style="font-size:13px;font-weight:500;">${m}</div>
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].startInit=this.value" style="text-align:center;padding:5px;">
+      <select class="magnet-select" id="msf-${i}-s" onchange="setMagnetFind(${i},'s',this.value)">
+        <option value="">—</option>
+        <option value="No Findings">No Findings</option>
+        <option value="Dust">Dust</option>
+        <option value="Pieces">⚠ Pieces</option>
+      </select>
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].midInit=this.value" style="text-align:center;padding:5px;">
+      <select class="magnet-select" id="msf-${i}-m" onchange="setMagnetFind(${i},'m',this.value)">
+        <option value="">—</option>
+        <option value="No Findings">No Findings</option>
+        <option value="Dust">Dust</option>
+        <option value="Pieces">⚠ Pieces</option>
+      </select>
+      <input type="text" placeholder="—" maxlength="6" oninput="magnetState[${i}].endInit=this.value" style="text-align:center;padding:5px;">
+      <select class="magnet-select" id="msf-${i}-e" onchange="setMagnetFind(${i},'e',this.value)">
+        <option value="">—</option>
+        <option value="No Findings">No Findings</option>
+        <option value="Dust">Dust</option>
+        <option value="Pieces">⚠ Pieces</option>
+      </select>
+    `;
     list.appendChild(row);
   });
+}
+
+function setMagnetFind(i,period,val){
+  const keyMap={s:'startFind',m:'midFind',e:'endFind'};
+  const idMap={s:`msf-${i}-s`,m:`msf-${i}-m`,e:`msf-${i}-e`};
+  magnetState[i][keyMap[period]]=val;
+  const sel=document.getElementById(idMap[period]);
+  sel.className=val==='Pieces'?'magnet-select red-flag':'magnet-select';
 }
 
 function addTaskRow(){
@@ -236,7 +276,16 @@ function buildReview(){
   const op=document.getElementById('operatorName').value||'(no operator)';
   const preIssues=Object.values(preopState).filter(v=>v.result==='fail').length;
   const postIssues=Object.values(postopState).filter(v=>v.result==='fail').length;
-  document.getElementById('review-summary').innerHTML=`<b>Date:</b> ${date}<br><b>Operator:</b> ${op}<br><b>Pre-Op Issues:</b> ${preIssues}<br><b>Post-Op Issues:</b> ${postIssues}<br><b>Production Rows:</b> ${taskRows}<br><br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>`;
+  const pieces=MAGNETS.filter((_,i)=>magnetState[i]?.startFind==='Pieces'||magnetState[i]?.midFind==='Pieces'||magnetState[i]?.endFind==='Pieces').length;
+  document.getElementById('review-summary').innerHTML=`
+    <b>Date:</b> ${date}<br>
+    <b>Operator:</b> ${op}<br>
+    <b>Pre-Op Issues:</b> ${preIssues}<br>
+    <b>Post-Op Issues:</b> ${postIssues}<br>
+    <b>Production Rows:</b> ${taskRows}<br>
+    ${pieces>0?`<span style="color:var(--red);font-weight:600;">⚠ ${pieces} magnet(s) found PIECES — review required!</span><br>`:''}
+    <br><span style="color:var(--muted);font-size:13px;">Tap the button below to send all data to Google Sheets.</span>
+  `;
 }
 
 async function submitAll(){
@@ -247,12 +296,12 @@ async function submitAll(){
   const ts=new Date().toLocaleString();
   const preopData=PRE_OP.map((label,i)=>[ts,date,operator,'Pre-Op',label,preopState[i]?.result||'',document.getElementById(`init-preop-list-${i}`)?.value||'',document.getElementById(`comment-preop-list-${i}`)?.value||'']);
   const postopData=POST_OP.map((label,i)=>[ts,date,operator,'Post-Op',label,postopState[i]?.result||'',document.getElementById(`init-postop-list-${i}`)?.value||'',document.getElementById(`comment-postop-list-${i}`)?.value||'']);
-  const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.start||'',magnetState[i]?.mid||'',magnetState[i]?.end||'']);
+  const magnetData=MAGNETS.map((label,i)=>[ts,date,operator,label,magnetState[i]?.startInit||'',magnetState[i]?.startFind||'',magnetState[i]?.midInit||'',magnetState[i]?.midFind||'',magnetState[i]?.endInit||'',magnetState[i]?.endFind||'']);
   const taskData=[];
   for(let i=0;i<taskRows;i++){taskData.push([ts,date,operator,document.getElementById(`t-task-${i}`)?.value||'',document.getElementById(`t-lot-${i}`)?.value||'',document.getElementById(`t-start-${i}`)?.value||'',document.getElementById(`t-end-${i}`)?.value||'',document.getElementById(`t-totes-${i}`)?.value||'',document.getElementById(`t-lbs-${i}`)?.value||'']);}
   const knifeData=EMPLOYEES.map((emp,i)=>[ts,date,operator,emp,knifeState[i]?.result||'']);
   const h1=['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
-  const h2=['Timestamp','Date','Operator','Magnet','Shift Start','Mid Shift','Shift End'];
+  const h2=['Timestamp','Date','Operator','Magnet','Start Initials','Start Findings','Mid Initials','Mid Findings','End Initials','End Findings'];
   const h3=['Timestamp','Date','Operator','Task','Lot #','Start Time','End Time','Totes','Lbs'];
   const h4=['Timestamp','Date','Operator','Employee','Knife Result'];
   try{
