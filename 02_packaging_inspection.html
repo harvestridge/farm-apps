@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Packaging Inspection</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input::placeholder{color:rgba(255,255,255,.6);}
+.header-meta select option{color:#000;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
+.card-body{padding:14px 16px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.field-group{margin-bottom:14px;}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+.acc-row{display:flex;gap:10px;align-items:center;}
+.acc-row label{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;padding:8px 14px;border:1.5px solid var(--border);border-radius:20px;background:white;transition:all .15s;}
+.acc-row input[type=radio]{display:none;}
+.acc-row label.selected-acc{background:var(--green);border-color:var(--green);color:white;}
+.acc-row label.selected-unacc{background:var(--red);border-color:var(--red);color:white;}
+.unacc-extra{display:none;margin-top:10px;}
+.unacc-extra.show{display:block;}
+.submit-btn{width:100%;padding:16px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <div class="sub">Packaging Receiving Inspection</div>
+  <div class="header-meta">
+    <input type="date" id="formDate">
+    <select id="inspector">
+      <option value="">Select Inspector</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+    </select>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="section-note">Complete for each packaging material delivery received. All fields required before submitting.</div>
+
+  <!-- SUPPLIER INFO -->
+  <div class="card">
+    <div class="card-head">Supplier Information</div>
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field-label">Supplier Name</div>
+        <select id="supplier">
+          <option value="">Select Supplier...</option>
+          <option>Northern</option>
+          <option>Amazon</option>
+          <option>GM Packaging</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Material / Item</div>
+        <select id="itemType">
+          <option value="">Select Item...</option>
+          <option>Tote - Standard (42x42x44)</option>
+          <option>Tote - Blue Corn (38.5x46x54)</option>
+          <option>Small Box (10x9x7)</option>
+          <option>Medium Box (14x12x8)</option>
+          <option>Large Box (24x14x6)</option>
+          <option>Large Bag (16x34x4)</option>
+          <option>Medium Bag (13x26x6)</option>
+          <option>Mini Kraft Bag (17x8x5)</option>
+          <option>Slip Sheets</option>
+          <option>Plastic Wrap</option>
+          <option>Pallet 42x42</option>
+          <option>Pallet 40x48</option>
+          <option>Black Strapping</option>
+          <option>Rope</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <div class="field-group">
+          <div class="field-label">Quantity Received</div>
+          <input type="number" id="quantity" placeholder="0" min="0">
+        </div>
+        <div class="field-group">
+          <div class="field-label">PO / Lot #</div>
+          <input type="text" id="lotNum" placeholder="Optional">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSPECTION RESULT -->
+  <div class="card">
+    <div class="card-head">Inspection Result</div>
+    <div class="card-body">
+      <div class="field-group">
+        <div class="field-label">Overall Condition</div>
+        <div class="acc-row" id="acc-btns">
+          <label id="lbl-acc" onclick="setResult('Acceptable')">
+            ✓ Acceptable
+          </label>
+          <label id="lbl-unacc" onclick="setResult('Unacceptable')">
+            ✗ Unacceptable
+          </label>
+        </div>
+      </div>
+
+      <div class="unacc-extra" id="unacc-extra">
+        <div class="field-group">
+          <div class="field-label">Quantity Unacceptable</div>
+          <input type="number" id="unaccQty" placeholder="0" min="0">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Reason / Description</div>
+          <textarea id="unaccReason" rows="3" placeholder="Describe the issue..."></textarea>
+        </div>
+      </div>
+
+      <div class="field-group" style="margin-top:4px;">
+        <div class="field-label">Additional Comments</div>
+        <textarea id="comments" rows="2" placeholder="Any other notes..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMIT -->
+  <button class="submit-btn" id="submitBtn" onclick="submitForm()">Submit to Google Sheets</button>
+
+  <div style="height:32px;"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+let result = '';
+
+function setResult(val) {
+  result = val;
+  document.getElementById('lbl-acc').className = val==='Acceptable' ? 'selected-acc' : '';
+  document.getElementById('lbl-unacc').className = val==='Unacceptable' ? 'selected-unacc' : '';
+  document.getElementById('unacc-extra').className = 'unacc-extra' + (val==='Unacceptable'?' show':'');
+}
+
+async function submitForm() {
+  const date = document.getElementById('formDate').value;
+  const inspector = document.getElementById('inspector').value;
+  const supplier = document.getElementById('supplier').value;
+  const itemType = document.getElementById('itemType').value;
+  const quantity = document.getElementById('quantity').value;
+
+  if(!date||!inspector||!supplier||!itemType||!quantity||!result){
+    showToast('Please fill all required fields', true);
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const row = [
+    new Date().toLocaleString(), date, inspector, supplier, itemType, quantity,
+    document.getElementById('lotNum').value,
+    result,
+    result==='Unacceptable' ? (document.getElementById('unaccQty').value||'') : '',
+    result==='Unacceptable' ? (document.getElementById('unaccReason').value||'') : '',
+    document.getElementById('comments').value
+  ];
+
+  const headers = ['Timestamp','Date','Inspector','Supplier','Item Type','Qty Received','PO/Lot #','Result','Qty Unacceptable','Reason','Comments'];
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({tab:'PackagingInspection', headers, row})
+    });
+    showToast('✓ Submitted to Google Sheets!', false);
+    btn.textContent = '✓ Submitted!';
+    btn.style.background = '#1a5c1a';
+    setTimeout(resetForm, 2500);
+  } catch(err) {
+    showToast('Error — check connection', true);
+    btn.disabled = false;
+    btn.textContent = 'Submit to Google Sheets';
+  }
+}
+
+function resetForm() {
+  document.getElementById('supplier').value='';
+  document.getElementById('itemType').value='';
+  document.getElementById('quantity').value='';
+  document.getElementById('lotNum').value='';
+  document.getElementById('comments').value='';
+  document.getElementById('unaccQty').value='';
+  document.getElementById('unaccReason').value='';
+  result='';
+  document.getElementById('lbl-acc').className='';
+  document.getElementById('lbl-unacc').className='';
+  document.getElementById('unacc-extra').className='unacc-extra';
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=false;
+  btn.textContent='Submit to Google Sheets';
+  btn.style.background='';
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
