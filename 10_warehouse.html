@@ -92,7 +92,7 @@ textarea{resize:none;}
 <body>
 
 <div class="app-header">
-  <<h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Warehouse Management</div>
   <div class="sync-row">
     <span class="sync-status" id="sync-status">⏳ Loading inventory...</span>
@@ -207,7 +207,7 @@ textarea{resize:none;}
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
 
 const GRADE_FIELDS = {
   'Corn':[{label:'Moisture',unit:'%'},{label:'Test Weight',unit:'lbs'},{label:'Broken/Cracked',unit:'%'},{label:'Different Colored',unit:'%'},{label:'Rock/Dirt',unit:'%'},{label:'Allergens',unit:'%'},{label:'Immature/Undersized',unit:'%'},{label:'Pieces per Ounce',unit:'ct'},{label:'Plant Material',unit:'%'},{label:'Total Screen Out',unit:'%'}],
@@ -251,7 +251,15 @@ async function loadInventoryFromSheets() {
       for(let i = 1; i < gradingRows.length; i++) {
         const r = gradingRows[i];
         const ts=r[0],date=r[1],inspector=r[2],lotNum=r[3],sampleNum=r[4],crop=r[5],grower=r[6],status=r[7],totes=parseInt(r[8])||0,lbs=parseInt(r[9])||0,notes=r[10];
-        let gradeData={};try{gradeData=JSON.parse(r[11]||'{}');}catch(e){}
+        // Grade data is now in individual columns starting at index 11
+        // Headers row tells us the field names
+        let gradeData={};
+        if(gradingRows[0]) {
+          const hdrs = gradingRows[0];
+          for(let h=11;h<hdrs.length;h++){
+            if(hdrs[h] && r[h]!==undefined && r[h]!=='') gradeData[hdrs[h]]=r[h];
+          }
+        }
         if(!lotNum) continue;
         if(!inventory[lotNum]) {
           inventory[lotNum] = {lotNum,crop,grower,status,createdDate:date,inspector,sampleNum,totesIn:0,lbsIn:0,totesRemaining:0,lbsRemaining:0,notes,gradeData,movements:[]};
@@ -334,8 +342,11 @@ async function submitGrading() {
   btn.disabled=true;btn.textContent='Submitting...';
 
   const ts=new Date().toLocaleString();
-  const gradeHeaders=['Timestamp','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes','GradeData'];
-  const gradeRow=[ts,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,JSON.stringify(gradeValues)];
+  // Send each grade field as its own column instead of JSON blob
+  const gradeKeys = Object.keys(gradeValues);
+  const gradeVals = Object.values(gradeValues);
+  const gradeHeaders=['Timestamp','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes',...gradeKeys];
+  const gradeRow=[ts,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,...gradeVals];
 
   try {
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseGrading',headers:gradeHeaders,row:gradeRow})});
