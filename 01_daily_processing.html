@@ -298,7 +298,8 @@ function buildKnives() {
       <div style="display:flex;gap:8px;margin-top:6px;">
         <button class="chk-btn" id="kpass-${i}" onclick="setKnife(${i},'pass')">✓ Pass</button>
         <button class="chk-btn" id="kfail-${i}" onclick="setKnife(${i},'fail')">✗ Fail</button>
-        <button class="chk-btn" id="kna-${i}" onclick="setKnife(${i},'na')">N/A</button>
+        <button class="chk-btn" id="knoknife-${i}" onclick="setKnife(${i},'noknife')">No Knife</button>
+        <button class="chk-btn" id="knotpresent-${i}" onclick="setKnife(${i},'notpresent')">Not Present</button>
       </div>
     `;
     list.appendChild(row);
@@ -308,7 +309,8 @@ function buildKnives() {
 function setKnife(i, val) {
   document.getElementById(`kpass-${i}`).className = 'chk-btn' + (val==='pass' ? ' pass-active' : '');
   document.getElementById(`kfail-${i}`).className = 'chk-btn' + (val==='fail' ? ' fail-active' : '');
-  document.getElementById(`kna-${i}`).className = 'chk-btn' + (val==='na' ? ' na-active' : '');
+  document.getElementById(`knoknife-${i}`).className = 'chk-btn' + (val==='noknife' ? ' na-active' : '');
+  document.getElementById(`knotpresent-${i}`).className = 'chk-btn' + (val==='notpresent' ? ' na-active' : '');
 }
 
 // ── Tab switching ──
@@ -437,9 +439,10 @@ async function submitKnives() {
   const rows = EMPLOYEES.map((emp, i) => ({
     headers: h,
     row: [ts, date, op, 'Knife Inspection', emp,
-      document.getElementById(`kpass-${i}`)?.classList.contains('pass-active') ? 'pass' :
-      document.getElementById(`kfail-${i}`)?.classList.contains('fail-active') ? 'fail' :
-      document.getElementById(`kna-${i}`)?.classList.contains('na-active') ? 'N/A' : ''
+      document.getElementById(`kpass-${i}`)?.classList.contains('pass-active') ? 'Pass' :
+      document.getElementById(`kfail-${i}`)?.classList.contains('fail-active') ? 'Fail' :
+      document.getElementById(`knoknife-${i}`)?.classList.contains('na-active') ? 'No Knife' :
+      document.getElementById(`knotpresent-${i}`)?.classList.contains('na-active') ? 'Not Present' : ''
     ]
   }));
   await sendRows(rows, 'btn-submit-knives');
