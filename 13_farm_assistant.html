@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Farm Assistant</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER (matches existing apps) ── */
+  .app-header {
+    background: #1a3a2a;
+    color: white;
+    padding: 14px 20px 10px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .app-header a {
+    display: block;
+    font-size: 13px;
+    color: #8fbb9f;
+    text-decoration: none;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .app-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .app-header p {
+    font-size: 13px;
+    color: #a8c5b0;
+    margin-top: 3px;
+  }
+
+  /* ── SUGGESTION CHIPS ── */
+  .chips-section {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 12px;
+    flex-shrink: 0;
+  }
+
+  .chips-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .chip {
+    background: #f0f6f2;
+    border: 1px solid #c2daca;
+    border-radius: 16px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: #1a3a2a;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .chip:active { background: #1a3a2a; color: white; }
+
+  /* ── CHAT AREA ── */
+  #chat-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .msg {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+    animation: fadeUp 0.2s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .avatar.ai  { background: #1a3a2a; }
+  .avatar.usr { background: #5a8a6a; }
+
+  .bubble {
+    max-width: calc(100% - 50px);
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .msg.ai .bubble {
+    background: white;
+    border: 1px solid #dde5e0;
+    border-bottom-left-radius: 4px;
+    color: #1a1a1a;
+  }
+
+  .msg.user .bubble {
+    background: #1a3a2a;
+    color: white;
+    border-bottom-right-radius: 4px;
+  }
+
+  .bubble p { margin-bottom: 7px; }
+  .bubble p:last-child { margin-bottom: 0; }
+  .bubble ul, .bubble ol { padding-left: 18px; margin-bottom: 7px; }
+  .bubble li { margin-bottom: 3px; }
+  .bubble strong { font-weight: 600; }
+
+  /* Typing dots */
+  .typing {
+    display: flex;
+    gap: 5px;
+    padding: 14px 16px;
+    align-items: center;
+  }
+  .typing span {
+    width: 8px; height: 8px;
+    background: #8fbb9f;
+    border-radius: 50%;
+    animation: dot 1.2s infinite;
+  }
+  .typing span:nth-child(2) { animation-delay: 0.2s; }
+  .typing span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-7px); }
+  }
+
+  /* ── INPUT BAR ── */
+  #input-bar {
+    background: white;
+    border-top: 1px solid #ddd;
+    padding: 10px 12px;
+    padding-bottom: max(10px, env(safe-area-inset-bottom));
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+
+  #user-input {
+    flex: 1;
+    border: 1.5px solid #c2daca;
+    border-radius: 20px;
+    padding: 9px 14px;
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.4;
+    background: #f8faf9;
+    color: #1a1a1a;
+  }
+
+  #user-input:focus { border-color: #1a3a2a; background: white; }
+
+  #send-btn {
+    width: 42px;
+    height: 42px;
+    background: #1a3a2a;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #send-btn:disabled { background: #bbb; }
+  #send-btn svg { width: 18px; height: 18px; fill: white; }
+
+  /* ── FOOTER ── */
+  .app-footer {
+    text-align: center;
+    font-size: 12px;
+    color: #aaa;
+    padding: 8px;
+    background: #f0f2f5;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <a href="https://harvestridge.github.io/farm-apps/00_home.html">← Harvest Ridge</a>
+  <h1>🌾 Farm Assistant</h1>
+  <p>Ask anything about HRP operations, grading, equipment & agronomy</p>
+</div>
+
+<div class="chips-section">
+  <div class="chips-label">Quick Questions</div>
+  <div class="chips">
+    <div class="chip" onclick="sendChip('Bean grading standards for splits and damage')">🫘 Bean grading</div>
+    <div class="chip" onclick="sendChip('Cleaning line troubleshooting tips')">⚙️ Cleaning line</div>
+    <div class="chip" onclick="sendChip('Organic certification NOP rules for inputs')">📜 Organic cert</div>
+    <div class="chip" onclick="sendChip('Blue corn storage best practices for moisture and temperature')">🌽 Corn storage</div>
+    <div class="chip" onclick="sendChip('Gravity table separation troubleshooting')">⚖️ Gravity table</div>
+    <div class="chip" onclick="sendChip('Nitrogen options for organic corn')">🌱 Organic N</div>
+    <div class="chip" onclick="sendChip('John Deere AutoTrac GPS troubleshooting')">🚜 JD diagnostics</div>
+  </div>
+</div>
+
+<div id="chat-scroll"></div>
+
+<div id="input-bar">
+  <textarea id="user-input" rows="1"
+    placeholder="Ask about processing, grading, equipment…"
+    onkeydown="handleKey(event)"
+    oninput="autoResize(this)"></textarea>
+  <button id="send-btn" onclick="sendMessage()">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+  </button>
+</div>
+
+<div class="app-footer">Harvest Ridge Processing · Caro MI · Powered by Claude AI</div>
+
+<script>
+const SYSTEM = `You are the HRP Farm Assistant — a knowledgeable AI for Harvest Ridge Processing (HRP), an organic grain and bean processing facility in Caro, Michigan in the Thumb region.
+
+HRP is run by Jon. His processing team includes Tyler, Allen, Andy, Aaron, Tim, Adrianna, and Tiffany. HRP also operates Clearwater Farms (CWF), an organic grain operation at the same location.
+
+Crops processed: organic dry beans, soybeans, yellow corn, blue corn, spelt, wheat, rye.
+
+Your expertise:
+- Organic dry bean and grain processing: cleaning, sizing, color sorting, packaging, grading
+- Bean grading standards (splits, foreign material, moisture, color, damage counts)
+- Organic certification (NOP rules, prohibited substances, audit prep, OSP documentation)
+- Cleaning equipment: destoners, scalpers, indent cylinders, gravity tables, color sorters, aspirators, Oliver gravity tables
+- Preventive maintenance scheduling
+- John Deere farm equipment diagnostics (AutoTrac, GPS, 9RX, field operations)
+- Organic row crop agronomy for Michigan Thumb conditions
+- Warehouse management, COA generation, lot traceability
+- Food safety, sanitation, and allergen control
+- Buyers: HCI, Cargill, Granite Ridge, Kalmbach, Amy's Kitchen
+
+Be specific, practical, and concise. When troubleshooting, ask targeted follow-up questions. Reference USDA or trade standards where applicable. Speak like a knowledgeable peer who understands both the farming and processing sides.`;
+
+let history = [];
+let busy = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function sendChip(text) {
+  document.getElementById('user-input').value = text;
+  sendMessage();
+}
+
+function addMsg(role, text) {
+  const scroll = document.getElementById('chat-scroll');
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+
+  const av = document.createElement('div');
+  av.className = `avatar ${role}`;
+  av.textContent = role === 'user' ? '👤' : '🌾';
+
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.innerHTML = fmt(text);
+
+  wrap.appendChild(av);
+  wrap.appendChild(bub);
+  scroll.appendChild(wrap);
+  scroll.scrollTop = scroll.scrollHeight;
+  return bub;
+}
+
+function showTyping() {
+  const scroll = document.getElementById('chat-scroll');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ai'; wrap.id = 'typing';
+  const av = document.createElement('div');
+  av.className = 'avatar ai'; av.textContent = '🌾';
+  const bub = document.createElement('div');
+  bub.className = 'bubble typing';
+  bub.innerHTML = '<span></span><span></span><span></span>';
+  wrap.appendChild(av); wrap.appendChild(bub);
+  scroll.appendChild(wrap);
+  scroll.scrollTop = scroll.scrollHeight;
+}
+
+function removeTyping() {
+  const el = document.getElementById('typing');
+  if (el) el.remove();
+}
+
+function fmt(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code style="background:#f0f2f5;padding:1px 4px;border-radius:3px;font-size:13px">$1</code>')
+    .replace(/^#{1,3} (.+)$/gm,'<strong>$1</strong>')
+    .replace(/^\s*[-•]\s+(.+)$/gm,'<li>$1</li>')
+    .replace(/(<li>[\s\S]*?<\/li>)/g,'<ul style="padding-left:16px;margin:6px 0">$1</ul>')
+    .split(/\n\n+/).map(p => `<p>${p.replace(/\n/g,'<br>')}</p>`).join('');
+}
+
+async function sendMessage() {
+  if (busy) return;
+  const inp = document.getElementById('user-input');
+  const text = inp.value.trim();
+  if (!text) return;
+
+  inp.value = ''; inp.style.height = 'auto';
+  busy = true;
+  document.getElementById('send-btn').disabled = true;
+
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: history
+      })
+    });
+    const data = await res.json();
+    removeTyping();
+    const reply = data.content?.map(b => b.text || '').join('') || 'Sorry, no response received.';
+    history.push({ role: 'assistant', content: reply });
+    addMsg('ai', reply);
+  } catch(e) {
+    removeTyping();
+    addMsg('ai', '⚠️ Connection issue — please try again.');
+    history.pop();
+  }
+
+  busy = false;
+  document.getElementById('send-btn').disabled = false;
+}
+</script>
+</body>
+</html>
