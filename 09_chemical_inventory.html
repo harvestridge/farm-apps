@@ -6,7 +6,7 @@
 <title>Harvest Ridge – Chemical Inventory</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--blue:#1d4ed8;--blue-pale:#eff6ff;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
 .app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
@@ -34,12 +34,13 @@ textarea{resize:none;}
 .badge-food{background:var(--green-pale);color:var(--green);}
 .chem-body{padding:12px 14px;}
 .chem-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.chem-grid input{padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
-.chem-grid input:focus{border-color:var(--green);outline:none;}
+.chem-grid input,.chem-grid textarea{padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;width:100%;}
+.chem-grid textarea{resize:none;}
+.chem-grid input:focus,.chem-grid textarea:focus{border-color:var(--green);outline:none;}
 .chem-field-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
 .remove-btn{background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;padding:2px 6px;border-radius:6px;}
 .remove-btn:hover{background:var(--red-light);}
-.add-chem-area{margin-bottom:4px;}
+.add-chem-area{margin-bottom:12px;}
 .add-chem-row{display:flex;gap:8px;align-items:flex-end;}
 .add-chem-row input{flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;}
 .add-chem-row select{width:130px;padding:10px 8px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
@@ -53,12 +54,17 @@ textarea{resize:none;}
 </style>
 </head>
 <body>
+
 <div class="app-header">
-  <h1><h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Chemical Inventory &amp; Usage Log</div>
 </div>
+
 <div class="content">
+
   <div class="section-note">Complete once per quarter. Log amount used and remaining inventory for each chemical. Add new chemicals as needed.</div>
+
+  <!-- QUARTER & DATE -->
   <div class="card">
     <div class="card-head">Reporting Period</div>
     <div class="card-body">
@@ -72,4 +78,200 @@ textarea{resize:none;}
         </div>
       </div>
       <div class="two-col">
-        <div class="field-group"><div class="f
+        <div class="field-group">
+          <div class="field-label">Start Date</div>
+          <input type="text" id="startDate" placeholder="e.g. 1.1.26">
+        </div>
+        <div class="field-group">
+          <div class="field-label">End Date</div>
+          <input type="text" id="endDate" placeholder="e.g. 3.31.26">
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field-group">
+          <div class="field-label">Completed By</div>
+          <select id="completedBy">
+            <option value="">Select person</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Initials</div>
+          <input type="text" id="initials" placeholder="e.g. TS" maxlength="6">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHEMICALS -->
+  <div class="card">
+    <div class="card-head">Chemical Inventory</div>
+    <div class="card-body">
+      <div id="chem-list"></div>
+      <div class="add-chem-area">
+        <div class="field-label" style="margin-bottom:6px;">Add a Chemical</div>
+        <div class="add-chem-row">
+          <input type="text" id="new-chem-name" placeholder="Chemical name...">
+          <select id="new-chem-grade">
+            <option value="Non-Food Grade">Non-Food Grade</option>
+            <option value="Food Grade">Food Grade</option>
+          </select>
+          <button onclick="addChemical()">+ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERIFICATION -->
+  <div class="card">
+    <div class="card-head">Verification</div>
+    <div class="card-body">
+      <div class="two-col">
+        <div class="field-group">
+          <div class="field-label">Verified By</div>
+          <select id="verifiedBy">
+            <option value="">Select person</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Verification Date</div>
+          <input type="text" id="verifiedDate" placeholder="e.g. 3.31.26">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Notes</div>
+        <textarea id="overallNotes" rows="2" placeholder="Any additional notes..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitLog()">Submit to Google Sheets</button>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+
+let chemicals = [
+  {name:'Food Grade Grease/Lube', grade:'Food Grade', amountUsed:'', remaining:''},
+  {name:'Spritz Disinfectant', grade:'Non-Food Grade', amountUsed:'', remaining:''},
+  {name:'Windex', grade:'Non-Food Grade', amountUsed:'', remaining:''}
+];
+
+let selectedQuarter = '';
+
+function setQuarter(q, start, end) {
+  selectedQuarter = q;
+  const year = new Date().getFullYear().toString().slice(-2);
+  document.getElementById('startDate').value = `${start}.${year}`;
+  document.getElementById('endDate').value = `${end}.${year}`;
+  ['q1','q2','q3','q4'].forEach(id => {
+    document.getElementById(id).classList.toggle('sel', id === q.toLowerCase());
+  });
+}
+
+function renderChemicals() {
+  const list = document.getElementById('chem-list');
+  list.innerHTML = '';
+  chemicals.forEach((chem, i) => {
+    const isFood = chem.grade === 'Food Grade';
+    const div = document.createElement('div');
+    div.className = 'chem-card';
+    div.innerHTML = `
+      <div class="chem-head">
+        <div class="chem-name">${chem.name}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="chem-badge ${isFood?'badge-food':'badge-nonfood'}">${chem.grade}</span>
+          <button class="remove-btn" onclick="removeChem(${i})">✕</button>
+        </div>
+      </div>
+      <div class="chem-body">
+        <div class="chem-grid">
+          <div>
+            <div class="chem-field-label">Amount Used</div>
+            <input type="text" placeholder="e.g. 1/2 bottle" value="${chem.amountUsed}" oninput="chemicals[${i}].amountUsed=this.value">
+          </div>
+          <div>
+            <div class="chem-field-label">Amount Remaining</div>
+            <input type="text" placeholder="e.g. 1/4 bottle" value="${chem.remaining}" oninput="chemicals[${i}].remaining=this.value">
+          </div>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addChemical() {
+  const name = document.getElementById('new-chem-name').value.trim();
+  const grade = document.getElementById('new-chem-grade').value;
+  if(!name){showToast('Please enter a chemical name',true);return;}
+  chemicals.push({name, grade, amountUsed:'', remaining:''});
+  document.getElementById('new-chem-name').value = '';
+  renderChemicals();
+}
+
+function removeChem(i) {
+  chemicals.splice(i,1);
+  renderChemicals();
+}
+
+async function submitLog() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const completedBy = document.getElementById('completedBy').value;
+  const initials = document.getElementById('initials').value;
+  const verifiedBy = document.getElementById('verifiedBy').value;
+  const verifiedDate = document.getElementById('verifiedDate').value;
+  const notes = document.getElementById('overallNotes').value;
+
+  if(!selectedQuarter||!startDate||!completedBy||!initials){
+    showToast('Please fill all required fields',true);return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Quarter','Start Date','End Date','Completed By','Initials','Chemical Name','Grade','Amount Used','Amount Remaining','Verified By','Verified Date','Notes'];
+
+  try {
+    for(const chem of chemicals){
+      const row = [ts, selectedQuarter, startDate, endDate, completedBy, initials, chem.name, chem.grade, chem.amountUsed, chem.remaining, verifiedBy, verifiedDate, notes];
+      await fetch(SCRIPT_URL,{
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({tab:'ChemicalInventory', headers, row})
+      });
+    }
+    showToast('✓ Submitted to Google Sheets!', false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+  } catch(err){
+    showToast('Error — check connection', true);
+    btn.disabled=false;
+    btn.textContent='Submit to Google Sheets';
+  }
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
+// Auto-select current quarter
+const month = new Date().getMonth();
+if(month<=2) setQuarter('Q1','1.1','3.31');
+else if(month<=5) setQuarter('Q2','4.1','6.30');
+else if(month<=8) setQuarter('Q3','7.1','9.30');
+else setQuarter('Q4','10.1','12.31');
+
+renderChemicals();
+</script>
+</body>
+</html>
