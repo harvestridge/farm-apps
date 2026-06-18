@@ -40,6 +40,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .task-extra input,.task-extra select,.task-extra textarea{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:white;width:100%;}
 .task-extra textarea{grid-column:1/-1;resize:none;}
 .task-extra input:focus,.task-extra select:focus,.task-extra textarea:focus{border-color:var(--green);outline:none;}
+.task-extra select option{color:#000;}
 .section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
 .verif-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
 .verif-body{padding:14px 16px;}
@@ -57,8 +58,9 @@ textarea{resize:none;}
 </style>
 </head>
 <body>
+
 <div class="app-header">
-  <<h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Master Cleaning Schedule</div>
   <div class="header-meta">
     <input type="date" id="formDate">
@@ -68,49 +70,239 @@ textarea{resize:none;}
     </select>
   </div>
 </div>
+
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('monthly',this)">Monthly</button>
   <button class="tab-btn" onclick="switchTab('yearly',this)">Yearly</button>
 </div>
+
 <div class="content">
+
+  <!-- MONTHLY TAB -->
   <div class="section active" id="tab-monthly">
-    <div class="section-note">Log cleaning tasks for each area. Assign each task, mark Pass/Fail, add initials and notes.</div>
+    <div class="section-note">Log cleaning tasks for each area. Assign each task, mark Pass/Fail, add initials and notes. Verify each section before submitting.</div>
     <div id="monthly-sections"></div>
     <div class="verif-card">
       <div class="card-head">Supervisor Sign-Off</div>
       <div class="verif-body">
-        <div class="field-group"><div class="field-label">Overall Notes</div><textarea id="monthly-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
-        <div class="field-group"><div class="field-label">Verified By</div><select id="monthly-verified"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
+        <div class="field-group">
+          <div class="field-label">Overall Notes</div>
+          <textarea id="monthly-notes" rows="2" placeholder="Any additional notes..."></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Verified By</div>
+          <select id="monthly-verified">
+            <option value="">Select person</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+          </select>
+        </div>
       </div>
     </div>
     <button class="submit-btn" id="monthlySubmitBtn" onclick="submitCleaning('monthly')">Submit to Google Sheets</button>
   </div>
+
+  <!-- YEARLY TAB -->
   <div class="section" id="tab-yearly">
     <div class="section-note">Log annual deep cleaning tasks. Assign each task, mark Pass/Fail, add initials and notes.</div>
     <div id="yearly-sections"></div>
     <div class="verif-card">
       <div class="card-head">Supervisor Sign-Off</div>
       <div class="verif-body">
-        <div class="field-group"><div class="field-label">Overall Notes</div><textarea id="yearly-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
-        <div class="field-group"><div class="field-label">Verified By</div><select id="yearly-verified"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
+        <div class="field-group">
+          <div class="field-label">Overall Notes</div>
+          <textarea id="yearly-notes" rows="2" placeholder="Any additional notes..."></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Verified By</div>
+          <select id="yearly-verified">
+            <option value="">Select person</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+          </select>
+        </div>
       </div>
     </div>
     <button class="submit-btn" id="yearlySubmitBtn" onclick="submitCleaning('yearly')">Submit to Google Sheets</button>
   </div>
+
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const EMPLOYEES=['Tyler','Allen','Andy','Tim','Aaron'];
-const MONTHLY_SECTIONS=[{id:'processing',label:'Processing Room',icon:'🏭',tasks:['Sweep underneath all machinery','Clean off top of all equipment including catwalks','Dust walls','Clean all thresholds and manual doors','Clean inside of all overhead doors','Clean plexi windows','Deep clean plant office including handwashing area']},{id:'warehouse',label:'Warehouse',icon:'🏪',tasks:['Blow down fork trucks','Clean plastic curtains','Clean large overhead doors','Clean tunnel and tool area','Clean thresholds and manual doors','Clean trashcan','Clean dock area including rails']},{id:'outside',label:'Outside',icon:'🌿',tasks:['Clean outside of overhead doors','Clean bootscrapers / remove excess dirt','Clean outside conveyor waste bucket','Clean out hammermill room','Remove all debris/growth from perimeter','Remove all debris from drain area','Clean batco belt conveyor']}];
-const YEARLY_SECTIONS=[{id:'yearly-deep',label:'Annual Deep Clean',icon:'✨',tasks:['Clean ceilings','Clean overhead structures','Deep clean walls','Clean dock doors']}];
-const state={};
-function buildSections(sections,containerId){const container=document.getElementById(containerId);container.innerHTML='';sections.forEach(section=>{state[section.id]=section.tasks.map(t=>({task:t,result:'',assignedTo:'',initials:'',notes:''}));const card=document.createElement('div');card.className='card';card.innerHTML=`<div class="card-head">${section.icon} ${section.label}<span class="prog" id="prog-${section.id}">0 / ${section.tasks.length}</span></div><div class="progress-wrap"><div class="progress-fill" id="fill-${section.id}" style="width:0%"></div></div><div id="list-${section.id}"></div>`;container.appendChild(card);section.tasks.forEach((task,i)=>{const empOptions=EMPLOYEES.map(e=>`<option value="${e}">${e}</option>`).join('');const row=document.createElement('div');row.className='task-row';row.innerHTML=`<div class="task-top"><div class="task-label">${task}</div><div class="pf-btns"><button class="btn-pass" id="pass-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Pass')">✓</button><button class="btn-fail" id="fail-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Fail')">✗</button></div></div><div class="task-extra"><select id="assigned-${section.id}-${i}" onchange="state['${section.id}'][${i}].assignedTo=this.value"><option value="">Assigned to...</option>${empOptions}</select><input type="text" maxlength="6" placeholder="Initials" id="init-${section.id}-${i}" oninput="state['${section.id}'][${i}].initials=this.value"><textarea rows="1" placeholder="Notes (optional)" id="notes-${section.id}-${i}" oninput="state['${section.id}'][${i}].notes=this.value"></textarea></div>`;document.getElementById(`list-${section.id}`).appendChild(row);});});}
-function setResult(sectionId,i,val){state[sectionId][i].result=val;document.getElementById(`pass-${sectionId}-${i}`).className='btn-pass'+(val==='Pass'?' sel':'');document.getElementById(`fail-${sectionId}-${i}`).className='btn-fail'+(val==='Fail'?' sel':'');updateProgress(sectionId);}
-function updateProgress(sectionId){const items=state[sectionId];const total=items.length;const done=items.filter(v=>v.result).length;document.getElementById(`prog-${sectionId}`).textContent=`${done} / ${total}`;document.getElementById(`fill-${sectionId}`).style.width=`${(done/total)*100}%`;}
-function switchTab(name,btn){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).style.display='block';btn.classList.add('active');window.scrollTo(0,0);}
-async function submitCleaning(type){const date=document.getElementById('formDate').value;const supervisor=document.getElementById('supervisor').value;if(!date||!supervisor){showToast('Please select date and supervisor',true);return;}const btn=document.getElementById(type+'SubmitBtn');btn.disabled=true;btn.textContent='Submitting...';const verifiedBy=document.getElementById(`${type}-verified`).value;const overallNotes=document.getElementById(`${type}-notes`).value;const ts=new Date().toLocaleString();const tab=type==='monthly'?'CleaningMonthly':'CleaningYearly';const headers=['Timestamp','Date','Supervisor','Section','Task','Result','Assigned To','Initials','Notes','Verified By','Overall Notes'];const rows=[];const sections=type==='monthly'?MONTHLY_SECTIONS:YEARLY_SECTIONS;sections.forEach(section=>{state[section.id].forEach(item=>{rows.push([ts,date,supervisor,section.label,item.task,item.result,item.assignedTo,item.initials,item.notes,verifiedBy,overallNotes]);});});try{for(const row of rows){await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab,headers,row})});}showToast('✓ Submitted to Google Sheets!',false);btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Submit to Google Sheets';}}
-function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3000);}
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+
+const EMPLOYEES = ['Tyler','Allen','Andy','Tim','Aaron'];
+
+const MONTHLY_SECTIONS = [
+  {
+    id:'processing', label:'Processing Room', icon:'🏭',
+    tasks:[
+      'Sweep underneath all machinery',
+      'Clean off top of all equipment including catwalks',
+      'Dust walls',
+      'Clean all thresholds and manual doors',
+      'Clean inside of all overhead doors',
+      'Clean plexi windows',
+      'Deep clean plant office including handwashing area'
+    ]
+  },
+  {
+    id:'warehouse', label:'Warehouse', icon:'🏪',
+    tasks:[
+      'Blow down fork trucks',
+      'Clean plastic curtains',
+      'Clean large overhead doors',
+      'Clean tunnel and tool area',
+      'Clean thresholds and manual doors',
+      'Clean trashcans',
+      'Clean dock area including rails'
+    ]
+  },
+  {
+    id:'outside', label:'Outside', icon:'🌿',
+    tasks:[
+      'Clean outside of overhead doors',
+      'Clean bootscrapers / remove excess dirt',
+      'Clean outside conveyor waste bucket',
+      'Clean out hammermill room',
+      'Remove all debris/growth from perimeter',
+      'Remove all debris from drain area',
+      'Clean batco belt conveyor',
+      'Loading area - sweep/clean',
+      'Dock area - sweep/clean'
+    ]
+  }
+];
+
+const YEARLY_SECTIONS = [
+  {
+    id:'yearly-deep', label:'Annual Deep Clean', icon:'✨',
+    tasks:[
+      'Clean ceilings',
+      'Clean overhead structures',
+      'Deep clean walls',
+      'Clean dock doors'
+    ]
+  }
+];
+
+const state = {};
+
+function buildSections(sections, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+
+  sections.forEach(section => {
+    state[section.id] = section.tasks.map(t => ({task:t, result:'', assignedTo:'', initials:'', notes:''}));
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-head">
+        ${section.icon} ${section.label}
+        <span class="prog" id="prog-${section.id}">0 / ${section.tasks.length}</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-fill" id="fill-${section.id}" style="width:0%"></div></div>
+      <div id="list-${section.id}"></div>
+    `;
+    container.appendChild(card);
+
+    section.tasks.forEach((task, i) => {
+      const empOptions = EMPLOYEES.map(e=>`<option value="${e}">${e}</option>`).join('');
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      row.innerHTML = `
+        <div class="task-top">
+          <div class="task-label">${task}</div>
+          <div class="pf-btns">
+            <button class="btn-pass" id="pass-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Pass')">✓</button>
+            <button class="btn-fail" id="fail-${section.id}-${i}" onclick="setResult('${section.id}',${i},'Fail')">✗</button>
+          </div>
+        </div>
+        <div class="task-extra">
+          <select id="assigned-${section.id}-${i}" onchange="state['${section.id}'][${i}].assignedTo=this.value">
+            <option value="">Assigned to...</option>
+            ${empOptions}
+          </select>
+          <input type="text" maxlength="6" placeholder="Initials" id="init-${section.id}-${i}" oninput="state['${section.id}'][${i}].initials=this.value">
+          <textarea rows="1" placeholder="Notes (optional)" id="notes-${section.id}-${i}" oninput="state['${section.id}'][${i}].notes=this.value"></textarea>
+        </div>
+      `;
+      document.getElementById(`list-${section.id}`).appendChild(row);
+    });
+  });
+}
+
+function setResult(sectionId, i, val) {
+  state[sectionId][i].result = val;
+  document.getElementById(`pass-${sectionId}-${i}`).className = 'btn-pass'+(val==='Pass'?' sel':'');
+  document.getElementById(`fail-${sectionId}-${i}`).className = 'btn-fail'+(val==='Fail'?' sel':'');
+  updateProgress(sectionId);
+}
+
+function updateProgress(sectionId) {
+  const items = state[sectionId];
+  const total = items.length;
+  const done = items.filter(v=>v.result).length;
+  document.getElementById(`prog-${sectionId}`).textContent = `${done} / ${total}`;
+  document.getElementById(`fill-${sectionId}`).style.width = `${(done/total)*100}%`;
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+async function submitCleaning(type) {
+  const date = document.getElementById('formDate').value;
+  const supervisor = document.getElementById('supervisor').value;
+  if(!date||!supervisor){showToast('Please select date and supervisor',true);return;}
+
+  const btn = document.getElementById(type+'SubmitBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  const verifiedBy = document.getElementById(`${type}-verified`).value;
+  const overallNotes = document.getElementById(`${type}-notes`).value;
+  const ts = new Date().toLocaleString();
+  const tab = type==='monthly' ? 'CleaningMonthly' : 'CleaningYearly';
+  const headers = ['Timestamp','Date','Supervisor','Section','Task','Result','Assigned To','Initials','Notes','Verified By','Overall Notes'];
+  const rows = [];
+
+  const sections = type==='monthly' ? MONTHLY_SECTIONS : YEARLY_SECTIONS;
+  sections.forEach(section => {
+    state[section.id].forEach(item => {
+      rows.push([ts, date, supervisor, section.label, item.task, item.result, item.assignedTo, item.initials, item.notes, verifiedBy, overallNotes]);
+    });
+  });
+
+  try {
+    for(const row of rows){
+      await fetch(SCRIPT_URL,{
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({tab, headers, row})
+      });
+    }
+    showToast('✓ Submitted to Google Sheets!', false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+  } catch(err){
+    showToast('Error — check connection', true);
+    btn.disabled=false;
+    btn.textContent='Submit to Google Sheets';
+  }
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
 document.getElementById('formDate').value=new Date().toISOString().split('T')[0];
 buildSections(MONTHLY_SECTIONS,'monthly-sections');
 buildSections(YEARLY_SECTIONS,'yearly-sections');
