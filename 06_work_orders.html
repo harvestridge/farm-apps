@@ -27,6 +27,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
 textarea{resize:none;}
+.wo-badge{display:inline-block;background:var(--green);color:white;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;padding:6px 16px;border-radius:8px;margin-bottom:4px;}
+.wo-date{font-size:12px;color:var(--muted);}
 .submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
 .submit-btn:hover{background:var(--green-light);}
 .submit-btn:disabled{background:#aaa;cursor:not-allowed;}
@@ -51,72 +53,430 @@ textarea{resize:none;}
 .yn-row label.sel-y{background:var(--green);border-color:var(--green);color:white;}
 .yn-row label.sel-n{background:var(--red);border-color:var(--red);color:white;}
 .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 .empty-state .big{font-size:40px;margin-bottom:8px;}
 .empty-state p{font-size:14px;}
 </style>
 </head>
 <body>
+
 <div class="app-header">
-  <<h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Maintenance Work Orders</div>
 </div>
+
 <div class="tab-bar">
   <button class="tab-btn active" onclick="switchTab('new',this)">New Issue</button>
   <button class="tab-btn" onclick="switchTab('open',this)">Open Orders</button>
   <button class="tab-btn" onclick="switchTab('complete',this)">Completed</button>
 </div>
+
 <div class="content">
+
+  <!-- NEW ISSUE -->
   <div class="section active" id="tab-new">
     <div class="section-note">Fill out this section when you discover an issue. A work order number will be assigned automatically.</div>
     <div class="card">
       <div class="card-head">Issue Discovery</div>
       <div class="card-body">
-        <div class="field-group"><div class="field-label">Discovered By</div><select id="new-discovered-by"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
-        <div class="field-group"><div class="field-label">Date Discovered</div><input type="date" id="new-date"></div>
-        <div class="field-group"><div class="field-label">Location of Equipment / Structure</div><select id="new-location"><option value="">Select location</option><option>Processing Room (Blue)</option><option>Processing Room (Orange)</option><option>Eye Room (White)</option><option>Plant Office (Gray)</option><option>Warehouse West (Yellow)</option><option>Tunnel (Green)</option><option>Dock Area (Red)</option><option>Outside / Grounds</option><option>Other</option></select></div>
-        <div class="field-group"><div class="field-label">Name of Equipment / Structure</div><input type="text" id="new-equipment" placeholder="e.g. Roller Mill, Conveyor Belt..."></div>
-        <div class="field-group"><div class="field-label">Describe the Issue</div><textarea id="new-issue" rows="3" placeholder="Describe what you found..."></textarea></div>
+        <div class="field-group">
+          <div class="field-label">Discovered By</div>
+          <select id="new-discovered-by">
+            <option value="">Select person</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Mel</option><option>Tiffany</option><option>Adrianna</option><option>Jon</option><option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Date Discovered</div>
+          <input type="date" id="new-date">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Location of Equipment / Structure</div>
+          <select id="new-location">
+            <option value="">Select location</option>
+            <option>Processing Room (Blue)</option>
+            <option>Processing Room (Orange)</option>
+            <option>Eye Room (White)</option>
+            <option>Plant Office (Gray)</option>
+            <option>Warehouse West (Yellow)</option>
+            <option>Tunnel (Green)</option>
+            <option>Dock Area (Red)</option>
+            <option>Outside / Grounds</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Name of Equipment / Structure</div>
+          <input type="text" id="new-equipment" placeholder="e.g. Roller Mill, Conveyor Belt...">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Describe the Issue</div>
+          <textarea id="new-issue" rows="3" placeholder="Describe what you found..."></textarea>
+        </div>
       </div>
     </div>
     <button class="submit-btn" id="newSubmitBtn" onclick="submitNewIssue()">Submit Work Order</button>
   </div>
+
+  <!-- OPEN ORDERS -->
   <div class="section" id="tab-open">
     <div id="open-list-view">
       <div class="section-note">Tap a work order to update it with work performed or manager sign-off.</div>
-      <div class="card"><div id="open-orders-list"></div></div>
+      <div class="card" id="open-orders-card">
+        <div id="open-orders-list"></div>
+      </div>
     </div>
     <div id="open-detail-view" style="display:none;">
       <button class="back-btn" onclick="showOpenList()">← Back to Open Orders</button>
       <div id="open-detail-content"></div>
     </div>
   </div>
+
+  <!-- COMPLETED -->
   <div class="section" id="tab-complete">
     <div class="section-note">All completed and signed-off work orders.</div>
-    <div class="card"><div id="complete-orders-list"></div></div>
+    <div class="card" id="complete-orders-card">
+      <div id="complete-orders-list"></div>
+    </div>
   </div>
+
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const STORAGE_KEY='hr_workorders';
-function loadOrders(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');}catch(e){return[];}}
-function saveOrders(orders){localStorage.setItem(STORAGE_KEY,JSON.stringify(orders));}
-function nextWONumber(orders){if(orders.length===0)return'WO-168';const nums=orders.map(o=>parseInt(o.woNum.replace('WO-',''))||0);const next=Math.max(...nums)+1;return'WO-'+String(next).padStart(3,'0');}
-function switchTab(name,btn){document.querySelectorAll('.section').forEach(s=>s.style.display='none');document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).style.display='block';btn.classList.add('active');if(name==='open')renderOpenOrders();if(name==='complete')renderCompleteOrders();window.scrollTo(0,0);}
-async function submitNewIssue(){const discoveredBy=document.getElementById('new-discovered-by').value;const date=document.getElementById('new-date').value;const location=document.getElementById('new-location').value;const equipment=document.getElementById('new-equipment').value;const issue=document.getElementById('new-issue').value;if(!discoveredBy||!date||!location||!equipment||!issue){showToast('Please fill all fields',true);return;}const btn=document.getElementById('newSubmitBtn');btn.disabled=true;btn.textContent='Submitting...';const orders=loadOrders();const woNum=nextWONumber(orders);const ts=new Date().toLocaleString();const newOrder={woNum,status:'Open',createdTs:ts,discoveredBy,dateDiscovered:date,location,equipment,issue,workDate:'',workBy:'',materials:'',workComments:'',toolsRemoved:'',safeToResume:'',verifiedBy:'',verifiedDate:'',completedTs:''};orders.push(newOrder);saveOrders(orders);const headers=['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];const row=[woNum,'Open',ts,discoveredBy,date,location,equipment,issue,'','','','','','','','',''];try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WorkOrders',headers,row})});showToast(`✓ ${woNum} created!`,false);btn.textContent='✓ Submitted!';btn.style.background='#1a5c1a';setTimeout(()=>{document.getElementById('new-discovered-by').value='';document.getElementById('new-date').value=new Date().toISOString().split('T')[0];document.getElementById('new-location').value='';document.getElementById('new-equipment').value='';document.getElementById('new-issue').value='';btn.disabled=false;btn.textContent='Submit Work Order';btn.style.background='';},2000);}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Submit Work Order';}}
-function renderOpenOrders(){showOpenList();const orders=loadOrders().filter(o=>o.status!=='Complete');const list=document.getElementById('open-orders-list');if(orders.length===0){list.innerHTML='<div class="empty-state"><div class="big">✓</div><p>No open work orders!</p></div>';return;}list.innerHTML='';orders.forEach(o=>{const div=document.createElement('div');div.className='wo-list-item';div.onclick=()=>showOrderDetail(o.woNum);const statusClass=o.status==='In Progress'?'status-inprogress':'status-open';div.innerHTML=`<div class="wo-row"><div class="wo-num">${o.woNum}</div><div class="wo-info"><div class="wo-equip">${o.equipment}</div><div class="wo-meta">${o.location} · ${o.dateDiscovered}</div></div><div class="status-pill ${statusClass}">${o.status}</div></div>`;list.appendChild(div);});}
-function renderCompleteOrders(){const orders=loadOrders().filter(o=>o.status==='Complete');const list=document.getElementById('complete-orders-list');if(orders.length===0){list.innerHTML='<div class="empty-state"><div class="big">📋</div><p>No completed orders yet.</p></div>';return;}list.innerHTML='';orders.forEach(o=>{const div=document.createElement('div');div.className='wo-list-item';div.innerHTML=`<div class="wo-row"><div class="wo-num">${o.woNum}</div><div class="wo-info"><div class="wo-equip">${o.equipment}</div><div class="wo-meta">${o.location} · Completed ${o.verifiedDate}</div></div><div class="status-pill status-complete">Complete</div></div>`;list.appendChild(div);});}
-function showOpenList(){document.getElementById('open-list-view').style.display='block';document.getElementById('open-detail-view').style.display='none';}
-function showOrderDetail(woNum){const orders=loadOrders();const order=orders.find(o=>o.woNum===woNum);if(!order)return;document.getElementById('open-list-view').style.display='none';document.getElementById('open-detail-view').style.display='block';const needsWork=!order.workDate;const needsSignoff=order.workDate&&!order.verifiedBy;let html=`<div class="card"><div class="card-head" style="display:flex;justify-content:space-between;align-items:center;"><span>${order.woNum}</span><span style="font-size:11px;font-weight:400;color:var(--muted);">${order.status}</span></div><div class="card-body"><div style="margin-bottom:10px;"><div class="field-label">Equipment</div><div style="font-size:14px;font-weight:500;">${order.equipment}</div></div><div style="margin-bottom:10px;"><div class="field-label">Location</div><div style="font-size:14px;">${order.location}</div></div><div style="margin-bottom:10px;"><div class="field-label">Discovered By</div><div style="font-size:14px;">${order.discoveredBy} on ${order.dateDiscovered}</div></div><div><div class="field-label">Issue</div><div style="font-size:14px;">${order.issue}</div></div></div></div>`;
-if(needsWork){html+=`<div class="card"><div class="card-head">Work Performed</div><div class="card-body"><div class="field-group"><div class="field-label">Date Work Performed</div><input type="date" id="work-date" value="${new Date().toISOString().split('T')[0]}"></div><div class="field-group"><div class="field-label">Performed By</div><select id="work-by"><option value="">Select person</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Outside Contractor</option></select></div><div class="field-group"><div class="field-label">Materials / Tools Used</div><textarea id="work-materials" rows="2" placeholder="List materials and tools..."></textarea></div><div class="field-group"><div class="field-label">Comments</div><textarea id="work-comments" rows="2" placeholder="Any additional comments..."></textarea></div></div></div><button class="submit-btn" id="workSubmitBtn" onclick="submitWorkPerformed('${woNum}')">Save Work Details</button>`;}
-else if(needsSignoff){html+=`<div class="card"><div class="card-head">Work Performed</div><div class="card-body"><div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Performed by <strong>${order.workBy}</strong> on ${order.workDate}</div><div style="font-size:13px;">${order.workComments||'No comments'}</div></div></div><div class="card"><div class="card-head">Manager Sign-Off</div><div class="card-body"><div class="field-group"><div class="field-label">Are all tools, parts & debris removed?</div><div class="yn-row"><label id="lbl-tools-y" onclick="setYN('tools','Y')">✓ Yes</label><label id="lbl-tools-n" onclick="setYN('tools','N')">✗ No</label></div></div><div class="field-group"><div class="field-label">Is it safe to resume production?</div><div class="yn-row"><label id="lbl-safe-y" onclick="setYN('safe','Y')">✓ Yes</label><label id="lbl-safe-n" onclick="setYN('safe','N')">✗ No</label></div></div><div class="field-group"><div class="field-label">Verified By</div><select id="signoff-by"><option value="">Select manager</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div><div class="field-group"><div class="field-label">Date Verified</div><input type="date" id="signoff-date" value="${new Date().toISOString().split('T')[0]}"></div></div></div><button class="submit-btn" id="signoffSubmitBtn" onclick="submitSignoff('${woNum}')">Complete Work Order</button>`;}
-document.getElementById('open-detail-content').innerHTML=html;}
-let ynState={tools:'',safe:''};
-function setYN(field,val){ynState[field]=val;if(field==='tools'){document.getElementById('lbl-tools-y').className=val==='Y'?'sel-y':'';document.getElementById('lbl-tools-n').className=val==='N'?'sel-n':'';}else{document.getElementById('lbl-safe-y').className=val==='Y'?'sel-y':'';document.getElementById('lbl-safe-n').className=val==='N'?'sel-n':'';}}
-async function submitWorkPerformed(woNum){const workDate=document.getElementById('work-date').value;const workBy=document.getElementById('work-by').value;const materials=document.getElementById('work-materials').value;const comments=document.getElementById('work-comments').value;if(!workDate||!workBy){showToast('Please fill required fields',true);return;}const btn=document.getElementById('workSubmitBtn');btn.disabled=true;btn.textContent='Saving...';const orders=loadOrders();const idx=orders.findIndex(o=>o.woNum===woNum);orders[idx].workDate=workDate;orders[idx].workBy=workBy;orders[idx].materials=materials;orders[idx].workComments=comments;orders[idx].status='In Progress';saveOrders(orders);const headers=['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];const o=orders[idx];const row=[o.woNum,'In Progress',o.createdTs,o.discoveredBy,o.dateDiscovered,o.location,o.equipment,o.issue,workDate,workBy,materials,comments,'','','','',''];try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WorkOrders',headers,row})});showToast('✓ Work details saved!',false);setTimeout(()=>renderOpenOrders(),1500);}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Save Work Details';}}
-async function submitSignoff(woNum){const toolsRemoved=ynState.tools;const safeToResume=ynState.safe;const verifiedBy=document.getElementById('signoff-by').value;const verifiedDate=document.getElementById('signoff-date').value;if(!toolsRemoved||!safeToResume||!verifiedBy||!verifiedDate){showToast('Please complete all fields',true);return;}if(toolsRemoved==='N'||safeToResume==='N'){showToast('Cannot complete — answer is No',true);return;}const btn=document.getElementById('signoffSubmitBtn');btn.disabled=true;btn.textContent='Completing...';const orders=loadOrders();const idx=orders.findIndex(o=>o.woNum===woNum);const ts=new Date().toLocaleString();orders[idx].toolsRemoved=toolsRemoved;orders[idx].safeToResume=safeToResume;orders[idx].verifiedBy=verifiedBy;orders[idx].verifiedDate=verifiedDate;orders[idx].status='Complete';orders[idx].completedTs=ts;saveOrders(orders);const o=orders[idx];const headers=['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];const row=[o.woNum,'Complete',o.createdTs,o.discoveredBy,o.dateDiscovered,o.location,o.equipment,o.issue,o.workDate,o.workBy,o.materials,o.workComments,toolsRemoved,safeToResume,verifiedBy,verifiedDate,ts];try{await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WorkOrders',headers,row})});showToast('✓ Work Order Complete!',false);ynState={tools:'',safe:''};setTimeout(()=>renderOpenOrders(),1500);}catch(err){showToast('Error — check connection',true);btn.disabled=false;btn.textContent='Complete Work Order';}}
-function showToast(msg,isError){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(isError?' error':'');setTimeout(()=>t.className='toast',3000);}
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+const STORAGE_KEY = 'hr_workorders';
+
+function loadOrders() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e){ return []; }
+}
+function saveOrders(orders) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+}
+function nextWONumber(orders) {
+  if(orders.length===0) return 'WO-001';
+  const nums = orders.map(o => parseInt(o.woNum.replace('WO-',''))||0);
+  const next = Math.max(...nums)+1;
+  return 'WO-'+String(next).padStart(3,'0');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).style.display='block';
+  btn.classList.add('active');
+  if(name==='open') renderOpenOrders();
+  if(name==='complete') renderCompleteOrders();
+  window.scrollTo(0,0);
+}
+
+async function submitNewIssue() {
+  const discoveredBy = document.getElementById('new-discovered-by').value;
+  const date = document.getElementById('new-date').value;
+  const location = document.getElementById('new-location').value;
+  const equipment = document.getElementById('new-equipment').value;
+  const issue = document.getElementById('new-issue').value;
+
+  if(!discoveredBy||!date||!location||!equipment||!issue){
+    showToast('Please fill all fields',true); return;
+  }
+
+  const btn = document.getElementById('newSubmitBtn');
+  btn.disabled=true; btn.textContent='Submitting...';
+
+  const orders = loadOrders();
+  const woNum = nextWONumber(orders);
+  const ts = new Date().toLocaleString();
+
+  const newOrder = {
+    woNum, status:'Open', createdTs:ts,
+    discoveredBy, dateDiscovered:date, location, equipment, issue,
+    workDate:'', workBy:'', materials:'', workComments:'',
+    toolsRemoved:'', safeToResume:'', verifiedBy:'', verifiedDate:'',
+    completedTs:''
+  };
+
+  orders.push(newOrder);
+  saveOrders(orders);
+
+  // Send to Google Sheets
+  const headers = ['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];
+  const row = [woNum,'Open',ts,discoveredBy,date,location,equipment,issue,'','','','','','','','',''];
+
+  try {
+    await fetch(SCRIPT_URL,{
+      method:'POST',mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({tab:'WorkOrders',headers,row})
+    });
+    showToast(`✓ ${woNum} created!`,false);
+    btn.textContent='✓ Submitted!';
+    btn.style.background='#1a5c1a';
+    // Reset form
+    setTimeout(()=>{
+      document.getElementById('new-discovered-by').value='';
+      document.getElementById('new-date').value=new Date().toISOString().split('T')[0];
+      document.getElementById('new-location').value='';
+      document.getElementById('new-equipment').value='';
+      document.getElementById('new-issue').value='';
+      btn.disabled=false; btn.textContent='Submit Work Order'; btn.style.background='';
+    },2000);
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false; btn.textContent='Submit Work Order';
+  }
+}
+
+function renderOpenOrders() {
+  showOpenList();
+  const orders = loadOrders().filter(o=>o.status!=='Complete');
+  const list = document.getElementById('open-orders-list');
+  if(orders.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="big">✓</div><p>No open work orders!</p></div>`;
+    return;
+  }
+  list.innerHTML='';
+  orders.forEach(o => {
+    const div = document.createElement('div');
+    div.className='wo-list-item';
+    div.onclick=()=>showOrderDetail(o.woNum);
+    const statusClass = o.status==='In Progress'?'status-inprogress':'status-open';
+    div.innerHTML=`<div class="wo-row"><div class="wo-num">${o.woNum}</div><div class="wo-info"><div class="wo-equip">${o.equipment}</div><div class="wo-meta">${o.location} · ${o.dateDiscovered}</div></div><div class="status-pill ${statusClass}">${o.status}</div></div>`;
+    list.appendChild(div);
+  });
+}
+
+function renderCompleteOrders() {
+  const orders = loadOrders().filter(o=>o.status==='Complete');
+  const list = document.getElementById('complete-orders-list');
+  if(orders.length===0){
+    list.innerHTML=`<div class="empty-state"><div class="big">📋</div><p>No completed orders yet.</p></div>`;
+    return;
+  }
+  list.innerHTML='';
+  orders.forEach(o => {
+    const div = document.createElement('div');
+    div.className='wo-list-item';
+    div.innerHTML=`<div class="wo-row"><div class="wo-num">${o.woNum}</div><div class="wo-info"><div class="wo-equip">${o.equipment}</div><div class="wo-meta">${o.location} · Completed ${o.verifiedDate}</div></div><div class="status-pill status-complete">Complete</div></div>`;
+    list.appendChild(div);
+  });
+}
+
+function showOpenList() {
+  document.getElementById('open-list-view').style.display='block';
+  document.getElementById('open-detail-view').style.display='none';
+}
+
+function showOrderDetail(woNum) {
+  const orders = loadOrders();
+  const order = orders.find(o=>o.woNum===woNum);
+  if(!order) return;
+
+  document.getElementById('open-list-view').style.display='none';
+  document.getElementById('open-detail-view').style.display='block';
+
+  const needsWork = !order.workDate;
+  const needsSignoff = order.workDate && !order.verifiedBy;
+
+  let html = `
+    <div class="card">
+      <div class="card-head" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>${order.woNum}</span>
+        <span style="font-size:11px;font-weight:400;color:var(--muted);">${order.status}</span>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:10px;">
+          <div class="field-label">Equipment</div>
+          <div style="font-size:14px;font-weight:500;">${order.equipment}</div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div class="field-label">Location</div>
+          <div style="font-size:14px;">${order.location}</div>
+        </div>
+        <div style="margin-bottom:10px;">
+          <div class="field-label">Discovered By</div>
+          <div style="font-size:14px;">${order.discoveredBy} on ${order.dateDiscovered}</div>
+        </div>
+        <div>
+          <div class="field-label">Issue</div>
+          <div style="font-size:14px;">${order.issue}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if(needsWork) {
+    html += `
+      <div class="card">
+        <div class="card-head">Work Performed</div>
+        <div class="card-body">
+          <div class="field-group">
+            <div class="field-label">Date Work Performed</div>
+            <input type="date" id="work-date" value="${new Date().toISOString().split('T')[0]}">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Performed By</div>
+            <select id="work-by">
+              <option value="">Select person</option>
+              <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Mel</option><option>Tiffany</option><option>Adrianna</option><option>Jon</option><option>Other</option><option>Outside Contractor</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Materials / Tools Used</div>
+            <textarea id="work-materials" rows="2" placeholder="List materials and tools..."></textarea>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Comments</div>
+            <textarea id="work-comments" rows="2" placeholder="Any additional comments..."></textarea>
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" id="workSubmitBtn" onclick="submitWorkPerformed('${woNum}')">Save Work Details</button>
+    `;
+  } else if(needsSignoff) {
+    html += `
+      <div class="card">
+        <div class="card-head">Work Performed</div>
+        <div class="card-body">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Performed by <strong>${order.workBy}</strong> on ${order.workDate}</div>
+          <div style="font-size:13px;">${order.workComments||'No comments'}</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head">Manager Sign-Off</div>
+        <div class="card-body">
+          <div class="field-group">
+            <div class="field-label">Are all tools, parts & debris removed?</div>
+            <div class="yn-row">
+              <label id="lbl-tools-y" onclick="setYN('tools','Y')">✓ Yes</label>
+              <label id="lbl-tools-n" onclick="setYN('tools','N')">✗ No</label>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Is it safe to resume production?</div>
+            <div class="yn-row">
+              <label id="lbl-safe-y" onclick="setYN('safe','Y')">✓ Yes</label>
+              <label id="lbl-safe-n" onclick="setYN('safe','N')">✗ No</label>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Verified By</div>
+            <select id="signoff-by">
+              <option value="">Select manager</option>
+              <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Mel</option><option>Tiffany</option><option>Adrianna</option><option>Jon</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Date Verified</div>
+            <input type="date" id="signoff-date" value="${new Date().toISOString().split('T')[0]}">
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" id="signoffSubmitBtn" onclick="submitSignoff('${woNum}')">Complete Work Order</button>
+    `;
+  }
+
+  document.getElementById('open-detail-content').innerHTML = html;
+}
+
+let ynState = {tools:'', safe:''};
+
+function setYN(field, val) {
+  ynState[field] = val;
+  if(field==='tools'){
+    document.getElementById('lbl-tools-y').className = val==='Y'?'sel-y':'';
+    document.getElementById('lbl-tools-n').className = val==='N'?'sel-n':'';
+  } else {
+    document.getElementById('lbl-safe-y').className = val==='Y'?'sel-y':'';
+    document.getElementById('lbl-safe-n').className = val==='N'?'sel-n':'';
+  }
+}
+
+async function submitWorkPerformed(woNum) {
+  const workDate = document.getElementById('work-date').value;
+  const workBy = document.getElementById('work-by').value;
+  const materials = document.getElementById('work-materials').value;
+  const comments = document.getElementById('work-comments').value;
+
+  if(!workDate||!workBy){showToast('Please fill required fields',true);return;}
+
+  const btn = document.getElementById('workSubmitBtn');
+  btn.disabled=true; btn.textContent='Saving...';
+
+  const orders = loadOrders();
+  const idx = orders.findIndex(o=>o.woNum===woNum);
+  orders[idx].workDate = workDate;
+  orders[idx].workBy = workBy;
+  orders[idx].materials = materials;
+  orders[idx].workComments = comments;
+  orders[idx].status = 'In Progress';
+  saveOrders(orders);
+
+  const headers = ['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];
+  const o = orders[idx];
+  const row = [o.woNum,'In Progress',o.createdTs,o.discoveredBy,o.dateDiscovered,o.location,o.equipment,o.issue,workDate,workBy,materials,comments,'','','','',''];
+
+  try {
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WorkOrders',headers,row})});
+    showToast('✓ Work details saved!',false);
+    setTimeout(()=>renderOpenOrders(),1500);
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false; btn.textContent='Save Work Details';
+  }
+}
+
+async function submitSignoff(woNum) {
+  const toolsRemoved = ynState.tools;
+  const safeToResume = ynState.safe;
+  const verifiedBy = document.getElementById('signoff-by').value;
+  const verifiedDate = document.getElementById('signoff-date').value;
+
+  if(!toolsRemoved||!safeToResume||!verifiedBy||!verifiedDate){
+    showToast('Please complete all fields',true);return;
+  }
+  if(toolsRemoved==='N'||safeToResume==='N'){
+    showToast('Cannot complete — answer is No',true);return;
+  }
+
+  const btn = document.getElementById('signoffSubmitBtn');
+  btn.disabled=true; btn.textContent='Completing...';
+
+  const orders = loadOrders();
+  const idx = orders.findIndex(o=>o.woNum===woNum);
+  const ts = new Date().toLocaleString();
+  orders[idx].toolsRemoved = toolsRemoved;
+  orders[idx].safeToResume = safeToResume;
+  orders[idx].verifiedBy = verifiedBy;
+  orders[idx].verifiedDate = verifiedDate;
+  orders[idx].status = 'Complete';
+  orders[idx].completedTs = ts;
+  saveOrders(orders);
+
+  const o = orders[idx];
+  const headers = ['Work Order #','Status','Created','Discovered By','Date Discovered','Location','Equipment','Issue','Work Date','Work By','Materials/Tools','Work Comments','Tools Removed','Safe to Resume','Verified By','Verified Date','Completed'];
+  const row = [o.woNum,'Complete',o.createdTs,o.discoveredBy,o.dateDiscovered,o.location,o.equipment,o.issue,o.workDate,o.workBy,o.materials,o.workComments,toolsRemoved,safeToResume,verifiedBy,verifiedDate,ts];
+
+  try {
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WorkOrders',headers,row})});
+    showToast('✓ Work Order Complete!',false);
+    ynState={tools:'',safe:''};
+    setTimeout(()=>renderOpenOrders(),1500);
+  } catch(err){
+    showToast('Error — check connection',true);
+    btn.disabled=false; btn.textContent='Complete Work Order';
+  }
+}
+
+function showToast(msg,isError){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast show'+(isError?' error':'');
+  setTimeout(()=>t.className='toast',3000);
+}
+
 document.getElementById('new-date').value=new Date().toISOString().split('T')[0];
 </script>
 </body>
