@@ -68,13 +68,13 @@ input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--border);bord
 <body>
 
 <div class="app-header">
-  <<h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Monthly Facility Inspection</div>
   <div class="header-meta">
     <input type="date" id="formDate">
     <select id="auditor">
       <option value="">Select Auditor</option>
-      <option>Tiffany</option><option>Adrianna</option><option>Melissa</option><option>Tim</option><option>Jon</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
     </select>
   </div>
 </div>
@@ -113,7 +113,7 @@ input[type=text]{width:100%;padding:9px 12px;border:1px solid var(--border);bord
 <div class="toast" id="toast"></div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
 
 const CATEGORIES = {
   'food-defense': {
@@ -124,8 +124,9 @@ const CATEGORIES = {
       'Restricted areas properly marked',
       'Ingredients and packaging secured',
       'Security cameras functional',
-      'Employee badges / access control in use',
-      'No unauthorized personnel observed'
+      'All outbound seals',
+      'No unauthorized personnel observed',
+      'Chemical storage - secure, signage posted, segregated and properly labeled'
     ]
   },
   'food-safety': {
