@@ -196,7 +196,7 @@ function buildChecklist(items, containerId) {
         <div style="display:flex;align-items:center;gap:8px;">
           <button class="chk-btn" id="btn-pass-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'pass')">✓ Pass</button>
           <button class="chk-btn" id="btn-fail-${containerId}-${i}" onclick="setCheck('${containerId}',${i},'fail')">✗ Fail</button>
-          <input type="text" placeholder="Initials" maxlength="6" id="init-${containerId}-${i}" style="width:80px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;">
+  
         </div>
       </div>
       <div class="fail-extra" id="extra-${containerId}-${i}">
@@ -399,7 +399,7 @@ async function submitPreOp() {
     row: [ts, date, op, 'Pre-Op', label,
       document.getElementById(`btn-pass-preop-list-${i}`)?.classList.contains('pass-active') ? 'pass' :
       document.getElementById(`btn-fail-preop-list-${i}`)?.classList.contains('fail-active') ? 'fail' : '',
-      document.getElementById(`init-preop-list-${i}`)?.value || '',
+      '',
       document.getElementById(`comment-preop-list-${i}`)?.value || ''
     ]
   }));
@@ -457,7 +457,7 @@ async function submitPostOp() {
     row: [ts, date, op, 'Post-Op', label,
       document.getElementById(`btn-pass-postop-list-${i}`)?.classList.contains('pass-active') ? 'pass' :
       document.getElementById(`btn-fail-postop-list-${i}`)?.classList.contains('fail-active') ? 'fail' : '',
-      document.getElementById(`init-postop-list-${i}`)?.value || '',
+      '',
       document.getElementById(`comment-postop-list-${i}`)?.value || ''
     ]
   }));
