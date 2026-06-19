@@ -425,7 +425,7 @@ function getCompletion(equipId, taskIdx) {
   return sharedCompletions[`${equipId}:${taskIdx}`] || null;
 }
 
-async function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
+function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
   const ts = new Date().toLocaleString();
   const headers = ['Timestamp','EquipID','TaskIndex','TaskName','Frequency','Technician','Status'];
   const row = [ts, equipId, taskIdx, taskName, freq, tech, status];
@@ -436,13 +436,12 @@ async function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
   } else {
     delete sharedCompletions[key];
   }
-  try {
-    await fetch(SCRIPT_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({tab:'PMCompletions', headers, row})
-    });
-  } catch(e) { /* silent — local cache still updated */ }
+  // Fire and forget — don't block UI on Sheets write
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'PMCompletions', headers, row})
+  }).catch(()=>{});
 }
 
 function getDueDate(timestamp, freq) {
@@ -616,24 +615,28 @@ function updatePMProgress(equipId) {
   document.getElementById(`pfill-${equipId}`).style.width = `${(done / tasks.length) * 100}%`;
 }
 
-function showMonthlyList() { document.getElementById('monthly-list-view').style.display='block'; document.getElementById('monthly-detail-view').style.display='none'; }
-async function showMonthlyDetail(equipId) {
+function showMonthlyList() {
+  document.getElementById('monthly-list-view').style.display='block';
+  document.getElementById('monthly-detail-view').style.display='none';
+  fetchCompletions().catch(()=>{});
+}
+function showMonthlyDetail(equipId) {
   const equip = MONTHLY_EQUIPMENT.find(e => e.id === equipId);
   document.getElementById('monthly-list-view').style.display = 'none';
   document.getElementById('monthly-detail-view').style.display = 'block';
-  document.getElementById('monthly-detail-content').innerHTML = '<div class="section-note">Loading…</div>';
-  await fetchCompletions();
   showEquipDetail(equip, 'monthly-detail-content', 'submitMonthly', 'done');
   window.scrollTo(0, 0);
 }
 
-function showAnnualList() { document.getElementById('annual-list-view').style.display='block'; document.getElementById('annual-detail-view').style.display='none'; }
-async function showAnnualDetail(equipId) {
+function showAnnualList() {
+  document.getElementById('annual-list-view').style.display='block';
+  document.getElementById('annual-detail-view').style.display='none';
+  fetchCompletions().catch(()=>{});
+}
+function showAnnualDetail(equipId) {
   const equip = ANNUAL_EQUIPMENT.find(e => e.id === equipId);
   document.getElementById('annual-list-view').style.display = 'none';
   document.getElementById('annual-detail-view').style.display = 'block';
-  document.getElementById('annual-detail-content').innerHTML = '<div class="section-note">Loading…</div>';
-  await fetchCompletions();
   showEquipDetail(equip, 'annual-detail-content', 'submitAnnual', 'done');
   window.scrollTo(0, 0);
 }
