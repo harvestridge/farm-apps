@@ -392,33 +392,21 @@ const VEHICLES=[
   {id:'yale',name:'Forklift — Yale',icon:'🏭',tasks:[{t:'Per Barrons schedule',f:'Per Barrons'}]}
 ];
 
-// ── COMPLETION TRACKING (Google Sheets) ──────────────────────────────────────
-// sharedCompletions: { "equipId:taskIdx": { timestamp, tech, status } }
+// ── COMPLETION TRACKING ───────────────────────────────────────────────────────
+// localStorage = instant (used to render UI immediately)
+// Sheets = source of truth (synced in background after UI is visible)
+const LS_KEY = 'hrp_pm_v2';
 let sharedCompletions = {};
-let completionsLoaded = false;
 
-async function fetchCompletions() {
-  try {
-    const url = `${SCRIPT_URL}?tab=PMCompletions`;
-    const res = await fetch(url);
-    const rows = await res.json();
-    // Columns: [timestamp, equipId, taskIndex, taskName, frequency, technician, status]
-    // Row 0 is header, skip it. Walk oldest→newest so last write wins.
-    const built = {};
-    for (let r = 1; r < rows.length; r++) {
-      const [ts, equipId, taskIdx, , , tech, status] = rows[r];
-      const key = `${equipId}:${taskIdx}`;
-      if (status === 'Done') {
-        built[key] = { timestamp: ts, tech };
-      } else if (status === 'Cleared') {
-        delete built[key];
-      }
-    }
-    sharedCompletions = built;
-  } catch(e) {
-    sharedCompletions = {};
-  }
-  completionsLoaded = true;
+function lsLoad() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function lsSave(data) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadFromLocalStorage() {
+  sharedCompletions = lsLoad();
 }
 
 function getCompletion(equipId, taskIdx) {
@@ -427,21 +415,42 @@ function getCompletion(equipId, taskIdx) {
 
 function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
   const ts = new Date().toLocaleString();
-  const headers = ['Timestamp','EquipID','TaskIndex','TaskName','Frequency','Technician','Status'];
-  const row = [ts, equipId, taskIdx, taskName, freq, tech, status];
-  // Optimistically update local cache
   const key = `${equipId}:${taskIdx}`;
+  // 1. Update in-memory instantly
   if (status === 'Done') {
     sharedCompletions[key] = { timestamp: ts, tech };
   } else {
     delete sharedCompletions[key];
   }
-  // Fire and forget — don't block UI on Sheets write
+  // 2. Persist to localStorage instantly
+  lsSave(sharedCompletions);
+  // 3. Write to Sheets in background — fire and forget
+  const headers = ['Timestamp','EquipID','TaskIndex','TaskName','Frequency','Technician','Status'];
+  const row = [ts, equipId, taskIdx, taskName, freq, tech, status];
   fetch(SCRIPT_URL, {
     method: 'POST', mode: 'no-cors',
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify({tab:'PMCompletions', headers, row})
   }).catch(()=>{});
+}
+
+// Pull latest from Sheets → overwrite localStorage → next page load picks it up
+// Called in background after UI is already visible — never blocks anything
+function syncFromSheets() {
+  fetch(`${SCRIPT_URL}?tab=PMCompletions`)
+    .then(r => r.json())
+    .then(rows => {
+      const built = {};
+      for (let r = 1; r < rows.length; r++) {
+        const [ts, equipId, taskIdx, , , tech, status] = rows[r];
+        const key = `${equipId}:${taskIdx}`;
+        if (status === 'Done') built[key] = { timestamp: ts, tech };
+        else if (status === 'Cleared') delete built[key];
+      }
+      sharedCompletions = built;
+      lsSave(built);
+    })
+    .catch(()=>{});
 }
 
 function getDueDate(timestamp, freq) {
@@ -618,7 +627,7 @@ function updatePMProgress(equipId) {
 function showMonthlyList() {
   document.getElementById('monthly-list-view').style.display='block';
   document.getElementById('monthly-detail-view').style.display='none';
-  fetchCompletions().catch(()=>{});
+  syncFromSheets();
 }
 function showMonthlyDetail(equipId) {
   const equip = MONTHLY_EQUIPMENT.find(e => e.id === equipId);
@@ -631,7 +640,7 @@ function showMonthlyDetail(equipId) {
 function showAnnualList() {
   document.getElementById('annual-list-view').style.display='block';
   document.getElementById('annual-detail-view').style.display='none';
-  fetchCompletions().catch(()=>{});
+  syncFromSheets();
 }
 function showAnnualDetail(equipId) {
   const equip = ANNUAL_EQUIPMENT.find(e => e.id === equipId);
@@ -689,16 +698,14 @@ document.getElementById('formDate').value = new Date().toISOString().split('T')[
 document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
 document.getElementById('tab-monthly').style.display = 'block';
 
-// Show loading state then fetch completions before building lists
-(async () => {
-  document.getElementById('monthly-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
-  document.getElementById('annual-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
-  document.getElementById('vehicles-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
-  await fetchCompletions();
-  buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
-  buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
-  buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
-})();
+// 1. Load from localStorage instantly — UI renders immediately
+loadFromLocalStorage();
+buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
+buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
+buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
+// 2. Sync from Sheets in background — updates localStorage for cross-device sharing
+//    Next time any iPad opens a card it will have the latest data
+syncFromSheets();
 </script>
 </body>
 </html>
