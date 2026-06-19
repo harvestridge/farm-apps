@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Visitor Log</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
+.card-body{padding:14px 16px;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+.field-hint{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:7px;}
+.field-hint strong{color:var(--text);}
+input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:none;}
+.initials-input{width:100px !important;}
+.row-2{display:flex;gap:10px;}
+.row-2 .field-group{flex:1;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.log-entry{padding:12px 16px;border-bottom:0.5px solid #f0ece6;}
+.log-entry:last-child{border-bottom:none;}
+.log-name{font-size:14px;font-weight:600;}
+.log-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.log-screens{font-size:12px;margin-top:5px;display:flex;gap:12px;flex-wrap:wrap;}
+.screen-badge{padding:2px 8px;border-radius:10px;font-weight:600;font-size:11px;}
+.badge-clear{background:var(--green-pale);color:var(--green);}
+.badge-flag{background:var(--red-light);color:var(--red);}
+.log-equip{font-size:11px;color:var(--muted);margin-top:3px;}
+.log-by{font-size:11px;color:var(--muted);margin-top:2px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.empty-log{font-size:13px;color:var(--muted);padding:16px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <div class="sub">Visitor / Contractor Sign-In Log &nbsp;·&nbsp; SQF 10.4.4</div>
+</div>
+
+<div class="content">
+
+  <div class="section-note">All visitors, contracted service workers, and affiliate employees must sign in and out. List all equipment being taken into the facility.</div>
+
+  <div class="card">
+    <div class="card-head">New Entry</div>
+    <div class="card-body">
+
+      <div class="field-group">
+        <div class="field-label">Name &amp; Company <span style="color:var(--red)">*</span></div>
+        <input type="text" id="v-name" placeholder="e.g. John Smith — Acme Services">
+      </div>
+
+      <div class="row-2">
+        <div class="field-group">
+          <div class="field-label">Date <span style="color:var(--red)">*</span></div>
+          <input type="date" id="v-date">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Duration <span style="color:var(--red)">*</span></div>
+          <select id="v-duration">
+            <option value="">Select…</option>
+            <option>AM Only</option>
+            <option>PM Only</option>
+            <option>Full Day</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Purpose <span style="color:var(--red)">*</span></div>
+        <select id="v-purpose">
+          <option value="">Select purpose…</option>
+          <option>Inspection</option>
+          <option>Maintenance</option>
+          <option>Audit</option>
+          <option>Delivery</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Tools or Equipment Brought In / Out</div>
+        <textarea id="v-equipment" rows="2" placeholder="List any tools or equipment, or leave blank if none"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">Screenings</div>
+    <div class="card-body">
+
+      <div class="field-group">
+        <div class="field-label">Health Screening <span style="color:var(--red)">*</span></div>
+        <div class="field-hint">Do you have any illnesses that could pose a risk to our food or employees? <strong>(e.g. diarrhea, COVID, infection)</strong></div>
+        <select id="v-health">
+          <option value="">Select answer…</option>
+          <option value="No — cleared">No — cleared</option>
+          <option value="Yes — see notes">Yes — see notes</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Allergen Screening <span style="color:var(--red)">*</span></div>
+        <div class="field-hint">Have you consumed any allergens prior to arrival, or have any trace of allergens on clothing?<br><strong>Allergens: wheat, soy, eggs, dairy, fish, shellfish, sesame, peanuts, tree nuts.</strong></div>
+        <select id="v-allergen">
+          <option value="">Select answer…</option>
+          <option value="No — cleared">No — cleared</option>
+          <option value="Yes — see notes">Yes — see notes</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Additional Notes</div>
+        <textarea id="v-notes" rows="2" placeholder="Any flags, exceptions, or additional notes…"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">HRP Sign-Off</div>
+    <div class="card-body">
+      <div class="row-2">
+        <div class="field-group">
+          <div class="field-label">HRP Employee <span style="color:var(--red)">*</span></div>
+          <select id="v-staff">
+            <option value="">Select…</option>
+            <option>Tyler</option><option>Allen</option><option>Andy</option>
+            <option>Tim</option><option>Aaron</option><option>Adrianna</option>
+            <option>Tiffany</option><option>Garrett</option><option>Lupe</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Initials <span style="color:var(--red)">*</span></div>
+          <input type="text" id="v-initials" maxlength="6" placeholder="e.g. TS">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="submitVisitor()">Log Visitor</button>
+
+  <div id="visitor-log" style="margin-top:20px;"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+const sessionLog = [];
+
+async function submitVisitor() {
+  const name     = document.getElementById('v-name').value.trim();
+  const date     = document.getElementById('v-date').value;
+  const duration = document.getElementById('v-duration').value;
+  const purpose  = document.getElementById('v-purpose').value;
+  const equipment= document.getElementById('v-equipment').value.trim();
+  const health   = document.getElementById('v-health').value;
+  const allergen = document.getElementById('v-allergen').value;
+  const notes    = document.getElementById('v-notes').value.trim();
+  const staff    = document.getElementById('v-staff').value;
+  const initials = document.getElementById('v-initials').value.trim();
+
+  if (!name || !date || !duration || !purpose || !health || !allergen || !staff || !initials) {
+    showToast('Please complete all required fields', true);
+    return;
+  }
+
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Name & Company','Date','Purpose','Duration','Tools/Equipment','Health Screening','Allergen Screening','Notes','HRP Employee','HRP Initials'];
+  const row = [ts, name, date, purpose, duration, equipment || 'None', health, allergen, notes, staff, initials];
+
+  // Add to session log immediately
+  sessionLog.unshift({ts, name, date, purpose, duration, equipment, health, allergen, notes, staff, initials});
+  renderLog();
+  showToast('✓ Visitor logged!', false);
+
+  // Reset form (keep date + staff)
+  document.getElementById('v-name').value = '';
+  document.getElementById('v-duration').value = '';
+  document.getElementById('v-purpose').value = '';
+  document.getElementById('v-equipment').value = '';
+  document.getElementById('v-health').value = '';
+  document.getElementById('v-allergen').value = '';
+  document.getElementById('v-notes').value = '';
+  document.getElementById('v-initials').value = '';
+
+  // Post to Sheets in background
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'Visitors', headers, row})
+  }).catch(() => {});
+}
+
+function renderLog() {
+  const container = document.getElementById('visitor-log');
+  if (!sessionLog.length) { container.innerHTML = ''; return; }
+
+  let html = '<div class="card"><div class="card-head">Entries This Session</div>';
+  sessionLog.forEach(e => {
+    const hClear = e.health.startsWith('No');
+    const aClear = e.allergen.startsWith('No');
+    html += `<div class="log-entry">
+      <div class="log-name">${e.name}</div>
+      <div class="log-meta">${e.date} &nbsp;·&nbsp; ${e.purpose} &nbsp;·&nbsp; ${e.duration}</div>
+      <div class="log-screens">
+        <span class="screen-badge ${hClear?'badge-clear':'badge-flag'}">Health: ${hClear?'✓ Clear':'⚠ Flagged'}</span>
+        <span class="screen-badge ${aClear?'badge-clear':'badge-flag'}">Allergens: ${aClear?'✓ Clear':'⚠ Flagged'}</span>
+      </div>
+      ${e.equipment ? `<div class="log-equip">Equipment: ${e.equipment}</div>` : ''}
+      ${e.notes ? `<div class="log-equip">Notes: ${e.notes}</div>` : ''}
+      <div class="log-by">Checked in by ${e.initials} (${e.staff}) at ${e.ts}</div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Pre-fill date
+document.getElementById('v-date').value = new Date().toISOString().split('T')[0];
+</script>
+</body>
+</html>
