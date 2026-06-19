@@ -392,22 +392,57 @@ const VEHICLES=[
   {id:'yale',name:'Forklift — Yale',icon:'🏭',tasks:[{t:'Per Barrons schedule',f:'Per Barrons'}]}
 ];
 
-// ── COMPLETION TRACKING (localStorage) ───────────────────────────────────────
-const STORAGE_KEY = 'hrp_pm_completions';
+// ── COMPLETION TRACKING (Google Sheets) ──────────────────────────────────────
+// sharedCompletions: { "equipId:taskIdx": { timestamp, tech, status } }
+let sharedCompletions = {};
+let completionsLoaded = false;
 
-function loadCompletions() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { return {}; }
+async function fetchCompletions() {
+  try {
+    const url = `${SCRIPT_URL}?tab=PMCompletions`;
+    const res = await fetch(url);
+    const rows = await res.json();
+    // Columns: [timestamp, equipId, taskIndex, taskName, frequency, technician, status]
+    // Row 0 is header, skip it. Walk oldest→newest so last write wins.
+    const built = {};
+    for (let r = 1; r < rows.length; r++) {
+      const [ts, equipId, taskIdx, , , tech, status] = rows[r];
+      const key = `${equipId}:${taskIdx}`;
+      if (status === 'Done') {
+        built[key] = { timestamp: ts, tech };
+      } else if (status === 'Cleared') {
+        delete built[key];
+      }
+    }
+    sharedCompletions = built;
+  } catch(e) {
+    sharedCompletions = {};
+  }
+  completionsLoaded = true;
 }
-function saveCompletion(equipId, taskIdx, timestamp) {
-  const data = loadCompletions();
-  if (!data[equipId]) data[equipId] = {};
-  data[equipId][taskIdx] = timestamp;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+function getCompletion(equipId, taskIdx) {
+  return sharedCompletions[`${equipId}:${taskIdx}`] || null;
 }
-function clearCompletion(equipId, taskIdx) {
-  const data = loadCompletions();
-  if (data[equipId]) delete data[equipId][taskIdx];
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+async function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','EquipID','TaskIndex','TaskName','Frequency','Technician','Status'];
+  const row = [ts, equipId, taskIdx, taskName, freq, tech, status];
+  // Optimistically update local cache
+  const key = `${equipId}:${taskIdx}`;
+  if (status === 'Done') {
+    sharedCompletions[key] = { timestamp: ts, tech };
+  } else {
+    delete sharedCompletions[key];
+  }
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({tab:'PMCompletions', headers, row})
+    });
+  } catch(e) { /* silent — local cache still updated */ }
 }
 
 function getDueDate(timestamp, freq) {
@@ -428,10 +463,12 @@ function formatDueLabel(dueDate, freq) {
   return {label: `Next due: ${dateStr}`, cls: ''};
 }
 
-function formatElapsed(timestamp) {
+function formatElapsed(timestamp, tech) {
   if (!timestamp) return '';
   const d = new Date(timestamp);
-  return `Completed ${d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})} at ${d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
+  const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const timeStr = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return `Completed ${dateStr} at ${timeStr}${tech ? ' by ' + tech : ''}`;
 }
 
 // ── TASK STATE ────────────────────────────────────────────────────────────────
@@ -459,17 +496,18 @@ function buildEquipList(equipArray, containerId, detailFn) {
 
 function showEquipDetail(equip, contentId, submitFn, mode) {
   // mode: 'pm' = pass/fail, 'done' = done button
-  const completions = loadCompletions();
   taskStates[equip.id] = equip.tasks.map(t => ({task:t.t, freq:t.f, result:'', initials:'', notes:''}));
 
   let html = `<div class="card"><div class="card-head">${equip.name} <span>${equip.tasks.length} task${equip.tasks.length!==1?'s':''}</span></div><div class="progress-wrap"><div class="progress-fill" id="pfill-${equip.id}" style="width:0%"></div></div><div id="tasklist-${equip.id}">`;
 
   equip.tasks.forEach((task, i) => {
     const freqClass = task.f === 'Monthly' ? 'freq-monthly' : 'freq-annual';
-    const prevTs = completions[equip.id]?.[i] || null;
+    const completion = getCompletion(equip.id, i);
+    const prevTs = completion ? completion.timestamp : null;
+    const prevTech = completion ? completion.tech : null;
     const dueDate = getDueDate(prevTs, task.f);
     const dueInfo = formatDueLabel(dueDate, task.f);
-    const elapsedStr = formatElapsed(prevTs);
+    const elapsedStr = prevTs ? formatElapsed(prevTs, prevTech) : '';
 
     let dueHtml = '';
     if (dueInfo) {
@@ -484,7 +522,7 @@ function showEquipDetail(equip, contentId, submitFn, mode) {
             <span class="freq-badge ${freqClass}">${task.f}</span><br>${task.t}
             ${dueHtml}
           </div>
-          <button class="btn-done${isDone?' sel':''}" id="done-${equip.id}-${i}" onclick="toggleDone('${equip.id}',${i},'${task.f}')">${isDone?'✓ Done':'Mark Done'}</button>
+          <button class="btn-done${isDone?' sel':''}" id="done-${equip.id}-${i}" onclick="toggleDone('${equip.id}',${i},'${task.f}',${JSON.stringify(task.t)})">${isDone?'✓ Done':'Mark Done'}</button>
         </div>
         ${isDone?`<div class="task-timer" id="timer-${equip.id}-${i}">${elapsedStr}</div>`:`<div class="task-timer" id="timer-${equip.id}-${i}"></div>`}
         <div class="task-extra">
@@ -523,33 +561,35 @@ function showEquipDetail(equip, contentId, submitFn, mode) {
   document.getElementById(contentId).innerHTML = html;
 }
 
-function toggleDone(equipId, i, freq) {
-  const completions = loadCompletions();
+function toggleDone(equipId, i, freq, taskName) {
   const btn = document.getElementById(`done-${equipId}-${i}`);
   const timerEl = document.getElementById(`timer-${equipId}-${i}`);
   const row = document.getElementById(`trow-${equipId}-${i}`);
   const alreadyDone = btn.classList.contains('sel');
+  const tech = document.getElementById('technician').value || '';
 
   if (alreadyDone) {
-    clearCompletion(equipId, i);
+    postCompletion(equipId, i, taskName, freq, tech, 'Cleared');
     btn.classList.remove('sel');
     btn.textContent = 'Mark Done';
     timerEl.textContent = '';
     row.classList.remove('task-done');
     taskStates[equipId][i].result = '';
+    // Clear due date label
+    const label = row.querySelector('.due-date');
+    if (label) label.remove();
   } else {
     const now = new Date().toISOString();
-    saveCompletion(equipId, i, now);
+    postCompletion(equipId, i, taskName, freq, tech, 'Done');
     btn.classList.add('sel');
     btn.textContent = '✓ Done';
-    timerEl.textContent = formatElapsed(now);
+    timerEl.textContent = formatElapsed(now, tech);
     row.classList.add('task-done');
     taskStates[equipId][i].result = 'Done';
 
     // Update due date label
     const dueDate = getDueDate(now, freq);
     const dueInfo = formatDueLabel(dueDate, freq);
-    // Refresh due label in task-label
     const label = row.querySelector('.due-date');
     if (label) { label.className = `due-date ${dueInfo.cls}`; label.textContent = dueInfo.label; }
     else {
@@ -577,19 +617,23 @@ function updatePMProgress(equipId) {
 }
 
 function showMonthlyList() { document.getElementById('monthly-list-view').style.display='block'; document.getElementById('monthly-detail-view').style.display='none'; }
-function showMonthlyDetail(equipId) {
+async function showMonthlyDetail(equipId) {
   const equip = MONTHLY_EQUIPMENT.find(e => e.id === equipId);
   document.getElementById('monthly-list-view').style.display = 'none';
   document.getElementById('monthly-detail-view').style.display = 'block';
-  showEquipDetail(equip, 'monthly-detail-content', 'submitMonthly', 'pm');
+  document.getElementById('monthly-detail-content').innerHTML = '<div class="section-note">Loading…</div>';
+  await fetchCompletions();
+  showEquipDetail(equip, 'monthly-detail-content', 'submitMonthly', 'done');
   window.scrollTo(0, 0);
 }
 
 function showAnnualList() { document.getElementById('annual-list-view').style.display='block'; document.getElementById('annual-detail-view').style.display='none'; }
-function showAnnualDetail(equipId) {
+async function showAnnualDetail(equipId) {
   const equip = ANNUAL_EQUIPMENT.find(e => e.id === equipId);
   document.getElementById('annual-list-view').style.display = 'none';
   document.getElementById('annual-detail-view').style.display = 'block';
+  document.getElementById('annual-detail-content').innerHTML = '<div class="section-note">Loading…</div>';
+  await fetchCompletions();
   showEquipDetail(equip, 'annual-detail-content', 'submitAnnual', 'done');
   window.scrollTo(0, 0);
 }
@@ -626,6 +670,7 @@ async function submitPM(equipId, tab) {
 }
 
 function submitMonthly(equipId) { submitPM(equipId, 'PMMonthly'); }
+
 function submitAnnual(equipId) { submitPM(equipId, 'PMAnnual'); }
 function submitVehicle(equipId) { submitPM(equipId, 'PMVehicles'); }
 
@@ -638,11 +683,19 @@ function showToast(msg, isError) {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
-buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
-buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
-buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
 document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
 document.getElementById('tab-monthly').style.display = 'block';
+
+// Show loading state then fetch completions before building lists
+(async () => {
+  document.getElementById('monthly-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
+  document.getElementById('annual-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
+  document.getElementById('vehicles-equip-list').innerHTML = '<div class="section-note">Loading completion data…</div>';
+  await fetchCompletions();
+  buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
+  buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
+  buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
+})();
 </script>
 </body>
 </html>
