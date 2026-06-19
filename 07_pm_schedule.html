@@ -3,158 +3,710 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Harvest Ridge – App Home</title>
+<title>Harvest Ridge – PM Schedule</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:14px;}
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
-.app-header{background:var(--green);color:white;padding:24px 20px 20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.25);}
-.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1;}
-.app-header .sub{font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;}
-.app-header .date{font-size:12px;opacity:.6;margin-top:8px;}
-.content{padding:20px 16px;max-width:600px;margin:0 auto;}
-.section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:20px 0 10px 4px;}
-.app-btn{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px;text-decoration:none;color:var(--text);transition:all .15s;-webkit-tap-highlight-color:transparent;}
-.app-btn:active{background:#f0ede8;transform:scale(0.98);}
-.app-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
-.app-info{flex:1;}
-.app-name{font-size:15px;font-weight:600;margin-bottom:2px;}
-.app-desc{font-size:12px;color:var(--muted);line-height:1.4;}
-.app-arrow{font-size:20px;color:var(--muted);flex-shrink:0;}
-.green-icon{background:var(--green-pale);}
-.gold-icon{background:#fef3c7;}
-.blue-icon{background:#eff6ff;}
-.red-icon{background:#fdecea;}
-.footer{text-align:center;margin-top:30px;font-size:11px;color:var(--muted);}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input::placeholder{color:rgba(255,255,255,.6);}
+.header-meta select option{color:#000;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.equip-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;cursor:pointer;transition:box-shadow .15s;}
+.equip-card:active{box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.equip-row{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.equip-icon{width:36px;height:36px;border-radius:8px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.equip-info{flex:1;}
+.equip-name{font-size:14px;font-weight:600;}
+.equip-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.equip-arrow{font-size:18px;color:var(--muted);}
+.freq-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;}
+.freq-monthly{background:#e8f3e8;color:var(--green);}
+.freq-annual{background:#fef3c7;color:#92400e;}
+.freq-yearly{background:#fef3c7;color:#92400e;}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;}
+.card-head span{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;}
+.task-row{padding:10px 16px;border-bottom:0.5px solid #f0ece6;}
+.task-row:last-child{border-bottom:none;}
+.task-row.task-done{background:#f0faf0;}
+.task-top{display:flex;align-items:flex-start;gap:8px;}
+.task-label{flex:1;font-size:13px;line-height:1.5;padding-top:2px;}
+.task-label .due-date{display:inline-block;font-size:11px;color:var(--muted);margin-top:3px;}
+.task-label .due-date.overdue{color:var(--red);font-weight:600;}
+.task-label .due-date.due-soon{color:#d97706;font-weight:600;}
+.pf-btns{display:flex;gap:5px;flex-shrink:0;}
+.pf-btns button{padding:5px 10px;border-radius:14px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-pass.sel{background:var(--green);border-color:var(--green);color:white;}
+.btn-fail.sel{background:var(--red);border-color:var(--red);color:white;}
+.btn-done{padding:5px 12px;border-radius:14px;border:1.5px solid var(--green);background:none;font-size:12px;font-weight:600;cursor:pointer;color:var(--green);transition:all .15s;}
+.btn-done.sel{background:var(--green);border-color:var(--green);color:white;}
+.task-timer{font-size:11px;color:var(--muted);margin-top:4px;font-style:italic;}
+.task-extra{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;}
+.task-extra input{flex:0 0 70px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;text-align:center;}
+.task-extra textarea{flex:1;min-width:160px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;resize:none;}
+.task-extra input:focus,.task-extra textarea:focus{border-color:var(--green);outline:none;}
+.field-group{margin-bottom:12px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:none;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.progress-wrap{background:#e0ddd8;height:5px;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
+.tab-bar{display:flex;background:var(--green-light);overflow-x:auto;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
+.tab-btn.active{color:white;border-bottom-color:var(--gold);}
 </style>
 </head>
 <body>
-
 <div class="app-header">
-  <h1>Harvest Ridge</h1>
-  <div class="sub">Processing Apps</div>
-  <div class="date" id="today-date"></div>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <div class="sub">Preventative Maintenance Schedule</div>
+  <div class="header-meta">
+    <input type="date" id="formDate">
+    <select id="technician">
+      <option value="">Select Technician</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+    </select>
+  </div>
 </div>
-
+<div class="tab-bar">
+  <button class="tab-btn active" id="tabbtn-monthly" onclick="switchTab('monthly',this)">Monthly</button>
+  <button class="tab-btn" id="tabbtn-annual" onclick="switchTab('annual',this)">Annual</button>
+  <button class="tab-btn" id="tabbtn-vehicles" onclick="switchTab('vehicles',this)">Vehicles</button>
+</div>
 <div class="content">
-
-  <div class="section-label">📋 Daily & Processing</div>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/01_daily_processing.html">
-    <div class="app-icon green-icon">📋</div>
-    <div class="app-info">
-      <div class="app-name">Daily Processing Sheet</div>
-      <div class="app-desc">Pre-Op, magnets, production log, knife inspection, Post-Op</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/02_packaging_inspection.html">
-    <div class="app-icon green-icon">📦</div>
-    <div class="app-info">
-      <div class="app-name">Packaging Inspection</div>
-      <div class="app-desc">Incoming packaging material receiving inspection</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/03_monthly_inspection.html">
-    <div class="app-icon green-icon">🗓️</div>
-    <div class="app-info">
-      <div class="app-name">Monthly Inspection</div>
-      <div class="app-desc">Food defense, food safety, cleanliness, equipment, pest control</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <div class="section-label">🛡️ Food Safety</div>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/04_wood_register.html">
-    <div class="app-icon gold-icon">🪵</div>
-    <div class="app-info">
-      <div class="app-name">Wood Register</div>
-      <div class="app-desc">5 zone inspection — processing, warehouse, dock</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/05_glass_brittle_plastics.html">
-    <div class="app-icon gold-icon">🔍</div>
-    <div class="app-info">
-      <div class="app-name">Glass & Brittle Plastics</div>
-      <div class="app-desc">7 zone inspection — all glass and brittle plastic items</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/08_cleaning_schedule.html">
-    <div class="app-icon gold-icon">🧹</div>
-    <div class="app-info">
-      <div class="app-name">Master Cleaning Schedule</div>
-      <div class="app-desc">Monthly and yearly cleaning tasks — processing, warehouse, outside</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/09_chemical_inventory.html">
-    <div class="app-icon gold-icon">🧪</div>
-    <div class="app-info">
-      <div class="app-name">Chemical Inventory</div>
-      <div class="app-desc">Quarterly usage log — food grade and non-food grade chemicals</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <div class="section-label">🔧 Maintenance</div>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/06_work_orders.html">
-    <div class="app-icon blue-icon">🔧</div>
-    <div class="app-info">
-      <div class="app-name">Work Orders</div>
-      <div class="app-desc">Report issues, track repairs, manager sign-off</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/07_pm_schedule.html">
-    <div class="app-icon blue-icon">⚙️</div>
-    <div class="app-info">
-      <div class="app-name">PM Schedule</div>
-      <div class="app-desc">Preventative maintenance — 32 pieces of equipment, vehicles</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <div class="section-label">🏭 Warehouse</div>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/10_warehouse.html">
-    <div class="app-icon red-icon">🌾</div>
-    <div class="app-info">
-      <div class="app-name">Warehouse Management</div>
-      <div class="app-desc">Grading, live inventory, outgoing shipments</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <a class="app-btn" href="https://harvestridge.github.io/farm-apps/11_coa_generator.html">
-    <div class="app-icon red-icon">📄</div>
-    <div class="app-info">
-      <div class="app-name">COA Generator</div>
-      <div class="app-desc">Certificate of Analysis — 8 customer templates, auto-fills from grading</div>
-    </div>
-    <div class="app-arrow">›</div>
-  </a>
-
-  <div class="footer">Harvest Ridge Processing · Caro MI · All data saved to Google Sheets</div>
-
+  <div class="section active" id="tab-monthly">
+    <div id="monthly-list-view"><div class="section-note">Select a piece of equipment to log its monthly PM tasks.</div><div id="monthly-equip-list"></div></div>
+    <div id="monthly-detail-view" style="display:none;"><button class="back-btn" onclick="showMonthlyList()">← Back to Equipment</button><div id="monthly-detail-content"></div></div>
+  </div>
+  <div class="section" id="tab-annual">
+    <div id="annual-list-view"><div class="section-note">Select a category to log annual PM tasks.</div><div id="annual-equip-list"></div></div>
+    <div id="annual-detail-view" style="display:none;"><button class="back-btn" onclick="showAnnualList()">← Back to Categories</button><div id="annual-detail-content"></div></div>
+  </div>
+  <div class="section" id="tab-vehicles">
+    <div id="vehicles-list-view"><div class="section-note">Select a vehicle to log its PM tasks.</div><div id="vehicles-equip-list"></div></div>
+    <div id="vehicles-detail-view" style="display:none;"><button class="back-btn" onclick="showVehiclesList()">← Back to Vehicles</button><div id="vehicles-detail-content"></div></div>
+  </div>
 </div>
-
+<div class="toast" id="toast"></div>
 <script>
-const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const now=new Date();
-document.getElementById('today-date').textContent=`${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+
+// ── MONTHLY EQUIPMENT ────────────────────────────────────────────────────────
+const MONTHLY_EQUIPMENT=[
+  {id:'outside-conveyor',name:'Outside Conveyor Belt',icon:'⚙️',tasks:[
+    {t:'Grease (2) front and (2) rear bearings',f:'Monthly'},
+    {t:'Visually inspect belt for wear/damage',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Check gearbox oil level',f:'Monthly'}
+  ]},
+  {id:'outside-elevator',name:'Outside Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect (2) drive belts for wear, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Check gearbox oil level',f:'Monthly'},
+    {t:'Grease (2) top bearings, (2) motor bearings, (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Visually inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'clipper-fanning',name:'Clipper Fanning Mill',icon:'🌀',tasks:[
+    {t:'Inspect (2) drive belts for wear, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) motor bearings, (2) fan bearings, (10) drive/eccentric/counterweight bearings',f:'Monthly'},
+    {t:'Check all bolts, nuts for tightness',f:'Monthly'},
+    {t:'Clean fan screens and inspect for damage, replace or repair as necessary',f:'Monthly'},
+    {t:'Inspect discharge duct for debris',f:'Monthly'}
+  ]},
+  {id:'mill-extraction',name:'Mill Extraction Blower',icon:'💨',tasks:[
+    {t:'Inspect (2) drive belts for wear, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) drive bearings and (2) motor bearings',f:'Monthly'}
+  ]},
+  {id:'air-compressor-1',name:'Air Compressor #1 (Blue)',icon:'🔩',tasks:[
+    {t:'Inspect (2) drive belts for wear, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Check compressor oil level',f:'Monthly'},
+    {t:'Test (2) safety valves',f:'Monthly'},
+    {t:'Verify unloader operation',f:'Monthly'}
+  ]},
+  {id:'air-compressor-2',name:'Air Compressor #2 (Green)',icon:'🔩',tasks:[
+    {t:'Inspect drive belt for wear, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Check compressor oil level',f:'Monthly'},
+    {t:'Test safety valve',f:'Monthly'},
+    {t:'Verify unloader operation',f:'Monthly'}
+  ]},
+  {id:'air-compressor-3',name:'Air Compressor #3 (Yellow)',icon:'🔩',tasks:[
+    {t:'Test safety valve',f:'Monthly'}
+  ]},
+  {id:'mill-elevator',name:'Mill Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect (2) drive belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (4) top bearings and (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'oliver-destoner',name:'Oliver Destoner',icon:'⚙️',tasks:[
+    {t:'Inspect (4) drive belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (4) fan bearings, (2) drive bearings, and (2) eccentric bearings',f:'Monthly'},
+    {t:'Inspect air skirt for damage/leaks',f:'Monthly'},
+    {t:'Inspect (3) intake screens for damage/holes',f:'Monthly'},
+    {t:'Inspect (5) 5-point brass insert knobs for wear/damage, check tension adjust as necessary',f:'Monthly'},
+    {t:'Inspect (12) mounting spacers for wear and/damage, check tension adjust as necessary',f:'Monthly'},
+    {t:'Remove all dust and debris from fan compartment',f:'Monthly'}
+  ]},
+  {id:'oliver-gravity',name:'Oliver Gravity Table',icon:'📐',tasks:[
+    {t:'Inspect (3) fan belts and (1) table belt and (1) chute belt for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (8) fan bearings and (2) table bearings (1) chute bearing as necessary',f:'Monthly'},
+    {t:'Grease (2) fan motor bearings, (2) table motor bearings and (2) chute motor bearings as necessary',f:'Monthly'},
+    {t:'Check all bearing setscrews for proper tightness',f:'Monthly'},
+    {t:'Inspect upper and lower air skirts for damage/leaks',f:'Monthly'},
+    {t:'Inspect (12) intake screens for damage/holes',f:'Monthly'},
+    {t:'Remove all dust and debris from fan compartment',f:'Monthly'}
+  ]},
+  {id:'gravity-conveyor',name:'Gravity Table Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Grease (2) front and (2) rear bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check gearbox oil level, add oil as necessary',f:'Monthly'}
+  ]},
+  {id:'gravity-rerun-leg',name:'Gravity Table Re-Run Leg',icon:'🔧',tasks:[
+    {t:'Inspect drive belt(s) for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease top and bottom bearings as necessary',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'cleaning-finish',name:'Cleaning Line Finish Leg',icon:'🔧',tasks:[
+    {t:'Inspect (2) drive belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (4) top bearings and (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'reject-elevator',name:'Reject Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect (1) drive belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) top bearings and (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'},
+    {t:'Check gearbox oil level',f:'Monthly'}
+  ]},
+  {id:'color-sorter-finish',name:'Color Sorter Finish Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect gearbox for leaks/damage',f:'Monthly'},
+    {t:'Grease (6) top bearings and (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'color-sorter-bin',name:'Color Sorter Bin Leg',icon:'🔧',tasks:[
+    {t:'Inspect (2) drive belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (4) top bearings and (2) bottom bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'reject-conveyor',name:'Reject Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Inspect chain for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) front bearings and (2) rear bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check gearbox oil level',f:'Monthly'}
+  ]},
+  {id:'finish-conveyor',name:'Finish Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Inspect chain for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) front bearings and (2) rear bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check gearbox oil level',f:'Monthly'}
+  ]},
+  {id:'pieces-bin-conveyor',name:'Pieces Bin Conveyor',icon:'➡️',tasks:[
+    {t:'Inspect chain/belt for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease front and rear bearings as necessary',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check gearbox oil level, add as necessary',f:'Monthly'}
+  ]},
+  {id:'dust-collector',name:'Dust Collector',icon:'🌫️',tasks:[
+    {t:'Clean top filter bag and inspect for damage/wear',f:'Monthly'},
+    {t:'Empty collection bag as necessary',f:'Monthly'},
+    {t:'Check hose for holes/damage',f:'Monthly'}
+  ]},
+  {id:'roller-mill',name:'Roller Mill',icon:'⚙️',tasks:[
+    {t:'Grease (8) roll position, (8) roll, (1) feeder, (2) motor, and (4) idler bearings as necessary',f:'Monthly'},
+    {t:'Inspect (4) roll drive belts and (1) feed belt for wear and tension, adjust or replace as necessary',f:'Monthly'},
+    {t:'Inspect (4) tension springs for damage/breakage, adjust or replace as necessary',f:'Monthly'}
+  ]},
+  {id:'aspirator',name:'Aspirator',icon:'💨',tasks:[
+    {t:'Inspect (1) drive belt for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) motor bearings and (2) fan bearings',f:'Monthly'},
+    {t:'Clean fan screens, aspirator screen, and discharge screen and inspect for damage',f:'Monthly'}
+  ]},
+  {id:'aspirator-leg',name:'Aspirator Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect (1) 4L480 belt and (1) 4L460 belt for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'screen-separator',name:'Screen Separator (Shaker Table)',icon:'📐',tasks:[
+    {t:'Grease (2) front and (2) rear bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check gearbox oil level, add oil as necessary',f:'Monthly'}
+  ]},
+  {id:'large-halves',name:'Large (Halves) Leg',icon:'🔧',tasks:[
+    {t:'Grease (2) top bearings, (2) bottom bearings, and (2) idler bearings as necessary',f:'Monthly'},
+    {t:'Inspect (1) 4L460 belt and (2) 5L500 belts for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Inspect leg for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'small-pieces',name:'Small (Pieces) Leg',icon:'🔧',tasks:[
+    {t:'Grease (2) top bearings, (2) bottom bearings, and (2) idler bearings as necessary',f:'Monthly'},
+    {t:'Inspect (1) B-47 belt and (1) B-? belt for wear/damage, check tension and adjust as necessary',f:'Monthly'},
+    {t:'Inspect leg for missing/damaged buckets and fasteners',f:'Monthly'}
+  ]},
+  {id:'conveyor-blower',name:'Conveyor Blower',icon:'💨',tasks:[
+    {t:'Inspect (3) drive belts for wear and tension, adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) motor bearings',f:'Monthly'},
+    {t:'Check pressure control for proper operation',f:'Monthly'},
+    {t:'Check (2) gearbox oil levels, adjust as necessary',f:'Monthly'},
+    {t:'Clean filter element',f:'Monthly'}
+  ]},
+  {id:'hammermill',name:'Hammermill',icon:'🔨',tasks:[
+    {t:'Inspect (1) drive belt, (1) drive chain for wear and tension, adjust as necessary',f:'Monthly'},
+    {t:'Grease (2) motor bearings',f:'Monthly'},
+    {t:'Inspect hammermill blades for damage/wear',f:'Monthly'},
+    {t:'Check airlock gearbox oil level, add as necessary',f:'Monthly'}
+  ]},
+  {id:'top-airlock',name:'Top Airlock',icon:'🔩',tasks:[
+    {t:'Inspect (1) chain for wear/tension, replace or adjust as necessary',f:'Monthly'}
+  ]},
+  {id:'bottom-airlock',name:'Bottom Airlock',icon:'🔩',tasks:[
+    {t:'Inspect (1) chain for wear/tension, replace or adjust as necessary',f:'Monthly'},
+    {t:'Inspect (1) 6723 belt for wear/tension, adjust or replace as necessary',f:'Monthly'},
+    {t:'Check gearbox oil add as necessary',f:'Monthly'}
+  ]},
+  {id:'batco-1',name:'Batco Belt Conveyor #1',icon:'➡️',tasks:[
+    {t:'Grease (2) upper bearings, (6) tensioner bearings, (2) lower bearings, and (2) PTO shaft bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check (2) tension cables for proper tension and inspect for damage',f:'Monthly'},
+    {t:'Inspect (6) belt guide rollers for damage and check for free rotation',f:'Monthly'},
+    {t:'Inspect hydraulic lift cylinder, hose, valve, and fitting for leaks',f:'Monthly'},
+    {t:'Check (2) tires for proper inflation, fill as necessary',f:'Monthly'},
+    {t:'Inspect spill skirt for damage/holes',f:'Monthly'}
+  ]},
+  {id:'batco-2',name:'Batco Belt Conveyor #2',icon:'➡️',tasks:[
+    {t:'Grease (2) upper bearings, (6) tensioner bearings, (2) lower bearings, and (2) PTO shaft bearings',f:'Monthly'},
+    {t:'Check belt tension and alignment, adjust as necessary',f:'Monthly'},
+    {t:'Inspect belt for damage/wear',f:'Monthly'},
+    {t:'Check (2) tension cables for proper tension and inspect for damage',f:'Monthly'},
+    {t:'Inspect (6) belt guide rollers for damage and check for free rotation',f:'Monthly'},
+    {t:'Inspect hydraulic lift cylinder, hose, valve, and fitting for leaks',f:'Monthly'},
+    {t:'Check (2) tires for proper inflation, fill as necessary',f:'Monthly'},
+    {t:'Inspect spill skirt for damage/holes',f:'Monthly'}
+  ]}
+];
+
+// ── ANNUAL EQUIPMENT ─────────────────────────────────────────────────────────
+const ANNUAL_EQUIPMENT=[
+  {id:'annual-outside-conveyor',name:'Outside Conveyor Belt',icon:'⚙️',tasks:[
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-outside-elevator',name:'Outside Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect back side of belt',f:'Annual'},
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-air-compressor-1',name:'Air Compressor #1 (Blue)',icon:'🔩',tasks:[
+    {t:'Change compressor oil',f:'Annual'},
+    {t:'Replace filter element',f:'Annual'}
+  ]},
+  {id:'annual-air-compressor-2',name:'Air Compressor #2 (Green)',icon:'🔩',tasks:[
+    {t:'Change compressor oil',f:'Annual'},
+    {t:'Replace (2) filter elements',f:'Annual'}
+  ]},
+  {id:'annual-air-compressor-3',name:'Air Compressor #3 (Yellow)',icon:'🔩',tasks:[
+    {t:'Replace (2) filter elements',f:'Annual'}
+  ]},
+  {id:'annual-mill-elevator',name:'Mill Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect backside of belt',f:'Annual'}
+  ]},
+  {id:'annual-gravity-conveyor',name:'Gravity Table Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-reject-elevator',name:'Reject Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect back side of belt',f:'Annual'},
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-color-sorter-finish',name:'Color Sorter Finish Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect backside of belt',f:'Annual'}
+  ]},
+  {id:'annual-reject-conveyor',name:'Reject Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-finish-conveyor',name:'Finish Conveyor Belt',icon:'➡️',tasks:[
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-aspirator-leg',name:'Aspirator Elevator Leg',icon:'🔧',tasks:[
+    {t:'Inspect backside of belt',f:'Annual'}
+  ]},
+  {id:'annual-screen-separator',name:'Screen Separator (Shaker Table)',icon:'📐',tasks:[
+    {t:'Change gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-conveyor-blower',name:'Conveyor Blower',icon:'💨',tasks:[
+    {t:'Replace filter element as necessary',f:'Annual'},
+    {t:'Change (2) gearbox oil, clean box, add new oil',f:'Annual'}
+  ]},
+  {id:'annual-hammermill',name:'Hammermill',icon:'🔨',tasks:[
+    {t:'Change airlock gearbox oil',f:'Annual'}
+  ]},
+  {id:'annual-bottom-airlock',name:'Bottom Airlock',icon:'🔩',tasks:[
+    {t:'Change gearbox oil, clean box, add new oil',f:'Annual'}
+  ]},
+  {id:'annual-forklift-filters',name:'Forklift Air Filters',icon:'🚜',tasks:[
+    {t:'Caterpillar Forklift — check/replace air filter',f:'Annual'},
+    {t:'Yale Forklift — check/replace air filter',f:'Annual'},
+    {t:'Hyster Forklift — check/replace air filter',f:'Annual'}
+  ]},
+  {id:'annual-hvac',name:'HVAC Filters',icon:'❄️',tasks:[
+    {t:'Warehouse AC Filters — check/replace',f:'Annual'}
+  ]},
+  {id:'annual-dust-collector',name:'Dust Collector (Annual)',icon:'🌫️',tasks:[
+    {t:'Dust Collector Filter & Bag — deep clean/replace',f:'Annual'}
+  ]}
+];
+
+// ── VEHICLES ─────────────────────────────────────────────────────────────────
+const VEHICLES=[
+  {id:'dump-truck',name:'1978 Chevrolet Tandem Dump Truck',icon:'🚛',tasks:[{t:'Annual CAM inspection',f:'August'}]},
+  {id:'semi-tractor',name:'1987 Ford LTL 9000 Semi Tractor',icon:'🚛',tasks:[{t:'Annual CAM inspection',f:'August'}]},
+  {id:'semi-trailer',name:'1985 Great Dane Semi Trailer',icon:'🚛',tasks:[{t:'Annual CAM inspection',f:'August'}]},
+  {id:'f150',name:'Ford F-150',icon:'🚗',tasks:[{t:'Oil change (every 5,000 miles)',f:'Every 5,000 mi'},{t:'Annual CAM maintenance',f:'August'}]},
+  {id:'jd-2025r',name:'John Deere 2025R Tractor',icon:'🚜',tasks:[{t:'Annual CAM inspection',f:'August'}]},
+  {id:'jd-120r',name:'John Deere 120R Loader',icon:'🚜',tasks:[{t:'Annual CAM inspection',f:'August'}]},
+  {id:'hyster',name:'Forklift — Hyster H55XM',icon:'🏭',tasks:[{t:'Per Barrons schedule',f:'Per Barrons'}]},
+  {id:'caterpillar',name:'Forklift — Caterpillar GP25K',icon:'🏭',tasks:[{t:'Per Barrons schedule',f:'Per Barrons'}]},
+  {id:'yale',name:'Forklift — Yale',icon:'🏭',tasks:[{t:'Per Barrons schedule',f:'Per Barrons'}]}
+];
+
+// ── COMPLETION TRACKING ───────────────────────────────────────────────────────
+// localStorage = instant (used to render UI immediately)
+// Sheets = source of truth (synced in background after UI is visible)
+const LS_KEY = 'hrp_pm_v2';
+let sharedCompletions = {};
+
+function lsLoad() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); } catch(e) { return {}; }
+}
+function lsSave(data) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function loadFromLocalStorage() {
+  sharedCompletions = lsLoad();
+}
+
+function getCompletion(equipId, taskIdx) {
+  return sharedCompletions[`${equipId}:${taskIdx}`] || null;
+}
+
+function postCompletion(equipId, taskIdx, taskName, freq, tech, status) {
+  const ts = new Date().toLocaleString();
+  const key = `${equipId}:${taskIdx}`;
+  // 1. Update in-memory instantly
+  if (status === 'Done') {
+    sharedCompletions[key] = { timestamp: ts, tech };
+  } else {
+    delete sharedCompletions[key];
+  }
+  // 2. Persist to localStorage instantly
+  lsSave(sharedCompletions);
+  // 3. Write to Sheets in background — fire and forget
+  const headers = ['Timestamp','EquipID','TaskIndex','TaskName','Frequency','Technician','Status'];
+  const row = [ts, equipId, taskIdx, taskName, freq, tech, status];
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'PMCompletions', headers, row})
+  }).catch(()=>{});
+}
+
+// Pull latest from Sheets → overwrite localStorage → next page load picks it up
+// Called in background after UI is already visible — never blocks anything
+function syncFromSheets() {
+  fetch(`${SCRIPT_URL}?tab=PMCompletions`)
+    .then(r => r.json())
+    .then(rows => {
+      const built = {};
+      for (let r = 1; r < rows.length; r++) {
+        const [ts, equipId, taskIdx, , , tech, status] = rows[r];
+        const key = `${equipId}:${taskIdx}`;
+        if (status === 'Done') built[key] = { timestamp: ts, tech };
+        else if (status === 'Cleared') delete built[key];
+      }
+      sharedCompletions = built;
+      lsSave(built);
+    })
+    .catch(()=>{});
+}
+
+function getDueDate(timestamp, freq) {
+  if (!timestamp) return null;
+  const d = new Date(timestamp);
+  if (freq === 'Monthly') d.setMonth(d.getMonth() + 1);
+  else if (freq === 'Annual') d.setFullYear(d.getFullYear() + 1);
+  return d;
+}
+
+function formatDueLabel(dueDate, freq) {
+  if (!dueDate) return null;
+  const now = new Date();
+  const diffDays = Math.round((dueDate - now) / (1000*60*60*24));
+  const dateStr = dueDate.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  if (diffDays < 0) return {label: `Overdue — was due ${dateStr}`, cls: 'overdue'};
+  if (diffDays <= 7) return {label: `Due soon — ${dateStr}`, cls: 'due-soon'};
+  return {label: `Next due: ${dateStr}`, cls: ''};
+}
+
+function formatElapsed(timestamp, tech) {
+  if (!timestamp) return '';
+  const d = new Date(timestamp);
+  const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  const timeStr = d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return `Completed ${dateStr} at ${timeStr}${tech ? ' by ' + tech : ''}`;
+}
+
+// ── TASK STATE ────────────────────────────────────────────────────────────────
+const taskStates = {};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function buildEquipList(equipArray, containerId, detailFn) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  equipArray.forEach(equip => {
+    const card = document.createElement('div');
+    card.className = 'equip-card';
+    card.onclick = () => detailFn(equip.id);
+    card.innerHTML = `<div class="equip-row"><div class="equip-icon">${equip.icon}</div><div class="equip-info"><div class="equip-name">${equip.name}</div><div class="equip-meta">${equip.tasks.length} task${equip.tasks.length!==1?'s':''}</div></div><div class="equip-arrow">›</div></div>`;
+    container.appendChild(card);
+  });
+}
+
+function showEquipDetail(equip, contentId, submitFn, mode) {
+  // mode: 'pm' = pass/fail, 'done' = done button
+  taskStates[equip.id] = equip.tasks.map(t => ({task:t.t, freq:t.f, result:'', initials:'', notes:''}));
+
+  let html = `<div class="card"><div class="card-head">${equip.name} <span>${equip.tasks.length} task${equip.tasks.length!==1?'s':''}</span></div><div class="progress-wrap"><div class="progress-fill" id="pfill-${equip.id}" style="width:0%"></div></div><div id="tasklist-${equip.id}">`;
+
+  equip.tasks.forEach((task, i) => {
+    const freqClass = task.f === 'Monthly' ? 'freq-monthly' : 'freq-annual';
+    const completion = getCompletion(equip.id, i);
+    const prevTs = completion ? completion.timestamp : null;
+    const prevTech = completion ? completion.tech : null;
+    const dueDate = getDueDate(prevTs, task.f);
+    const dueInfo = formatDueLabel(dueDate, task.f);
+    const elapsedStr = prevTs ? formatElapsed(prevTs, prevTech) : '';
+
+    let dueHtml = '';
+    if (dueInfo) {
+      dueHtml = `<div class="due-date ${dueInfo.cls}">${dueInfo.label}</div>`;
+    }
+
+    if (mode === 'done') {
+      const isDone = !!prevTs;
+      html += `<div class="task-row${isDone?' task-done':''}" id="trow-${equip.id}-${i}">
+        <div class="task-top">
+          <div class="task-label">
+            <span class="freq-badge ${freqClass}">${task.f}</span><br>${task.t}
+            ${dueHtml}
+          </div>
+          <button class="btn-done${isDone?' sel':''}" id="done-${equip.id}-${i}" onclick="toggleDone('${equip.id}',${i},'${task.f}')">${isDone?'✓ Done':'Mark Done'}</button>
+        </div>
+        ${isDone?`<div class="task-timer" id="timer-${equip.id}-${i}">${elapsedStr}</div>`:`<div class="task-timer" id="timer-${equip.id}-${i}"></div>`}
+        <div class="task-extra">
+          <input type="text" maxlength="6" placeholder="Initials" id="init-${equip.id}-${i}" oninput="taskStates['${equip.id}'][${i}].initials=this.value">
+          <textarea rows="1" placeholder="Notes (optional)" id="notes-${equip.id}-${i}" oninput="taskStates['${equip.id}'][${i}].notes=this.value"></textarea>
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="task-row" id="trow-${equip.id}-${i}">
+        <div class="task-top">
+          <div class="task-label">
+            <span class="freq-badge ${freqClass}">${task.f}</span><br>${task.t}
+            ${dueHtml}
+          </div>
+          <div class="pf-btns">
+            <button class="btn-pass" id="pass-${equip.id}-${i}" onclick="setTaskResult('${equip.id}',${i},'Pass')">✓</button>
+            <button class="btn-fail" id="fail-${equip.id}-${i}" onclick="setTaskResult('${equip.id}',${i},'Fail')">✗</button>
+          </div>
+        </div>
+        ${dueHtml ? '' : ''}
+        <div class="task-extra">
+          <input type="text" maxlength="6" placeholder="Initials" id="init-${equip.id}-${i}" oninput="taskStates['${equip.id}'][${i}].initials=this.value">
+          <textarea rows="1" placeholder="Notes (optional)" id="notes-${equip.id}-${i}" oninput="taskStates['${equip.id}'][${i}].notes=this.value"></textarea>
+        </div>
+      </div>`;
+    }
+  });
+
+  html += `</div></div>
+  <div class="card"><div class="card-head">Manager Sign-Off</div><div style="padding:14px 16px;">
+    <div class="field-group"><div class="field-label">General Notes</div><textarea id="general-notes-${equip.id}" rows="2" placeholder="Any additional notes for this equipment..."></textarea></div>
+    <div class="field-group"><div class="field-label">Verified By</div><select id="verified-by-${equip.id}"><option value="">Select manager</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option></select></div>
+  </div></div>
+  <button class="submit-btn" onclick="${submitFn}('${equip.id}')">Submit to Google Sheets</button>`;
+
+  document.getElementById(contentId).innerHTML = html;
+}
+
+function toggleDone(equipId, i, freq) {
+  const taskName = taskStates[equipId]?.[i]?.task || '';
+  const btn = document.getElementById(`done-${equipId}-${i}`);
+  const timerEl = document.getElementById(`timer-${equipId}-${i}`);
+  const row = document.getElementById(`trow-${equipId}-${i}`);
+  const alreadyDone = btn.classList.contains('sel');
+  const tech = document.getElementById('technician').value || '';
+
+  if (alreadyDone) {
+    postCompletion(equipId, i, taskName, freq, tech, 'Cleared');
+    btn.classList.remove('sel');
+    btn.textContent = 'Mark Done';
+    timerEl.textContent = '';
+    row.classList.remove('task-done');
+    taskStates[equipId][i].result = '';
+    // Clear due date label
+    const label = row.querySelector('.due-date');
+    if (label) label.remove();
+  } else {
+    const now = new Date().toISOString();
+    postCompletion(equipId, i, taskName, freq, tech, 'Done');
+    btn.classList.add('sel');
+    btn.textContent = '✓ Done';
+    timerEl.textContent = formatElapsed(now, tech);
+    row.classList.add('task-done');
+    taskStates[equipId][i].result = 'Done';
+
+    // Update due date label
+    const dueDate = getDueDate(now, freq);
+    const dueInfo = formatDueLabel(dueDate, freq);
+    const label = row.querySelector('.due-date');
+    if (label) { label.className = `due-date ${dueInfo.cls}`; label.textContent = dueInfo.label; }
+    else {
+      const taskLabel = row.querySelector('.task-label');
+      const div = document.createElement('div');
+      div.className = `due-date ${dueInfo.cls}`;
+      div.textContent = dueInfo.label;
+      taskLabel.appendChild(div);
+    }
+  }
+  updatePMProgress(equipId);
+}
+
+function setTaskResult(equipId, i, val) {
+  taskStates[equipId][i].result = val;
+  document.getElementById(`pass-${equipId}-${i}`).className = 'btn-pass' + (val === 'Pass' ? ' sel' : '');
+  document.getElementById(`fail-${equipId}-${i}`).className = 'btn-fail' + (val === 'Fail' ? ' sel' : '');
+  updatePMProgress(equipId);
+}
+
+function updatePMProgress(equipId) {
+  const tasks = taskStates[equipId];
+  const done = tasks.filter(t => t.result).length;
+  document.getElementById(`pfill-${equipId}`).style.width = `${(done / tasks.length) * 100}%`;
+}
+
+function showMonthlyList() {
+  document.getElementById('monthly-list-view').style.display='block';
+  document.getElementById('monthly-detail-view').style.display='none';
+  syncFromSheets();
+}
+function showMonthlyDetail(equipId) {
+  const equip = MONTHLY_EQUIPMENT.find(e => e.id === equipId);
+  document.getElementById('monthly-list-view').style.display = 'none';
+  document.getElementById('monthly-detail-view').style.display = 'block';
+  showEquipDetail(equip, 'monthly-detail-content', 'submitMonthly', 'done');
+  window.scrollTo(0, 0);
+}
+
+function showAnnualList() {
+  document.getElementById('annual-list-view').style.display='block';
+  document.getElementById('annual-detail-view').style.display='none';
+  syncFromSheets();
+}
+function showAnnualDetail(equipId) {
+  const equip = ANNUAL_EQUIPMENT.find(e => e.id === equipId);
+  document.getElementById('annual-list-view').style.display = 'none';
+  document.getElementById('annual-detail-view').style.display = 'block';
+  showEquipDetail(equip, 'annual-detail-content', 'submitAnnual', 'done');
+  window.scrollTo(0, 0);
+}
+
+function showVehiclesList() { document.getElementById('vehicles-list-view').style.display='block'; document.getElementById('vehicles-detail-view').style.display='none'; }
+function showVehiclesDetail(equipId) {
+  const equip = VEHICLES.find(e => e.id === equipId);
+  document.getElementById('vehicles-list-view').style.display = 'none';
+  document.getElementById('vehicles-detail-view').style.display = 'block';
+  showEquipDetail(equip, 'vehicles-detail-content', 'submitVehicle', 'pm');
+  window.scrollTo(0, 0);
+}
+
+async function submitPM(equipId, tab) {
+  const date = document.getElementById('formDate').value;
+  const tech = document.getElementById('technician').value;
+  if (!date || !tech) { showToast('Please select date and technician', true); return; }
+  const verifiedBy = document.getElementById(`verified-by-${equipId}`)?.value || '';
+  const generalNotes = document.getElementById(`general-notes-${equipId}`)?.value || '';
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Date','Technician','Equipment','Task','Frequency','Result','Initials','Notes','General Notes','Verified By'];
+  const rows = taskStates[equipId].map(t => [ts, date, tech, equipId, t.task, t.freq, t.result, t.initials, t.notes, generalNotes, verifiedBy]);
+  try {
+    for (const row of rows) {
+      await fetch(SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify({tab, headers, row})});
+    }
+    showToast('✓ Submitted to Google Sheets!', false);
+    setTimeout(() => {
+      if (tab === 'PMMonthly') showMonthlyList();
+      else if (tab === 'PMAnnual') showAnnualList();
+      else showVehiclesList();
+    }, 1800);
+  } catch(err) { showToast('Error — check connection', true); }
+}
+
+function submitMonthly(equipId) { submitPM(equipId, 'PMMonthly'); }
+
+function submitAnnual(equipId) { submitPM(equipId, 'PMAnnual'); }
+function submitVehicle(equipId) { submitPM(equipId, 'PMVehicles'); }
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
+document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+document.getElementById('tab-monthly').style.display = 'block';
+
+// 1. Load from localStorage instantly — UI renders immediately
+loadFromLocalStorage();
+buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
+buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
+buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
+// 2. Sync from Sheets in background — updates localStorage for cross-device sharing
+//    Next time any iPad opens a card it will have the latest data
+syncFromSheets();
 </script>
 </body>
 </html>
