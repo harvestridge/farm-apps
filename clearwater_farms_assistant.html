@@ -112,7 +112,7 @@ body {
   0%,60%,100% { transform: translateY(0); }
   30% { transform: translateY(-6px); }
 }
-.err { color: #c0392b; font-size: 13px; padding: 4px 0; }
+.errmsg { color: #c0392b; font-size: 13px; }
 #bar {
   background: white;
   border-top: 1px solid #C8D8EE;
@@ -138,6 +138,7 @@ body {
   color: #1a1a1a;
 }
 #inp:focus { border-color: #1B3A6B; background: white; }
+#inp::placeholder { color: #8a9ab0; }
 #btn {
   width: 40px; height: 40px;
   background: #1B3A6B;
@@ -184,10 +185,10 @@ body {
 </div>
 <div class="foot">Clearwater Farms &middot; Est. 2000 &middot; Caro, MI &middot; Powered by Claude AI</div>
 <script>
-var KEY = "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";
+var APIKEY = "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";
 var SYS = "You are the Clearwater Farms Assistant, a knowledgeable AI for Clearwater Farms (CWF), an organic grain and row crop operation in Caro, Michigan in the Thumb region. Established in 2000. Run by Jon and his farm crew. Certified organic. Crops: dry beans, soybeans, yellow corn, blue corn, spelt, wheat, rye. Primarily John Deere equipment including a Treffler 45-foot tine weeder. Your expertise: organic agronomy, crop rotation, mechanical weed control, cover cropping, organic fertility management, dry bean production, soybean and corn and small grain production, soil health, pest and disease management in organic systems, John Deere diagnostics including AutoTrac and GPS and 9RX, organic certification NOP rules and record keeping, Michigan Thumb weather and planting windows. Be practical, specific, and concise. Speak like a trusted agronomist who knows the Thumb region well. Do NOT discuss grain processing, food safety, or packaging.";
 
-var history = [];
+var chatLog = [];
 var busy = false;
 
 var chipMap = {
@@ -242,7 +243,6 @@ function addMsg(role, html) {
   wrap.appendChild(bub);
   msgs.appendChild(wrap);
   msgs.scrollTop = msgs.scrollHeight;
-  return bub;
 }
 
 function showDots() {
@@ -264,7 +264,7 @@ function showDots() {
 
 function removeDots() {
   var el = document.getElementById("dots");
-  if (el) el.remove();
+  if (el) { el.remove(); }
 }
 
 function renderText(raw) {
@@ -285,12 +285,10 @@ function renderText(raw) {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // bold: **text**
     ln = ln.replace(/[*][*]([^*]+)[*][*]/g, "<b>$1</b>");
-    // headings
     ln = ln.replace(/^#{1,3}\s+(.+)$/, "<b>$1</b>");
 
-    if (ln.match(/^[-*]\s+/)) {
+    if (/^[-*]\s/.test(ln)) {
       buf.push("<li>" + ln.replace(/^[-*]\s+/, "") + "</li>");
     } else if (ln.trim() === "") {
       flush();
@@ -304,9 +302,9 @@ function renderText(raw) {
 }
 
 async function go() {
-  if (busy) return;
+  if (busy) { return; }
   var text = inp.value.trim();
-  if (!text) return;
+  if (!text) { return; }
 
   inp.value = "";
   inp.style.height = "auto";
@@ -314,7 +312,7 @@ async function go() {
   btn.disabled = true;
 
   addMsg("user", "<p>" + text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;") + "</p>");
-  history.push({ role: "user", content: text });
+  chatLog.push({ role: "user", content: text });
   showDots();
 
   try {
@@ -322,7 +320,7 @@ async function go() {
       method: "POST",
       headers: {
         "content-type": "application/json",
-        "x-api-key": KEY,
+        "x-api-key": APIKEY,
         "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true"
       },
@@ -330,7 +328,7 @@ async function go() {
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
         system: SYS,
-        messages: history
+        messages: chatLog
       })
     });
 
@@ -338,17 +336,17 @@ async function go() {
     removeDots();
 
     if (data.error) {
-      addMsg("ai", "<p class='err'>API error: " + data.error.message + "</p>");
-      history.pop();
+      addMsg("ai", "<p class='errmsg'>Error: " + data.error.message + "</p>");
+      chatLog.pop();
     } else {
-      var reply = data.content.map(function(b){ return b.text || ""; }).join("");
-      history.push({ role: "assistant", content: reply });
+      var reply = data.content.map(function(b) { return b.text || ""; }).join("");
+      chatLog.push({ role: "assistant", content: reply });
       addMsg("ai", renderText(reply));
     }
   } catch(e) {
     removeDots();
-    addMsg("ai", "<p class='err'>Network error: " + e.message + "</p>");
-    history.pop();
+    addMsg("ai", "<p class='errmsg'>Network error: " + e.message + "</p>");
+    chatLog.pop();
   }
 
   busy = false;
