@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.tab-bar{display:flex;background:var(--green-light);}
+.tab-btn{flex:1;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;border-bottom:3px solid transparent;}
+.tab-btn.active{color:white;border-bottom-color:var(--gold);}
+.equip-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;cursor:pointer;}
+.equip-card:active{background:#f0ede8;}
+.equip-row{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.equip-icon{width:36px;height:36px;border-radius:8px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.equip-info{flex:1;}
+.equip-name{font-size:14px;font-weight:600;}
+.equip-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.equip-arrow{font-size:18px;color:var(--muted);}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
+.card-body{padding:14px 16px;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+input[type=text],input[type=date],select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus{border-color:var(--green);}
+.row-2{display:flex;gap:10px;}
+.row-2 .field-group{flex:1;}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.q-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;padding:16px;}
+.q-num{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;}
+.q-text{font-size:14px;font-weight:600;margin-bottom:12px;line-height:1.4;}
+.q-hint{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;margin-bottom:8px;}
+.opt-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:7px;cursor:pointer;transition:all .15s;}
+.opt-row.selected{background:var(--green-pale);border-color:var(--green);}
+.opt-row input{flex-shrink:0;}
+.opt-row .opt-label{font-size:13px;flex:1;}
+.tf-row{display:flex;gap:8px;}
+.tf-btn{flex:1;padding:11px;border-radius:8px;border:1.5px solid var(--border);background:white;font-size:14px;font-weight:600;cursor:pointer;text-align:center;}
+.tf-btn.sel{background:var(--green);border-color:var(--green);color:white;}
+.eval-section-head{font-size:13px;font-weight:700;color:var(--green);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px;}
+.eval-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px;padding:14px 16px;}
+.eval-item-label{font-size:14px;font-weight:600;margin-bottom:10px;}
+.eval-crit{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:7px 0;border-top:0.5px solid #f0ece6;}
+.eval-crit:first-of-type{border-top:none;}
+.eval-crit-text{font-size:12.5px;flex:1;line-height:1.4;}
+.eval-toggle{display:flex;gap:5px;flex-shrink:0;}
+.eval-toggle button{padding:5px 10px;border-radius:14px;border:1.5px solid var(--border);background:none;font-size:11px;font-weight:600;cursor:pointer;}
+.eval-toggle button.sel-yes{background:var(--green);border-color:var(--green);color:white;}
+.eval-toggle button.sel-no{background:var(--red);border-color:var(--red);color:white;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:10px;}
+.submit-btn:hover{background:var(--green-light);}
+.result-card{background:var(--card);border-radius:var(--radius);border:2px solid var(--green);padding:24px;text-align:center;margin-bottom:16px;}
+.result-card.fail{border-color:var(--red);}
+.result-score{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--green);letter-spacing:1px;}
+.result-card.fail .result-score{color:var(--red);}
+.result-label{font-size:14px;color:var(--muted);margin-top:4px;}
+.result-pass-fail{font-size:18px;font-weight:700;margin-top:10px;color:var(--green);}
+.result-card.fail .result-pass-fail{color:var(--red);}
+.review-item{padding:10px 0;border-bottom:0.5px solid #f0ece6;}
+.review-item:last-child{border-bottom:none;}
+.review-q{font-size:12.5px;font-weight:600;margin-bottom:3px;}
+.review-answer{font-size:12px;color:var(--muted);}
+.review-correct{color:var(--green);}
+.review-wrong{color:var(--red);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <div class="sub">Employee Training</div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tabbtn-quizzes" onclick="switchTab('quizzes',this)">Quizzes</button>
+  <button class="tab-btn" id="tabbtn-evals" onclick="switchTab('evals',this)">Visual Evaluations</button>
+</div>
+
+<div class="content">
+
+  <!-- QUIZ LIST -->
+  <div class="section active" id="tab-quizzes">
+    <div id="quiz-list-view">
+      <div class="section-note">Select a topic to begin a multiple-choice quiz. Your results will be saved.</div>
+      <div id="quiz-list"></div>
+    </div>
+    <div id="quiz-detail-view" style="display:none;"></div>
+  </div>
+
+  <!-- EVAL LIST -->
+  <div class="section" id="tab-evals">
+    <div id="eval-list-view">
+      <div class="section-note">Select a topic to conduct an employee visual evaluation. Each criterion is rated Yes/No.</div>
+      <div id="eval-list"></div>
+    </div>
+    <div id="eval-detail-view" style="display:none;"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="quiz_data.js"></script>
+<script src="eval_data.js"></script>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+const EMPLOYEES = ['Tyler','Allen','Andy','Tim','Aaron','Adrianna','Tiffany','Garrett','Lupe'];
+const QUIZ_ICONS = {comprehensive:'📚',gmp:'🧼',allergen:'🥜',foodfraud:'🛡️',haccp:'⚠️',pest:'🐛',chemicals:'🧪',shipping:'🚚'};
+const EVAL_ICONS = {sanitation:'🧽',shipping:'🚚',processing:'⚙️',environmental:'🔬',ccp:'🧲'};
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── QUIZ LIST ─────────────────────────────────────────────────────────────────
+function buildQuizList() {
+  const container = document.getElementById('quiz-list');
+  container.innerHTML = '';
+  Object.keys(QUIZZES).forEach(key => {
+    const quiz = QUIZZES[key];
+    const card = document.createElement('div');
+    card.className = 'equip-card';
+    card.onclick = () => startQuiz(key);
+    card.innerHTML = `<div class="equip-row"><div class="equip-icon">${QUIZ_ICONS[key]||'📋'}</div><div class="equip-info"><div class="equip-name">${quiz.title}</div><div class="equip-meta">${quiz.questions.length} questions</div></div><div class="equip-arrow">›</div></div>`;
+    container.appendChild(card);
+  });
+}
+
+let currentQuizKey = null;
+let currentQuizAnswers = [];
+let currentEmployee = '';
+
+function startQuiz(key) {
+  currentQuizKey = key;
+  currentQuizAnswers = QUIZZES[key].questions.map(() => null);
+  document.getElementById('quiz-list-view').style.display = 'none';
+  document.getElementById('quiz-detail-view').style.display = 'block';
+  renderQuizForm();
+  window.scrollTo(0,0);
+}
+
+function showQuizList() {
+  document.getElementById('quiz-list-view').style.display = 'block';
+  document.getElementById('quiz-detail-view').style.display = 'none';
+}
+
+function renderQuizForm() {
+  const quiz = QUIZZES[currentQuizKey];
+  let html = `<button class="back-btn" onclick="showQuizList()">← Back to Quizzes</button>
+  <div class="card"><div class="card-head">${quiz.title}</div><div class="card-body">
+    <div class="row-2">
+      <div class="field-group"><div class="field-label">Employee Name</div>
+        <select id="quiz-employee">
+          <option value="">Select…</option>
+          ${EMPLOYEES.map(e => `<option>${e}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group"><div class="field-label">Date</div><input type="date" id="quiz-date"></div>
+    </div>
+  </div></div>`;
+
+  quiz.questions.forEach((q, i) => {
+    html += `<div class="q-card"><div class="q-num">Question ${i+1} of ${quiz.questions.length}</div><div class="q-text">${q.q}</div>`;
+    if (q.type === 'tf') {
+      html += `<div class="tf-row">
+        <button type="button" class="tf-btn" id="q${i}-true" onclick="answerTF(${i}, true)">True</button>
+        <button type="button" class="tf-btn" id="q${i}-false" onclick="answerTF(${i}, false)">False</button>
+      </div>`;
+    } else if (q.type === 'multi') {
+      html += `<div class="q-hint">Select all that apply</div>`;
+      q.options.forEach((opt, j) => {
+        html += `<div class="opt-row" id="q${i}-opt${j}" onclick="toggleMulti(${i},${j})">
+          <input type="checkbox" id="q${i}-cb${j}" onclick="event.stopPropagation();toggleMulti(${i},${j})">
+          <div class="opt-label">${opt}</div>
+        </div>`;
+      });
+    } else if (q.type === 'order') {
+      html += `<div class="q-hint">Number each option 1–${q.options.length} in the correct order</div>`;
+      q.options.forEach((opt, j) => {
+        html += `<div class="opt-row" style="cursor:default;">
+          <input type="text" maxlength="1" style="width:40px;text-align:center;padding:6px;" id="q${i}-ord${j}" oninput="answerOrder(${i})">
+          <div class="opt-label">${opt}</div>
+        </div>`;
+      });
+    } else {
+      q.options.forEach((opt, j) => {
+        html += `<div class="opt-row" id="q${i}-opt${j}" onclick="answerSingle(${i},${j})">
+          <input type="radio" name="q${i}" id="q${i}-rb${j}" onclick="event.stopPropagation();answerSingle(${i},${j})">
+          <div class="opt-label">${opt}</div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  });
+
+  html += `<button class="submit-btn" onclick="submitQuiz()">Submit Quiz</button>`;
+  document.getElementById('quiz-detail-view').innerHTML = html;
+}
+
+function answerSingle(qIdx, optIdx) {
+  currentQuizAnswers[qIdx] = [optIdx];
+  QUIZZES[currentQuizKey].questions[qIdx].options.forEach((_, j) => {
+    document.getElementById(`q${qIdx}-opt${j}`).classList.toggle('selected', j === optIdx);
+    document.getElementById(`q${qIdx}-rb${j}`).checked = (j === optIdx);
+  });
+}
+
+function toggleMulti(qIdx, optIdx) {
+  if (!Array.isArray(currentQuizAnswers[qIdx])) currentQuizAnswers[qIdx] = [];
+  const arr = currentQuizAnswers[qIdx];
+  const pos = arr.indexOf(optIdx);
+  if (pos === -1) arr.push(optIdx); else arr.splice(pos, 1);
+  document.getElementById(`q${qIdx}-opt${optIdx}`).classList.toggle('selected', arr.includes(optIdx));
+  document.getElementById(`q${qIdx}-cb${optIdx}`).checked = arr.includes(optIdx);
+}
+
+function answerTF(qIdx, val) {
+  currentQuizAnswers[qIdx] = val;
+  document.getElementById(`q${qIdx}-true`).classList.toggle('sel', val === true);
+  document.getElementById(`q${qIdx}-false`).classList.toggle('sel', val === false);
+}
+
+function answerOrder(qIdx) {
+  const q = QUIZZES[currentQuizKey].questions[qIdx];
+  const vals = q.options.map((_, j) => {
+    const v = document.getElementById(`q${qIdx}-ord${j}`).value;
+    return v ? parseInt(v) : null;
+  });
+  currentQuizAnswers[qIdx] = vals;
+}
+
+function gradeQuiz() {
+  const quiz = QUIZZES[currentQuizKey];
+  let correct = 0;
+  const review = [];
+  quiz.questions.forEach((q, i) => {
+    const given = currentQuizAnswers[i];
+    let isCorrect = false;
+    let givenText = '';
+    if (q.type === 'tf') {
+      isCorrect = given === q.answer;
+      givenText = given === null ? '(no answer)' : (given ? 'True' : 'False');
+    } else if (q.type === 'multi' || q.type === 'order') {
+      const g = Array.isArray(given) ? given : [];
+      const a = q.answer;
+      isCorrect = g.length === a.length && g.every((v,idx) => q.type === 'order' ? v === a[idx] : a.includes(v));
+      givenText = q.type === 'order'
+        ? (g.every(v=>v) ? g.map(v=>q.options[v-1]||'?').join(', ') : '(incomplete)')
+        : (g.length ? g.map(idx => q.options[idx]).join(', ') : '(no answer)');
+    } else {
+      const g = Array.isArray(given) ? given[0] : null;
+      isCorrect = g !== null && q.answer.includes(g);
+      givenText = g !== null ? q.options[g] : '(no answer)';
+    }
+    if (isCorrect) correct++;
+    review.push({q: q.q, given: givenText, correct: isCorrect});
+  });
+  return {correct, total: quiz.questions.length, review};
+}
+
+async function submitQuiz() {
+  const employee = document.getElementById('quiz-employee').value;
+  const date = document.getElementById('quiz-date').value;
+  if (!employee || !date) { showToast('Please select employee and date', true); return; }
+
+  const result = gradeQuiz();
+  const pct = Math.round((result.correct / result.total) * 100);
+  const pass = pct >= 80;
+
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Employee','Date','Quiz','Score','Total','Percent','Pass/Fail'];
+  const row = [ts, employee, date, QUIZZES[currentQuizKey].title, result.correct, result.total, pct, pass ? 'Pass' : 'Fail'];
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'TrainingQuizzes', headers, row})
+  }).catch(()=>{});
+
+  renderQuizResult(employee, result, pct, pass);
+}
+
+function renderQuizResult(employee, result, pct, pass) {
+  let html = `<button class="back-btn" onclick="showQuizList()">← Back to Quizzes</button>
+  <div class="result-card ${pass ? '' : 'fail'}">
+    <div class="result-score">${result.correct}/${result.total}</div>
+    <div class="result-label">${pct}% — ${employee}</div>
+    <div class="result-pass-fail">${pass ? '✓ PASS' : '✗ FAIL — Retraining Required'}</div>
+  </div>
+  <div class="card"><div class="card-head">Review</div><div class="card-body">`;
+  result.review.forEach((r, i) => {
+    html += `<div class="review-item">
+      <div class="review-q">${i+1}. ${r.q}</div>
+      <div class="review-answer ${r.correct ? 'review-correct' : 'review-wrong'}">${r.correct ? '✓' : '✗'} Your answer: ${r.given}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+  document.getElementById('quiz-detail-view').innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+// ── EVALUATIONS ──────────────────────────────────────────────────────────────
+function buildEvalList() {
+  const container = document.getElementById('eval-list');
+  container.innerHTML = '';
+  Object.keys(EVALUATIONS).forEach(key => {
+    const ev = EVALUATIONS[key];
+    const itemCount = ev.sections.reduce((sum, s) => sum + s.items.length, 0);
+    const card = document.createElement('div');
+    card.className = 'equip-card';
+    card.onclick = () => startEval(key);
+    card.innerHTML = `<div class="equip-row"><div class="equip-icon">${EVAL_ICONS[key]||'📋'}</div><div class="equip-info"><div class="equip-name">${ev.title}</div><div class="equip-meta">${itemCount} evaluation items</div></div><div class="equip-arrow">›</div></div>`;
+    container.appendChild(card);
+  });
+}
+
+let currentEvalKey = null;
+let evalResults = {};
+
+function startEval(key) {
+  currentEvalKey = key;
+  evalResults = {};
+  document.getElementById('eval-list-view').style.display = 'none';
+  document.getElementById('eval-detail-view').style.display = 'block';
+  renderEvalForm();
+  window.scrollTo(0,0);
+}
+
+function showEvalList() {
+  document.getElementById('eval-list-view').style.display = 'block';
+  document.getElementById('eval-detail-view').style.display = 'none';
+}
+
+function renderEvalForm() {
+  const ev = EVALUATIONS[currentEvalKey];
+  let html = `<button class="back-btn" onclick="showEvalList()">← Back to Evaluations</button>
+  <div class="card"><div class="card-head">${ev.title}</div><div class="card-body">
+    <div class="section-note" style="margin-bottom:0;">${ev.description}</div>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <div class="row-2">
+      <div class="field-group"><div class="field-label">Employee Name</div><input type="text" id="eval-employee" placeholder="Employee name"></div>
+      <div class="field-group"><div class="field-label">Title</div><input type="text" id="eval-title" placeholder="Job title"></div>
+    </div>
+    <div class="row-2">
+      <div class="field-group"><div class="field-label">Date</div><input type="date" id="eval-date"></div>
+      <div class="field-group"><div class="field-label">Trainer Name</div>
+        <select id="eval-trainer"><option value="">Select…</option>${EMPLOYEES.map(e=>`<option>${e}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="field-group"><div class="field-label">Evaluation Type</div>
+      <select id="eval-type"><option>Annual Review</option><option>Special Incident</option></select>
+    </div>
+  </div></div>`;
+
+  ev.sections.forEach((section, si) => {
+    html += `<div class="eval-section-head">${section.name}</div>`;
+    section.items.forEach((item, ii) => {
+      html += `<div class="eval-item"><div class="eval-item-label">${item.label}</div>`;
+      item.criteria.forEach((crit, ci) => {
+        const id = `${si}-${ii}-${ci}`;
+        html += `<div class="eval-crit">
+          <div class="eval-crit-text">${crit}</div>
+          <div class="eval-toggle">
+            <button type="button" id="ec-${id}-yes" onclick="setEvalCrit('${id}','Yes')">Yes</button>
+            <button type="button" id="ec-${id}-no" onclick="setEvalCrit('${id}','No')">No</button>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
+    });
+  });
+
+  html += `<div class="card"><div class="card-body">
+    <div class="field-group"><div class="field-label">Overall Notes</div><input type="text" id="eval-notes" placeholder="Any additional notes..."></div>
+  </div></div>
+  <button class="submit-btn" onclick="submitEval()">Submit Evaluation</button>`;
+
+  document.getElementById('eval-detail-view').innerHTML = html;
+}
+
+function setEvalCrit(id, val) {
+  evalResults[id] = val;
+  document.getElementById(`ec-${id}-yes`).className = val === 'Yes' ? 'sel-yes' : '';
+  document.getElementById(`ec-${id}-no`).className = val === 'No' ? 'sel-no' : '';
+}
+
+async function submitEval() {
+  const employee = document.getElementById('eval-employee').value.trim();
+  const title = document.getElementById('eval-title').value.trim();
+  const date = document.getElementById('eval-date').value;
+  const trainer = document.getElementById('eval-trainer').value;
+  const evalType = document.getElementById('eval-type').value;
+  const notes = document.getElementById('eval-notes').value.trim();
+
+  if (!employee || !date || !trainer) { showToast('Please fill in employee, date, and trainer', true); return; }
+
+  const ev = EVALUATIONS[currentEvalKey];
+  let totalCriteria = 0, yesCount = 0, noCount = 0;
+  const flaggedItems = [];
+
+  ev.sections.forEach((section, si) => {
+    section.items.forEach((item, ii) => {
+      item.criteria.forEach((crit, ci) => {
+        const id = `${si}-${ii}-${ci}`;
+        totalCriteria++;
+        const val = evalResults[id];
+        if (val === 'Yes') yesCount++;
+        else if (val === 'No') { noCount++; flaggedItems.push(`${item.label}: ${crit}`); }
+      });
+    });
+  });
+
+  const pct = totalCriteria ? Math.round((yesCount/totalCriteria)*100) : 0;
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Employee','Title','Date','Trainer','Eval Type','Form','Yes Count','No Count','Total Criteria','Percent','Flagged Items','Notes'];
+  const row = [ts, employee, title, date, trainer, evalType, ev.title, yesCount, noCount, totalCriteria, pct, flaggedItems.join('; '), notes];
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'TrainingEvaluations', headers, row})
+  }).catch(()=>{});
+
+  showToast('✓ Evaluation submitted!', false);
+
+  let html = `<button class="back-btn" onclick="showEvalList()">← Back to Evaluations</button>
+  <div class="result-card ${noCount === 0 ? '' : 'fail'}">
+    <div class="result-score">${yesCount}/${totalCriteria}</div>
+    <div class="result-label">${pct}% — ${employee}</div>
+    <div class="result-pass-fail">${noCount === 0 ? '✓ All Criteria Met' : `⚠ ${noCount} Area${noCount>1?'s':''} Need Attention`}</div>
+  </div>`;
+  if (flaggedItems.length) {
+    html += `<div class="card"><div class="card-head">Flagged Items</div><div class="card-body">`;
+    flaggedItems.forEach(f => html += `<div class="review-item"><div class="review-answer review-wrong">⚠ ${f}</div></div>`);
+    html += `</div></div>`;
+  }
+  document.getElementById('eval-detail-view').innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Init
+buildQuizList();
+buildEvalList();
+</script>
+</body>
+</html>
