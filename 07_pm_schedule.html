@@ -29,6 +29,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .equip-arrow{font-size:18px;color:var(--muted);}
 .freq-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:600;}
 .freq-monthly{background:#e8f3e8;color:var(--green);}
+.freq-weekly{background:#eff6ff;color:#1d4ed8;}
 .freq-annual{background:#fef3c7;color:#92400e;}
 .freq-yearly{background:#fef3c7;color:#92400e;}
 .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;}
@@ -88,6 +89,7 @@ textarea{resize:none;}
 </div>
 <div class="tab-bar">
   <button class="tab-btn active" id="tabbtn-monthly" onclick="switchTab('monthly',this)">Monthly</button>
+  <button class="tab-btn" id="tabbtn-weekly" onclick="switchTab('weekly',this)">Weekly</button>
   <button class="tab-btn" id="tabbtn-annual" onclick="switchTab('annual',this)">Annual</button>
   <button class="tab-btn" id="tabbtn-vehicles" onclick="switchTab('vehicles',this)">Vehicles</button>
 </div>
@@ -95,6 +97,10 @@ textarea{resize:none;}
   <div class="section active" id="tab-monthly">
     <div id="monthly-list-view"><div class="section-note">Select a piece of equipment to log its monthly PM tasks.</div><div id="monthly-equip-list"></div></div>
     <div id="monthly-detail-view" style="display:none;"><button class="back-btn" onclick="showMonthlyList()">← Back to Equipment</button><div id="monthly-detail-content"></div></div>
+  </div>
+  <div class="section" id="tab-weekly">
+    <div id="weekly-list-view"><div class="section-note">Select an item to log its weekly PM check.</div><div id="weekly-equip-list"></div></div>
+    <div id="weekly-detail-view" style="display:none;"><button class="back-btn" onclick="showWeeklyList()">← Back to Items</button><div id="weekly-detail-content"></div></div>
   </div>
   <div class="section" id="tab-annual">
     <div id="annual-list-view"><div class="section-note">Select a category to log annual PM tasks.</div><div id="annual-equip-list"></div></div>
@@ -311,6 +317,37 @@ const MONTHLY_EQUIPMENT=[
   ]}
 ];
 
+// ── WEEKLY EQUIPMENT ─────────────────────────────────────────────────────────
+const WEEKLY_EQUIPMENT=[
+  {id:'weekly-forklift-filters',name:'Forklift Air Filters',icon:'🚜',tasks:[
+    {t:'Caterpillar Forklift — check air filter',f:'Weekly'},
+    {t:'Yale Forklift — check air filter',f:'Weekly'},
+    {t:'Hyster Forklift — check air filter',f:'Weekly'}
+  ]},
+  {id:'weekly-compressor-filters',name:'Compressor Air Filters',icon:'🔩',tasks:[
+    {t:'Air Compressor #2 (Green) — check air filter',f:'Weekly'},
+    {t:'Air Compressor #3 (Yellow) — check air filter',f:'Weekly'}
+  ]},
+  {id:'weekly-water-traps',name:'Water Traps',icon:'💧',tasks:[
+    {t:'Compressed Air Condensate Drains',f:'Weekly'},
+    {t:'Air Compressor #1 (Blue) Drain Bucket',f:'Weekly'},
+    {t:'Air Compressor #2 (Green) Drain Bucket',f:'Weekly'},
+    {t:'Reject Leg Trap',f:'Weekly'},
+    {t:'Automatic Magnet Trap',f:'Weekly'},
+    {t:'Roller Mill Trap',f:'Weekly'},
+    {t:'Air Hose Trap',f:'Weekly'}
+  ]},
+  {id:'weekly-hvac-filters',name:'HVAC Filters',icon:'❄️',tasks:[
+    {t:'Warehouse AC Filters — check',f:'Weekly'}
+  ]},
+  {id:'weekly-air-dryer',name:'Air Dryer',icon:'💨',tasks:[
+    {t:'Air Dryer Blowout',f:'Weekly'}
+  ]},
+  {id:'weekly-dust-collector',name:'Dust Collector',icon:'🌫️',tasks:[
+    {t:'Dust Collector Filter & Bag — check',f:'Weekly'}
+  ]}
+];
+
 // ── ANNUAL EQUIPMENT ─────────────────────────────────────────────────────────
 const ANNUAL_EQUIPMENT=[
   {id:'annual-outside-conveyor',name:'Outside Conveyor Belt',icon:'⚙️',tasks:[
@@ -456,7 +493,8 @@ function syncFromSheets() {
 function getDueDate(timestamp, freq) {
   if (!timestamp) return null;
   const d = new Date(timestamp);
-  if (freq === 'Monthly') d.setMonth(d.getMonth() + 1);
+  if (freq === 'Weekly') d.setDate(d.getDate() + 7);
+  else if (freq === 'Monthly') d.setMonth(d.getMonth() + 1);
   else if (freq === 'Annual') d.setFullYear(d.getFullYear() + 1);
   return d;
 }
@@ -466,8 +504,9 @@ function formatDueLabel(dueDate, freq) {
   const now = new Date();
   const diffDays = Math.round((dueDate - now) / (1000*60*60*24));
   const dateStr = dueDate.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  const soonThreshold = freq === 'Weekly' ? 2 : 7;
   if (diffDays < 0) return {label: `Overdue — was due ${dateStr}`, cls: 'overdue'};
-  if (diffDays <= 7) return {label: `Due soon — ${dateStr}`, cls: 'due-soon'};
+  if (diffDays <= soonThreshold) return {label: `Due soon — ${dateStr}`, cls: 'due-soon'};
   return {label: `Next due: ${dateStr}`, cls: ''};
 }
 
@@ -509,7 +548,7 @@ function showEquipDetail(equip, contentId, submitFn, mode) {
   let html = `<div class="card"><div class="card-head">${equip.name} <span>${equip.tasks.length} task${equip.tasks.length!==1?'s':''}</span></div><div class="progress-wrap"><div class="progress-fill" id="pfill-${equip.id}" style="width:0%"></div></div><div id="tasklist-${equip.id}">`;
 
   equip.tasks.forEach((task, i) => {
-    const freqClass = task.f === 'Monthly' ? 'freq-monthly' : 'freq-annual';
+    const freqClass = task.f === 'Monthly' ? 'freq-monthly' : task.f === 'Weekly' ? 'freq-weekly' : 'freq-annual';
     const completion = getCompletion(equip.id, i);
     const prevTs = completion ? completion.timestamp : null;
     const prevTech = completion ? completion.tech : null;
@@ -638,6 +677,19 @@ function showMonthlyDetail(equipId) {
   window.scrollTo(0, 0);
 }
 
+function showWeeklyList() {
+  document.getElementById('weekly-list-view').style.display='block';
+  document.getElementById('weekly-detail-view').style.display='none';
+  syncFromSheets();
+}
+function showWeeklyDetail(equipId) {
+  const equip = WEEKLY_EQUIPMENT.find(e => e.id === equipId);
+  document.getElementById('weekly-list-view').style.display = 'none';
+  document.getElementById('weekly-detail-view').style.display = 'block';
+  showEquipDetail(equip, 'weekly-detail-content', 'submitWeekly', 'done');
+  window.scrollTo(0, 0);
+}
+
 function showAnnualList() {
   document.getElementById('annual-list-view').style.display='block';
   document.getElementById('annual-detail-view').style.display='none';
@@ -683,6 +735,7 @@ async function submitPM(equipId, tab) {
 }
 
 function submitMonthly(equipId) { submitPM(equipId, 'PMMonthly'); }
+function submitWeekly(equipId) { submitPM(equipId, 'PMWeekly'); }
 
 function submitAnnual(equipId) { submitPM(equipId, 'PMAnnual'); }
 function submitVehicle(equipId) { submitPM(equipId, 'PMVehicles'); }
@@ -702,6 +755,7 @@ document.getElementById('tab-monthly').style.display = 'block';
 // 1. Load from localStorage instantly — UI renders immediately
 loadFromLocalStorage();
 buildEquipList(MONTHLY_EQUIPMENT, 'monthly-equip-list', showMonthlyDetail);
+buildEquipList(WEEKLY_EQUIPMENT, 'weekly-equip-list', showWeeklyDetail);
 buildEquipList(ANNUAL_EQUIPMENT, 'annual-equip-list', showAnnualDetail);
 buildEquipList(VEHICLES, 'vehicles-equip-list', showVehiclesDetail);
 // 2. Sync from Sheets in background — updates localStorage for cross-device sharing
