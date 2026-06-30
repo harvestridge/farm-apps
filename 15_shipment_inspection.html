@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Harvest Ridge – Shipment Inspection</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
+.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.content{padding:16px;max-width:680px;margin:0 auto;}
+.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
+.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
+.card-body{padding:14px 16px;}
+.field-group{margin-bottom:14px;}
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+input[type=text],input[type=date],input[type=time],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:none;}
+.row-2{display:flex;gap:10px;}
+.row-2 .field-group{flex:1;}
+.row-3{display:flex;gap:8px;}
+.row-3 .field-group{flex:1;}
+.pf-group{display:flex;gap:8px;}
+.pf-btn{flex:1;padding:10px;border-radius:8px;border:1.5px solid var(--border);background:white;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
+.pf-btn.sel-pass{background:var(--green);border-color:var(--green);color:white;}
+.pf-btn.sel-fail{background:var(--red);border-color:var(--red);color:white;}
+.pf-btn.sel-na{background:#888;border-color:#888;color:white;}
+.corrective-box{margin-top:10px;padding:10px;background:var(--red-light);border-radius:8px;border-left:3px solid var(--red);display:none;}
+.corrective-box.show{display:block;}
+.corrective-box .field-label{color:var(--red);}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn:hover{background:var(--green-light);}
+.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--red);}
+.log-entry{padding:12px 16px;border-bottom:0.5px solid #f0ece6;}
+.log-entry:last-child{border-bottom:none;}
+.log-top{display:flex;justify-content:space-between;align-items:center;}
+.log-po{font-size:14px;font-weight:600;}
+.log-result{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:600;}
+.result-pass{background:var(--green-pale);color:var(--green);}
+.result-fail{background:var(--red-light);color:var(--red);}
+.result-na{background:#eee;color:#666;}
+.log-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.seal-inputs{display:flex;gap:8px;}
+.seal-inputs input{flex:1;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <div class="sub">Shipment / Tote Inspection</div>
+</div>
+
+<div class="content">
+
+  <div class="section-note">Log incoming or outgoing shipment inspections, including tote tag and seal verification.</div>
+
+  <div class="card">
+    <div class="card-head">Shipment Details</div>
+    <div class="card-body">
+
+      <div class="field-group">
+        <div class="field-label">Date <span style="color:var(--red)">*</span></div>
+        <input type="date" id="s-date">
+      </div>
+
+      <div class="row-2">
+        <div class="field-group">
+          <div class="field-label">Start Time</div>
+          <input type="time" id="s-start">
+        </div>
+        <div class="field-group">
+          <div class="field-label">End Time</div>
+          <input type="time" id="s-end">
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field-group">
+          <div class="field-label">PO Number <span style="color:var(--red)">*</span></div>
+          <input type="text" id="s-po" placeholder="PO #">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Scale Ticket Number</div>
+          <input type="text" id="s-scale" placeholder="Scale ticket #">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">HRP Employee <span style="color:var(--red)">*</span></div>
+        <select id="s-employee">
+          <option value="">Select…</option>
+          <option>Tyler</option><option>Allen</option><option>Andy</option>
+          <option>Tim</option><option>Aaron</option><option>Adrianna</option>
+          <option>Tiffany</option><option>Garrett</option><option>Lupe</option>
+        </select>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">Inspection</div>
+    <div class="card-body">
+
+      <div class="field-group">
+        <div class="field-label">Inspected <span style="color:var(--red)">*</span></div>
+        <select id="s-inspected">
+          <option value="">Select…</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Tote Tags Acceptable <span style="color:var(--red)">*</span></div>
+        <div class="pf-group">
+          <button type="button" class="pf-btn" id="tt-pass" onclick="setToteResult('Pass')">Pass</button>
+          <button type="button" class="pf-btn" id="tt-fail" onclick="setToteResult('Fail')">Fail</button>
+          <button type="button" class="pf-btn" id="tt-na" onclick="setToteResult('N/A')">N/A</button>
+        </div>
+        <div class="corrective-box" id="corrective-box">
+          <div class="field-label">Corrective Action Taken <span style="color:var(--red)">*</span></div>
+          <textarea id="s-corrective" rows="2" placeholder="Describe the corrective action taken..."></textarea>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Lot # <span style="color:var(--red)">*</span></div>
+        <select id="s-lot">
+          <option value="">Loading lot numbers…</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Seal # <span style="font-weight:400;color:var(--muted);">(up to 3)</span></div>
+        <div class="seal-inputs">
+          <input type="text" id="s-seal1" placeholder="Seal 1">
+          <input type="text" id="s-seal2" placeholder="Seal 2">
+          <input type="text" id="s-seal3" placeholder="Seal 3">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Notes</div>
+        <textarea id="s-notes" rows="2" placeholder="Additional notes (optional)"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="submit-btn" onclick="submitInspection()">Submit Inspection</button>
+
+  <div id="inspection-log" style="margin-top:20px;"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCGdM1Tzs6RrO3BAWP_4Dz75sD7Cv1OxtJWtJUwcETm1fvBxjgrm0JsUKBx3T1Y9qXpg/exec";
+let toteResult = '';
+const sessionLog = [];
+
+function setToteResult(val) {
+  toteResult = val;
+  ['tt-pass','tt-fail','tt-na'].forEach(id => document.getElementById(id).className = 'pf-btn');
+  if (val === 'Pass') document.getElementById('tt-pass').className = 'pf-btn sel-pass';
+  if (val === 'Fail') document.getElementById('tt-fail').className = 'pf-btn sel-fail';
+  if (val === 'N/A') document.getElementById('tt-na').className = 'pf-btn sel-na';
+  document.getElementById('corrective-box').className = val === 'Fail' ? 'corrective-box show' : 'corrective-box';
+}
+
+// Pull lot numbers from WarehouseGrading tab, column D
+async function loadLotNumbers() {
+  const sel = document.getElementById('s-lot');
+  try {
+    const res = await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`);
+    const rows = await res.json();
+    // Column D = index 3. Skip header row.
+    const lots = new Set();
+    for (let r = 1; r < rows.length; r++) {
+      const lot = rows[r][3];
+      if (lot !== undefined && lot !== null && String(lot).trim() !== '') lots.add(String(lot).trim());
+    }
+    const sorted = Array.from(lots).sort();
+    sel.innerHTML = '<option value="">Select lot #…</option>' + sorted.map(l => `<option>${l}</option>`).join('');
+    if (!sorted.length) sel.innerHTML = '<option value="">No lot numbers found — type manually below</option>';
+  } catch(e) {
+    sel.innerHTML = '<option value="">Could not load lot numbers</option>';
+  }
+}
+
+async function submitInspection() {
+  const date      = document.getElementById('s-date').value;
+  const start     = document.getElementById('s-start').value;
+  const end       = document.getElementById('s-end').value;
+  const po        = document.getElementById('s-po').value.trim();
+  const scale     = document.getElementById('s-scale').value.trim();
+  const employee  = document.getElementById('s-employee').value;
+  const inspected = document.getElementById('s-inspected').value;
+  const lot       = document.getElementById('s-lot').value;
+  const seal1     = document.getElementById('s-seal1').value.trim();
+  const seal2     = document.getElementById('s-seal2').value.trim();
+  const seal3     = document.getElementById('s-seal3').value.trim();
+  const notes     = document.getElementById('s-notes').value.trim();
+  const corrective= document.getElementById('s-corrective').value.trim();
+
+  if (!date || !po || !employee || !inspected || !toteResult || !lot) {
+    showToast('Please complete all required fields', true);
+    return;
+  }
+  if (toteResult === 'Fail' && !corrective) {
+    showToast('Corrective action is required when tote tags fail', true);
+    return;
+  }
+
+  const ts = new Date().toLocaleString();
+  const headers = ['Timestamp','Date','Start Time','End Time','PO Number','Scale Ticket','HRP Employee','Inspected','Tote Tags','Corrective Action','Lot #','Seal 1','Seal 2','Seal 3','Notes'];
+  const row = [ts, date, start, end, po, scale, employee, inspected, toteResult, corrective, lot, seal1, seal2, seal3, notes];
+
+  sessionLog.unshift({ts, date, po, scale, employee, inspected, toteResult, corrective, lot, seal1, seal2, seal3, notes});
+  renderLog();
+  showToast('✓ Inspection submitted!', false);
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({tab:'ShipmentInspections', headers, row})
+  }).catch(()=>{});
+
+  // Reset form (keep date and employee)
+  document.getElementById('s-start').value = '';
+  document.getElementById('s-end').value = '';
+  document.getElementById('s-po').value = '';
+  document.getElementById('s-scale').value = '';
+  document.getElementById('s-inspected').value = '';
+  document.getElementById('s-lot').value = '';
+  document.getElementById('s-seal1').value = '';
+  document.getElementById('s-seal2').value = '';
+  document.getElementById('s-seal3').value = '';
+  document.getElementById('s-notes').value = '';
+  document.getElementById('s-corrective').value = '';
+  setToteResult('');
+  toteResult = '';
+  ['tt-pass','tt-fail','tt-na'].forEach(id => document.getElementById(id).className = 'pf-btn');
+  document.getElementById('corrective-box').className = 'corrective-box';
+}
+
+function renderLog() {
+  const container = document.getElementById('inspection-log');
+  if (!sessionLog.length) { container.innerHTML = ''; return; }
+  let html = '<div class="card"><div class="card-head">Entries This Session</div>';
+  sessionLog.forEach(e => {
+    const resultClass = e.toteResult === 'Pass' ? 'result-pass' : e.toteResult === 'Fail' ? 'result-fail' : 'result-na';
+    const seals = [e.seal1, e.seal2, e.seal3].filter(s => s).join(', ');
+    html += `<div class="log-entry">
+      <div class="log-top">
+        <div class="log-po">PO ${e.po}</div>
+        <div class="log-result ${resultClass}">Tote Tags: ${e.toteResult}</div>
+      </div>
+      <div class="log-meta">
+        ${e.date} &middot; Lot ${e.lot} &middot; Inspected: ${e.inspected}<br>
+        ${seals ? `Seals: ${seals}<br>` : ''}
+        ${e.scale ? `Scale Ticket: ${e.scale}<br>` : ''}
+        ${e.corrective ? `<span style="color:var(--red);">Corrective Action: ${e.corrective}</span><br>` : ''}
+        Logged by ${e.employee}
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Init
+document.getElementById('s-date').value = new Date().toISOString().split('T')[0];
+loadLotNumbers();
+</script>
+</body>
+</html>
