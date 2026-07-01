@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Clearwater Bin Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:  #27500A;
+  --green-mid:   #3B6D11;
+  --green-light: #639922;
+  --green-pale:  #EAF3DE;
+  --gold:        #C8960C;
+  --gold-pale:   #FDF3DC;
+  --blue:        #185FA5;
+  --blue-pale:   #E6F1FB;
+  --sand:        #B0A878;
+  --sand-light:  #F2F0E8;
+  --stone:       #888780;
+  --stone-light: #E8E7E2;
+  --text-p:      #1A1A18;
+  --text-m:      #444441;
+  --text-l:      #888780;
+  --white:       #FFFFFF;
+  --radius:      10px;
+  --radius-sm:   6px;
+  --shadow:      0 2px 12px rgba(0,0,0,0.10);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#F0EDE4;color:var(--text-p);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+header{background:var(--green-dark);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:#fff;line-height:1}
+.h-sub{font-size:11px;color:#97C459;letter-spacing:0.04em}
+.h-left{display:flex;flex-direction:column;gap:1px}
+.h-right{display:flex;gap:8px;align-items:center}
+.hbtn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);border-radius:var(--radius-sm);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 11px;cursor:pointer;transition:background 0.15s}
+.hbtn:hover{background:rgba(255,255,255,0.22)}
+.hbtn.active{background:rgba(255,200,0,0.25);border-color:rgba(255,200,0,0.5);color:#FFE066}
+
+/* MAIN */
+main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
+
+/* SUMMARY */
+.summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.sc{background:var(--white);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
+.sc-label{font-size:11px;font-weight:500;color:var(--text-l);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px}
+.sc-value{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.03em;color:var(--green-dark);line-height:1}
+.sc-unit{font-size:11px;color:var(--text-l);margin-top:1px}
+
+/* SECTION LABEL */
+.slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-l);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.slabel-action{font-size:11px;font-weight:500;color:var(--green-mid);cursor:pointer;text-transform:none;letter-spacing:0}
+
+/* MAP */
+.map-wrap{background:var(--sand);border-radius:var(--radius);padding:12px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;user-select:none}
+.map-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent,transparent 18px,rgba(255,255,255,0.06) 18px,rgba(255,255,255,0.06) 19px);pointer-events:none}
+#mapCanvas{position:absolute;inset:0;pointer-events:none;z-index:1}
+#mapYard{position:relative;z-index:2;width:100%;height:420px}
+.map-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;position:relative;z-index:2}
+.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-m)}
+.ld{width:9px;height:9px;border-radius:50%}
+.edit-hint{font-size:11px;color:rgba(255,255,255,0.7);text-align:center;margin-top:6px;position:relative;z-index:2}
+
+/* MAP ELEMENTS */
+.mbin{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;text-align:center;border:2px solid rgba(0,0,0,0.2);transition:box-shadow 0.1s}
+.mbin:active{cursor:grabbing}
+.mbin.sel{box-shadow:0 0 0 3px #fff,0 0 0 5px #378ADD}
+.mhopper{position:absolute;cursor:grab;touch-action:none}
+.mhopper:active{cursor:grabbing}
+.mhopper.sel .hsvg{filter:drop-shadow(0 0 4px #378ADD)}
+.mequip{position:absolute;cursor:grab;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.mequip:active{cursor:grabbing}
+.mlabel{font-size:10px;font-weight:600;color:#fff;line-height:1.15;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.55)}
+.msub{font-size:8px;color:rgba(255,255,255,0.88);pointer-events:none;margin-top:1px}
+.mshop{position:absolute;background:#d0c898;border:1px solid #a09060;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#412402;cursor:grab;touch-action:none}
+
+/* BIN CARDS */
+.bin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:10px;margin-bottom:20px}
+.bin-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid transparent;transition:transform 0.1s,box-shadow 0.1s}
+.bin-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.bct{padding:13px 15px 10px}
+.bc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
+.bc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;color:var(--green-dark);line-height:1}
+.bc-type{font-size:10px;font-weight:500;color:var(--text-l);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px}
+.bbadge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.03em}
+.bcorn{background:var(--green-pale);color:var(--green-dark)}
+.bsoy{background:var(--blue-pale);color:var(--blue)}
+.bhull{background:var(--gold-pale);color:#7A5200}
+.bempty{background:var(--stone-light);color:var(--stone)}
+.bwet{background:var(--blue-pale);color:var(--blue)}
+.bbu-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+.bbu{font-size:25px;font-weight:300;color:var(--text-p);line-height:1}
+.bbu-u{font-size:12px;color:var(--text-l);margin-left:2px}
+.bpct{font-size:13px;font-weight:600}
+.bcap{font-size:11px;color:var(--text-l)}
+.fill-wrap{height:6px;background:var(--stone-light);border-radius:3px;overflow:hidden}
+.fill-bar{height:100%;border-radius:3px;transition:width 0.5s ease}
+.bca{border-top:1px solid var(--stone-light);padding:9px 14px;display:flex;gap:7px}
+.abtn{flex:1;padding:8px 0;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:background 0.12s}
+.abtn:active{transform:scale(0.97)}
+.aadd{background:var(--green-pale);color:var(--green-dark)}
+.aadd:hover{background:#d4e9b8}
+.arem{background:#FDE8E8;color:#8B1A1A}
+.arem:hover{background:#f5d0d0}
+.aset{background:var(--sand-light);color:var(--text-m)}
+.aset:hover{background:#e4e1d5}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:500px;padding:22px 22px 30px;box-shadow:var(--shadow-lg);animation:slideUp 0.2s ease}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle{width:36px;height:4px;background:var(--stone-light);border-radius:2px;margin:0 auto 18px}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--green-dark);margin-bottom:3px}
+.msub2{font-size:12px;color:var(--text-l);margin-bottom:17px}
+.mtype{display:flex;gap:7px;margin-bottom:16px}
+.tbtn{flex:1;padding:8px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-m);transition:all 0.1s}
+.tbtn.ta{background:var(--green-pale);border-color:var(--green-mid);color:var(--green-dark)}
+.tbtn.tr{background:#FDE8E8;border-color:#c84040;color:#8B1A1A}
+.tbtn.ts{background:var(--sand-light);border-color:var(--sand);color:var(--text-m)}
+.flabel{font-size:11px;font-weight:600;color:var(--text-m);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;display:block}
+.frow{margin-bottom:14px}
+.etabs{display:flex;gap:5px;margin-bottom:10px}
+.etab{flex:1;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;color:var(--text-l);transition:all 0.1s}
+.etab.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark)}
+.finput{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text-p);background:var(--white);-webkit-appearance:none}
+.finput:focus{outline:none;border-color:var(--green-mid)}
+.finput-row{display:flex;gap:7px;align-items:center}
+.finput-row .finput{flex:1}
+.funit{font-size:13px;color:var(--text-l);white-space:nowrap}
+.fselect{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text-p);background:var(--white);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+.fselect:focus{outline:none;border-color:var(--green-mid)}
+.fnotes{width:100%;padding:9px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-p);background:var(--white);resize:none;height:56px}
+.fnotes:focus{outline:none;border-color:var(--green-mid)}
+.mpreview{background:var(--sand-light);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:16px;font-size:13px;color:var(--text-m);min-height:36px}
+.mb{font-weight:600;color:var(--text-p)}
+.mbtns{display:flex;gap:8px}
+.bcancel{flex:0 0 76px;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-m)}
+.bsubmit{flex:1;padding:12px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:#fff;background:var(--green-mid);transition:background 0.12s}
+.bsubmit:hover{background:var(--green-dark)}
+.bsubmit:disabled{background:var(--stone);cursor:not-allowed}
+
+/* LOG */
+.log-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.log-hdr{padding:12px 15px 9px;border-bottom:1px solid var(--stone-light);display:flex;justify-content:space-between;align-items:center}
+.log-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--green-dark)}
+.log-clr{font-size:11px;color:var(--text-l);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.log-clr:hover{color:#c84040}
+.log-empty{padding:22px 15px;text-align:center;font-size:13px;color:var(--text-l)}
+.log-entry{padding:11px 15px;border-bottom:1px solid var(--stone-light);display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-entry:last-child{border-bottom:none}
+.le-bin{font-size:13px;font-weight:600;color:var(--text-p)}
+.le-com{font-size:11px;color:var(--text-l);margin-top:1px}
+.le-note{font-size:11px;color:var(--text-l);font-style:italic;margin-top:1px}
+.le-time{font-size:11px;color:var(--text-l);text-align:right;white-space:nowrap}
+.le-amt{font-size:14px;font-weight:600;text-align:right}
+.la{color:var(--green-light)}.lr{color:#c84040}.ls{color:var(--blue)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-dark);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:24px;box-shadow:var(--shadow-lg);z-index:300;transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* LAYOUT SAVE BANNER */
+.layout-banner{background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:#5A3A00}
+.layout-banner button{background:var(--gold);border:none;border-radius:var(--radius-sm);padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#fff;white-space:nowrap}
+
+@media(max-width:480px){.summary-strip{gap:5px}.sc-value{font-size:20px}.bin-grid{grid-template-columns:1fr}.modal{padding:18px 16px 26px}header{padding:0 12px}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Clearwater Bin Manager</div>
+    <div class="h-sub">142 W. Elmwood Rd. · Caro, MI</div>
+  </div>
+  <div class="h-right">
+    <button class="hbtn" id="editLayoutBtn" onclick="toggleEditLayout()">✦ Edit Layout</button>
+    <button class="hbtn" onclick="syncSheet()">⟳ Sync</button>
+  </div>
+</header>
+
+<main>
+  <div class="summary-strip">
+    <div class="sc"><div class="sc-label">Total stored</div><div class="sc-value" id="totalBu">—</div><div class="sc-unit">bushels</div></div>
+    <div class="sc"><div class="sc-label">Capacity used</div><div class="sc-value" id="totalPct">—</div><div class="sc-unit">of 134,800 bu</div></div>
+    <div class="sc"><div class="sc-label">Bins active</div><div class="sc-value" id="binsActive">—</div><div class="sc-unit">of 8 bins</div></div>
+  </div>
+
+  <div class="slabel">Facility map</div>
+  <div id="layoutBanner" style="display:none" class="layout-banner">
+    <span>🖐 Drag bins, legs, and dryer into position</span>
+    <button onclick="saveLayout()">Save layout</button>
+  </div>
+  <div class="map-wrap" id="mapWrap">
+    <canvas id="mapCanvas"></canvas>
+    <div id="mapYard"></div>
+    <div class="map-legend">
+      <div class="li"><div class="ld" style="background:#2e5a10"></div>Full</div>
+      <div class="li"><div class="ld" style="background:#639922"></div>Mid</div>
+      <div class="li"><div class="ld" style="background:#b4b2a9"></div>Empty</div>
+      <div class="li"><div class="ld" style="background:#c84040;border-radius:0;height:3px;width:16px;margin-right:2px"></div>Jumper auger</div>
+    </div>
+  </div>
+
+  <div class="slabel">Bin inventory</div>
+  <div class="bin-grid" id="binGrid"></div>
+
+  <div class="slabel">Recent movements</div>
+  <div class="log-wrap">
+    <div class="log-hdr"><div class="log-title">Movement Log</div><button class="log-clr" onclick="clearLog()">Clear local log</button></div>
+    <div id="logEntries"><div class="log-empty">No movements recorded yet.</div></div>
+  </div>
+</main>
+
+<!-- Modal -->
+<div class="overlay" id="overlay" onclick="closeOut(event)">
+  <div class="modal">
+    <div class="mhandle"></div>
+    <div class="mtitle" id="mTitle">Update Bin</div>
+    <div class="msub2" id="mSub"></div>
+    <div class="mtype">
+      <button class="tbtn" id="tAdd" onclick="setType('Add')">＋ Add</button>
+      <button class="tbtn" id="tRemove" onclick="setType('Remove')">－ Remove</button>
+      <button class="tbtn" id="tSet" onclick="setType('Set')">✎ Set</button>
+    </div>
+    <div class="frow">
+      <label class="flabel">Entry method</label>
+      <div class="etabs">
+        <button class="etab active" id="et-free" onclick="setEntry('free')">Bushels</button>
+        <button class="etab" id="et-load" onclick="setEntry('load')">By load</button>
+        <button class="etab" id="et-weight" onclick="setEntry('weight')">By weight</button>
+      </div>
+      <div id="e-free">
+        <div class="finput-row"><input type="number" class="finput" id="iBu" placeholder="0" min="0" oninput="updPreview()"><span class="funit">bu</span></div>
+      </div>
+      <div id="e-load" style="display:none">
+        <div class="finput-row" style="margin-bottom:7px"><input type="number" class="finput" id="iLoads" placeholder="1" min="1" value="1" oninput="updPreview()"><span class="funit">loads</span></div>
+        <div class="finput-row"><input type="number" class="finput" id="iBpl" placeholder="900" min="1" oninput="updPreview()"><span class="funit">bu/load</span></div>
+      </div>
+      <div id="e-weight" style="display:none">
+        <div class="finput-row" style="margin-bottom:7px"><input type="number" class="finput" id="iLbs" placeholder="0" min="0" oninput="updPreview()"><span class="funit">lbs</span></div>
+        <select class="fselect" id="iLbsBu" onchange="updPreview()">
+          <option value="56">Corn — 56 lbs/bu</option>
+          <option value="60" selected>Soybeans — 60 lbs/bu</option>
+          <option value="60">Soy hulls — 60 lbs/bu</option>
+          <option value="60">Wheat/Spelt — 60 lbs/bu</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <label class="flabel">Commodity</label>
+      <select class="fselect" id="iCom" onchange="updPreview()">
+        <option value="Org. Blue Corn">Org. Blue Corn</option>
+        <option value="Dry Soybeans">Dry Soybeans</option>
+        <option value="Wet Soybeans">Wet Soybeans</option>
+        <option value="Soy Hulls">Soy Hulls</option>
+        <option value="Yellow Corn">Yellow Corn</option>
+        <option value="Spelt">Spelt</option>
+        <option value="Empty">Empty / Clear bin</option>
+      </select>
+    </div>
+    <div class="frow">
+      <label class="flabel">Notes <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+      <textarea class="fnotes" id="iNotes" placeholder="e.g. Load from field 4, semi load from elevator..."></textarea>
+    </div>
+    <div class="mpreview" id="mPreview">Enter an amount above to preview.</div>
+    <div class="mbtns">
+      <button class="bcancel" onclick="closeModal()">Cancel</button>
+      <button class="bsubmit" onclick="submitMove()">Save movement</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+const TOTAL_CAP = 134800;
+
+// ── BIN DEFINITIONS ───────────────────────────────────────────
+let bins = [
+  {id:'B1',name:'Bin 1',capacity:6500, currentBu:6500, commodity:'Soy (dried)',   type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:52},
+  {id:'B2',name:'Bin 2',capacity:24000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Jumper from B3', shape:'circle',size:76},
+  {id:'B3',name:'Bin 3',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:72},
+  {id:'B4',name:'Bin 4',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall only',      shape:'circle',size:72},
+  {id:'B5',name:'Bin 5',capacity:2800, currentBu:2800, commodity:'Wet Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:52},
+  {id:'B6',name:'Bin 6',capacity:3600, currentBu:3600, commodity:'Dry Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:50},
+  {id:'B7',name:'Bin 7',capacity:2900, currentBu:2900, commodity:'Soy Hulls',     type:'Hopper', legSystem:'Short only',     shape:'hopper',size:48},
+  {id:'B8',name:'Bin 8',capacity:50000,currentBu:50000,commodity:'Org. Blue Corn',type:'Bin',    legSystem:'Jumper from B1', shape:'circle',size:104},
+];
+
+// Equipment items
+let equip = [
+  {id:'leg_tall', label:'Tall Leg',  sub:'Bins 1,3,4,5,6', color:'#555', border:'#222', w:14, h:62},
+  {id:'leg_short',label:'Short Leg', sub:'Bins 1,3,5,6,7', color:'#336699',border:'#1a3d5c',w:14,h:50},
+  {id:'dryer',    label:'Dryer',     sub:'Nat. gas',        color:'#c87830',border:'#7a4010',w:42,h:60},
+  {id:'auger',    label:'5-ft Auger',sub:'Dryer→Leg',       color:'#888',  border:'#444',   w:12,h:44},
+];
+
+// Default positions (% of yard dimensions so they scale)
+const defaultPos = {
+  B8: {x:0.42,y:0.04}, B2:{x:0.63,y:0.06}, B3:{x:0.26,y:0.24},
+  B4: {x:0.60,y:0.28}, B1:{x:0.44,y:0.38}, B6:{x:0.26,y:0.50},
+  B7: {x:0.62,y:0.50}, B5:{x:0.44,y:0.68},
+  leg_tall:{x:0.46,y:0.30}, leg_short:{x:0.40,y:0.16},
+  dryer:{x:0.32,y:0.60}, auger:{x:0.38,y:0.52},
+  shop:{x:0.03,y:0.06},
+};
+
+// Flow connections for canvas drawing
+const flows = [
+  {from:'dryer',to:'auger',color:'#888',dash:[],lw:2},
+  {from:'auger',to:'leg_tall',color:'#888',dash:[],lw:2},
+  {from:'leg_tall',to:'B1',color:'#e8a030',dash:[],lw:1.5},
+  {from:'leg_tall',to:'B3',color:'#e8a030',dash:[],lw:1.5},
+  {from:'leg_tall',to:'B4',color:'#e8a030',dash:[],lw:1.5},
+  {from:'leg_tall',to:'B5',color:'#e8a030',dash:[],lw:1.5},
+  {from:'leg_tall',to:'B6',color:'#e8a030',dash:[],lw:1.5},
+  {from:'leg_short',to:'B1',color:'#378ADD',dash:[],lw:1.5},
+  {from:'leg_short',to:'B3',color:'#378ADD',dash:[],lw:1.5},
+  {from:'leg_short',to:'B5',color:'#378ADD',dash:[],lw:1.5},
+  {from:'leg_short',to:'B6',color:'#378ADD',dash:[],lw:1.5},
+  {from:'leg_short',to:'B7',color:'#378ADD',dash:[],lw:1.5},
+  {from:'B5',to:'dryer',color:'#c87830',dash:[4,4],lw:1.5},
+  {from:'B1',to:'B8',color:'#c84040',dash:[6,4],lw:1.8},
+  {from:'B3',to:'B2',color:'#c84040',dash:[6,4],lw:1.8},
+];
+
+let positions = {}; // pixel positions, built on init
+let editMode  = false;
+let activeBin = null;
+let activeType = 'Add';
+let entryMethod = 'free';
+let log = JSON.parse(localStorage.getItem('cwfLog') || '[]');
+
+// ── YARD SETUP ────────────────────────────────────────────────
+function initYard() {
+  const yard = document.getElementById('mapYard');
+  const canvas = document.getElementById('mapCanvas');
+  const saved = JSON.parse(localStorage.getItem('cwfLayout') || 'null');
+
+  // Build positions from saved or defaults
+  const W = yard.offsetWidth  || 600;
+  const H = yard.offsetHeight || 420;
+  canvas.width  = W;
+  canvas.height = H;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
+
+  const keys = [...bins.map(b=>b.id), ...equip.map(e=>e.id), 'shop'];
+  keys.forEach(k => {
+    if (saved && saved[k]) {
+      positions[k] = saved[k];
+    } else if (defaultPos[k]) {
+      positions[k] = {x: Math.round(defaultPos[k].x * W), y: Math.round(defaultPos[k].y * H)};
+    } else {
+      positions[k] = {x:50, y:50};
+    }
+  });
+
+  // Clear yard
+  yard.innerHTML = '';
+
+  // Shop
+  const shop = document.createElement('div');
+  shop.className = 'mshop'; shop.id = 'el-shop';
+  shop.style.cssText = `left:${positions.shop.x}px;top:${positions.shop.y}px;width:72px;height:44px;`;
+  shop.textContent = 'Shop';
+  yard.appendChild(shop);
+  makeDraggable(shop, 'shop');
+
+  // Equipment
+  equip.forEach(eq => {
+    const el = document.createElement('div');
+    el.className = 'mequip'; el.id = 'el-' + eq.id;
+    el.style.cssText = `left:${positions[eq.id].x}px;top:${positions[eq.id].y}px;width:${eq.w}px;height:${eq.h}px;`;
+    el.innerHTML = `<div style="width:100%;height:100%;background:${eq.color};border:1.5px solid ${eq.border};border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px">
+      <div class="mlabel" style="font-size:8px">${eq.label}</div>
+      <div class="msub">${eq.sub}</div>
+    </div>`;
+    yard.appendChild(el);
+    makeDraggable(el, eq.id);
+  });
+
+  // Bins
+  bins.forEach(b => {
+    const el = document.createElement('div');
+    el.id = 'el-' + b.id;
+    const pos = positions[b.id];
+
+    if (b.shape === 'hopper') {
+      el.className = 'mhopper'; el.id = 'el-' + b.id;
+      const s = b.size;
+      el.style.cssText = `left:${pos.x}px;top:${pos.y}px;width:${s}px;height:${s}px;`;
+      el.innerHTML = `<svg class="hsvg" width="${s}" height="${s}" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+        <polygon id="hfill-${b.id}" points="5,0 55,0 60,20 40,60 20,60 0,20" fill="#b4b2a9" stroke="#7a6020" stroke-width="2"/>
+        <text x="30" y="24" text-anchor="middle" font-size="10" font-weight="600" fill="#fff" font-family="DM Sans,sans-serif" style="text-shadow:0 1px 2px rgba(0,0,0,0.5)">${b.name}</text>
+        <text id="mbl-${b.id}" x="30" y="37" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.88)" font-family="DM Sans,sans-serif"></text>
+        <text id="mbp-${b.id}" x="30" y="49" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.75)" font-family="DM Sans,sans-serif"></text>
+      </svg>`;
+      el.addEventListener('click', e => { if (!didDrag) openModal(b.id); });
+    } else {
+      el.className = 'mbin'; el.id = 'el-' + b.id;
+      const s = b.size;
+      el.style.cssText = `left:${pos.x}px;top:${pos.y}px;width:${s}px;height:${s}px;background:#b4b2a9;border:2px solid rgba(0,0,0,0.2);`;
+      el.id = 'el-' + b.id;
+      el.innerHTML = `<div class="mlabel">${b.name}</div>
+        <div class="msub" id="mbl-${b.id}"></div>
+        <div class="msub" id="mbp-${b.id}"></div>`;
+      el.addEventListener('click', e => { if (!didDrag) openModal(b.id); });
+    }
+    yard.appendChild(el);
+    makeDraggable(el, b.id);
+  });
+
+  drawFlows();
+  updateMapColors();
+}
+
+// ── DRAG ──────────────────────────────────────────────────────
+let didDrag = false;
+function makeDraggable(el, id) {
+  let sx,sy,sl,st,dragging=false;
+  function start(e) {
+    if (!editMode && !['shop','leg_tall','leg_short','dryer','auger'].includes(id)) {
+      // In view mode, bins open modal on tap — don't drag
+      return;
+    }
+    e.preventDefault();
+    const p = e.touches ? e.touches[0] : e;
+    sx=p.clientX; sy=p.clientY;
+    const r = el.getBoundingClientRect();
+    const yr = document.getElementById('mapYard').getBoundingClientRect();
+    sl=r.left-yr.left; st=r.top-yr.top;
+    dragging=true; didDrag=false;
+    el.style.zIndex=50;
+    document.addEventListener('mousemove',move);
+    document.addEventListener('mouseup',end);
+    document.addEventListener('touchmove',move,{passive:false});
+    document.addEventListener('touchend',end);
+  }
+  function move(e) {
+    if(!dragging)return;
+    e.preventDefault();
+    const p = e.touches?e.touches[0]:e;
+    const dx=p.clientX-sx, dy=p.clientY-sy;
+    if(Math.abs(dx)>4||Math.abs(dy)>4) didDrag=true;
+    const yr = document.getElementById('mapYard').getBoundingClientRect();
+    const newL = Math.max(0,Math.min(yr.width-el.offsetWidth, sl+dx));
+    const newT = Math.max(0,Math.min(yr.height-el.offsetHeight,st+dy));
+    el.style.left=newL+'px'; el.style.top=newT+'px';
+    positions[id]={x:newL,y:newT};
+    drawFlows();
+  }
+  function end() {
+    dragging=false; el.style.zIndex='';
+    document.removeEventListener('mousemove',move);
+    document.removeEventListener('mouseup',end);
+    document.removeEventListener('touchmove',move);
+    document.removeEventListener('touchend',end);
+  }
+  el.addEventListener('mousedown',start);
+  el.addEventListener('touchstart',start,{passive:false});
+}
+
+// ── EDIT LAYOUT MODE ──────────────────────────────────────────
+function toggleEditLayout() {
+  editMode = !editMode;
+  const btn = document.getElementById('editLayoutBtn');
+  const banner = document.getElementById('layoutBanner');
+  if (editMode) {
+    btn.classList.add('active');
+    btn.textContent = '✦ Editing…';
+    banner.style.display = 'flex';
+    // Make all elements draggable in edit mode
+    bins.forEach(b => {
+      const el = document.getElementById('el-'+b.id);
+      if (el) el.style.cursor = 'grab';
+    });
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '✦ Edit Layout';
+    banner.style.display = 'none';
+  }
+}
+
+function saveLayout() {
+  localStorage.setItem('cwfLayout', JSON.stringify(positions));
+  toggleEditLayout();
+  showToast('Layout saved ✓');
+}
+
+// ── CANVAS FLOW LINES ─────────────────────────────────────────
+function getCenter(id) {
+  const pos = positions[id];
+  if (!pos) return null;
+  const el = document.getElementById('el-'+id);
+  if (!el) return null;
+  return { x: pos.x + el.offsetWidth/2, y: pos.y + el.offsetHeight/2 };
+}
+
+function drawFlows() {
+  const canvas = document.getElementById('mapCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  flows.forEach(f => {
+    const a = getCenter(f.from), b = getCenter(f.to);
+    if (!a || !b) return;
+    ctx.beginPath();
+    ctx.strokeStyle = f.color;
+    ctx.lineWidth   = f.lw || 1.5;
+    ctx.setLineDash(f.dash || []);
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.55;
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    // arrowhead
+    if (!f.dash || !f.dash.length) {
+      const ang = Math.atan2(b.y-a.y, b.x-a.x);
+      ctx.beginPath(); ctx.setLineDash([]); ctx.globalAlpha=0.7;
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x-7*Math.cos(ang-0.4), b.y-7*Math.sin(ang-0.4));
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x-7*Math.cos(ang+0.4), b.y-7*Math.sin(ang+0.4));
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  });
+}
+
+// ── FILL COLOR ────────────────────────────────────────────────
+function fillColor(pct, commodity) {
+  if (pct === 0) return '#b4b2a9';
+  const c = (commodity||'').toLowerCase();
+  if (c.includes('corn')) return pct>70?'#2e5a10':pct>30?'#639922':'#97C459';
+  if (c.includes('soy')||c.includes('hull')) return pct>70?'#185FA5':pct>30?'#378ADD':'#85B7EB';
+  return pct>70?'#639922':pct>30?'#C8960C':'#b4b2a9';
+}
+
+function badgeClass(com) {
+  if (!com||com==='Empty') return 'bempty';
+  const c=com.toLowerCase();
+  if(c.includes('corn')) return 'bcorn';
+  if(c.includes('wet'))  return 'bwet';
+  if(c.includes('soy'))  return 'bsoy';
+  if(c.includes('hull')) return 'bhull';
+  return 'bempty';
+}
+
+// ── UPDATE MAP COLORS ─────────────────────────────────────────
+function updateMapColors() {
+  bins.forEach(b => {
+    const pct = b.capacity>0 ? b.currentBu/b.capacity*100 : 0;
+    const col = fillColor(pct, b.commodity);
+    const buStr = b.currentBu>0 ? b.currentBu.toLocaleString()+' bu' : 'Empty';
+    const pctStr = Math.round(pct)+'%';
+
+    if (b.shape === 'hopper') {
+      const poly = document.getElementById('hfill-'+b.id);
+      if (poly) poly.setAttribute('fill', col);
+    } else {
+      const el = document.getElementById('el-'+b.id);
+      if (el) el.style.background = col;
+    }
+    const lbl = document.getElementById('mbl-'+b.id);
+    const pp  = document.getElementById('mbp-'+b.id);
+    if (lbl) lbl.textContent = buStr;
+    if (pp)  pp.textContent  = pctStr;
+  });
+}
+
+// ── RENDER CARDS ──────────────────────────────────────────────
+function render() {
+  const totalBu  = bins.reduce((a,b)=>a+b.currentBu,0);
+  const active   = bins.filter(b=>b.currentBu>0).length;
+  document.getElementById('totalBu').textContent  = totalBu.toLocaleString();
+  document.getElementById('totalPct').textContent = Math.round(totalBu/TOTAL_CAP*100)+'%';
+  document.getElementById('binsActive').textContent = active;
+
+  updateMapColors();
+
+  const grid = document.getElementById('binGrid');
+  grid.innerHTML = '';
+  bins.forEach(b => {
+    const pct = b.capacity>0?b.currentBu/b.capacity*100:0;
+    const col = fillColor(pct, b.commodity);
+    const card = document.createElement('div');
+    card.className = 'bin-card';
+    card.innerHTML = `
+      <div class="bct">
+        <div class="bc-header">
+          <div><div class="bc-name">${b.name}</div><div class="bc-type">${b.type} · ${b.legSystem}</div></div>
+          <span class="bbadge ${badgeClass(b.commodity)}">${b.commodity}</span>
+        </div>
+        <div class="bbu-row">
+          <div><span class="bbu">${b.currentBu.toLocaleString()}</span><span class="bbu-u">bu</span></div>
+          <div class="bpct" style="color:${col}">${Math.round(pct)}%</div>
+        </div>
+        <div class="fill-wrap"><div class="fill-bar" style="width:${pct}%;background:${col}"></div></div>
+        <div class="bcap" style="margin-top:4px">of ${b.capacity.toLocaleString()} bu capacity</div>
+      </div>
+      <div class="bca">
+        <button class="abtn aadd" onclick="openModal('${b.id}','Add')">＋ Add</button>
+        <button class="abtn arem" onclick="openModal('${b.id}','Remove')">－ Remove</button>
+        <button class="abtn aset" onclick="openModal('${b.id}','Set')">✎ Set</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  renderLog();
+  saveLocal();
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(binId, type) {
+  activeBin = binId;
+  const bin = bins.find(b=>b.id===binId);
+  const pct = Math.round(bin.currentBu/bin.capacity*100);
+  document.getElementById('mTitle').textContent = bin.name+' — '+bin.type;
+  document.getElementById('mSub').textContent   = `Current: ${bin.currentBu.toLocaleString()} bu · ${pct}% full · cap ${bin.capacity.toLocaleString()} bu`;
+  const com = document.getElementById('iCom');
+  const match=[...com.options].find(o=>o.value===bin.commodity||bin.commodity.toLowerCase().includes(o.value.split(' ')[0].toLowerCase()));
+  if(match) com.value=match.value;
+  setType(type||'Add'); setEntry('free');
+  ['iBu','iLoads','iBpl','iLbs','iNotes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('iLoads').value='1';
+  updPreview();
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('iBu').focus(),100);
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); activeBin=null; }
+function closeOut(e)  { if(e.target===document.getElementById('overlay')) closeModal(); }
+
+function setType(t) {
+  activeType=t;
+  [{id:'tAdd',t:'Add',cl:'ta'},{id:'tRemove',t:'Remove',cl:'tr'},{id:'tSet',t:'Set',cl:'ts'}].forEach(o=>{
+    document.getElementById(o.id).className='tbtn'+(t===o.t?' '+o.cl:'');
+  });
+  updPreview();
+}
+function setEntry(m) {
+  entryMethod=m;
+  ['free','load','weight'].forEach(x=>{
+    document.getElementById('e-'+x).style.display=x===m?'block':'none';
+    document.getElementById('et-'+x).className='etab'+(x===m?' active':'');
+  });
+  updPreview();
+}
+function calcBu() {
+  if(entryMethod==='free') return parseFloat(document.getElementById('iBu').value)||0;
+  if(entryMethod==='load') { const l=parseFloat(document.getElementById('iLoads').value)||0; const b=parseFloat(document.getElementById('iBpl').value)||0; return l*b; }
+  const lbs=parseFloat(document.getElementById('iLbs').value)||0; const lbsbu=parseFloat(document.getElementById('iLbsBu').value)||60; return Math.round(lbs/lbsbu);
+}
+function updPreview() {
+  const bu=calcBu(); const bin=bins.find(b=>b.id===activeBin);
+  if(!bin||bu===0){document.getElementById('mPreview').innerHTML='Enter an amount above to preview.';return;}
+  let nw=bin.currentBu;
+  if(activeType==='Add') nw=Math.min(bin.currentBu+bu,bin.capacity);
+  if(activeType==='Remove') nw=Math.max(bin.currentBu-bu,0);
+  if(activeType==='Set') nw=Math.min(Math.max(bu,0),bin.capacity);
+  const diff=nw-bin.currentBu, pct=Math.round(nw/bin.capacity*100);
+  const ds=(diff>=0?'+':'')+diff.toLocaleString();
+  document.getElementById('mPreview').innerHTML=`<span class="mb">${bu.toLocaleString()} bu</span> ${activeType==='Set'?'→ set to':activeType.toLowerCase()} · New total: <span class="mb">${nw.toLocaleString()} bu</span> (${pct}%) <span style="color:${diff>=0?'var(--green-light)':'#c84040'}">${ds}</span>`;
+}
+function submitMove() {
+  const bu=calcBu(); const bin=bins.find(b=>b.id===activeBin);
+  if(!bin||bu<=0)return;
+  const commodity=document.getElementById('iCom').value;
+  const notes=document.getElementById('iNotes').value.trim();
+  let nw=bin.currentBu;
+  if(activeType==='Add') nw=Math.min(bin.currentBu+bu,bin.capacity);
+  if(activeType==='Remove') nw=Math.max(bin.currentBu-bu,0);
+  if(activeType==='Set') nw=Math.min(Math.max(bu,0),bin.capacity);
+  bin.currentBu=nw;
+  bin.commodity=commodity==='Empty'?'Empty':commodity;
+  const now=new Date();
+  const ts=now.toLocaleDateString('en-US',{month:'short',day:'numeric'})+' '+now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  log.push({binId:bin.id,binName:bin.name,type:activeType,bushels:bu,commodity,notes,time:ts,timestamp:now.toISOString()});
+  sendToSheet(bin.id,activeType,bu,commodity,notes);
+  closeModal(); render();
+  showToast(bin.name+' updated — '+nw.toLocaleString()+' bu');
+}
+
+// ── LOG ───────────────────────────────────────────────────────
+function renderLog() {
+  const el=document.getElementById('logEntries');
+  if(!log.length){el.innerHTML='<div class="log-empty">No movements recorded yet.</div>';return;}
+  el.innerHTML=[...log].reverse().slice(0,30).map(m=>{
+    const a=m.type==='Add'?'+'+m.bushels.toLocaleString()+' bu':m.type==='Remove'?'−'+m.bushels.toLocaleString()+' bu':'→ '+m.bushels.toLocaleString()+' bu';
+    const ac=m.type==='Add'?'la':m.type==='Remove'?'lr':'ls';
+    return `<div class="log-entry"><div><div class="le-bin">${m.binName}</div><div class="le-com">${m.commodity}</div>${m.notes?'<div class="le-note">'+m.notes+'</div>':''}</div><div><div class="le-amt ${ac}">${a}</div><div class="le-time">${m.time}</div></div></div>`;
+  }).join('');
+}
+function clearLog(){if(confirm('Clear the local movement log?')){log=[];saveLocal();renderLog();}}
+
+// ── SHEET SYNC ────────────────────────────────────────────────
+function sendToSheet(binId,movementType,bushels,commodity,notes){
+  if(SHEET_URL.includes('YOUR_DEPLOYMENT'))return;
+  fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({binId,movementType,bushels,commodity,notes,timestamp:new Date().toISOString()})}).catch(()=>{});
+}
+function syncSheet(){
+  if(SHEET_URL.includes('YOUR_DEPLOYMENT')){showToast('Add your Apps Script URL to enable sync');return;}
+  fetch(SHEET_URL+'?action=getBins').then(r=>r.json()).then(data=>{
+    if(data&&data.length){data.forEach(row=>{const bin=bins.find(b=>b.id===row.id);if(bin){bin.currentBu=row.currentBu;bin.commodity=row.commodity;}});render();showToast('Synced ✓');}
+  }).catch(()=>showToast('Sync failed — check connection'));
+}
+
+// ── LOCAL STORAGE ─────────────────────────────────────────────
+function saveLocal(){
+  localStorage.setItem('cwfBins',JSON.stringify(bins.map(b=>({id:b.id,currentBu:b.currentBu,commodity:b.commodity}))));
+  localStorage.setItem('cwfLog',JSON.stringify(log));
+}
+function loadLocal(){
+  const s=JSON.parse(localStorage.getItem('cwfBins')||'[]');
+  s.forEach(sv=>{const b=bins.find(x=>x.id===sv.id);if(b){b.currentBu=sv.currentBu;b.commodity=sv.commodity;}});
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// ── RESIZE ────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  const canvas=document.getElementById('mapCanvas');
+  const yard=document.getElementById('mapYard');
+  canvas.width=yard.offsetWidth; canvas.height=yard.offsetHeight;
+  canvas.style.width=yard.offsetWidth+'px'; canvas.style.height=yard.offsetHeight+'px';
+  drawFlows();
+});
+
+// ── INIT ──────────────────────────────────────────────────────
+loadLocal();
+window.addEventListener('load', () => { initYard(); render(); });
+</script>
+</body>
+</html>
