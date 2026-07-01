@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Clearwater Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-dark:   #0C2D6B;
+  --blue-mid:    #1A4FA0;
+  --blue-light:  #2E7DD1;
+  --blue-pale:   #E6F0FB;
+  --gold:        #C8960C;
+  --gold-pale:   #FDF3DC;
+  --gold-dark:   #7A5200;
+  --stone:       #888780;
+  --stone-light: #E8E7E2;
+  --text-p:      #1A1A18;
+  --text-m:      #444441;
+  --text-l:      #888780;
+  --bg:          #F0EDE4;
+  --white:       #FFFFFF;
+  --radius:      14px;
+  --radius-sm:   8px;
+  --shadow:      0 2px 12px rgba(0,0,0,0.09);
+  --shadow-lg:   0 8px 32px rgba(0,0,0,0.14);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text-p);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--blue-dark);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.28);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.h-wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+.h-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.07em;
+  color: #fff;
+  line-height: 1;
+}
+.h-sub {
+  font-size: 11px;
+  color: #7DB8F0;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+.h-badge {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── HERO STRIP ── */
+.hero {
+  background: linear-gradient(135deg, var(--blue-mid) 0%, var(--blue-dark) 100%);
+  padding: 28px 20px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 20px,
+    rgba(255,255,255,0.03) 20px,
+    rgba(255,255,255,0.03) 40px
+  );
+  pointer-events: none;
+}
+.hero-date {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7DB8F0;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  position: relative;
+}
+.hero-greeting {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  letter-spacing: 0.05em;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 6px;
+  position: relative;
+}
+.hero-location {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  position: relative;
+}
+
+/* ── QUICK STATS ── */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--stone-light);
+  border-bottom: 1px solid var(--stone-light);
+}
+.stat {
+  background: var(--white);
+  padding: 14px 12px;
+  text-align: center;
+}
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.03em;
+  color: var(--blue-dark);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-l);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 2px;
+}
+
+/* ── MAIN ── */
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-l);
+  margin-bottom: 10px;
+  padding-left: 2px;
+}
+
+/* ── APP GRID ── */
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+.app-grid.single { grid-template-columns: 1fr; }
+
+.app-tile {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 20px 18px;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1.5px solid transparent;
+  transition: transform 0.14s, box-shadow 0.14s, border-color 0.14s;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 130px;
+}
+.app-tile:active {
+  transform: scale(0.97);
+  box-shadow: var(--shadow-lg);
+}
+.app-tile.primary { border-color: var(--blue-mid); }
+.app-tile.gold-accent { border-color: var(--gold); }
+.app-tile.coming-soon {
+  background: #F8F7F3;
+  border: 1.5px dashed var(--stone-light);
+  cursor: default;
+  opacity: 0.72;
+}
+.app-tile.coming-soon:active { transform: none; box-shadow: var(--shadow); }
+
+/* Accent bar top */
+.app-tile::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: transparent;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.app-tile.primary::before   { background: var(--blue-mid); }
+.app-tile.gold-accent::before { background: var(--gold); }
+.app-tile.blue-accent::before { background: #185FA5; }
+
+.tile-icon {
+  font-size: 30px;
+  line-height: 1;
+}
+.tile-body { flex: 1; }
+.tile-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--text-p);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.tile-desc {
+  font-size: 12px;
+  color: var(--text-l);
+  line-height: 1.5;
+}
+.tile-badge {
+  align-self: flex-start;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.badge-live    { background: var(--blue-pale); color: var(--blue-dark); }
+.badge-ai      { background: #EEE6FB; color: #4A1D96; }
+.badge-coming  { background: var(--stone-light); color: var(--stone); }
+.badge-gold    { background: var(--gold-pale); color: var(--gold-dark); }
+
+/* ── WIDE TILE (full width) ── */
+.app-tile.wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px 22px;
+  min-height: auto;
+  gap: 16px;
+}
+.app-tile.wide .tile-body { flex: 1; }
+.app-tile.wide .tile-icon { font-size: 36px; flex-shrink: 0; }
+
+/* ── NOTICE CARD ── */
+.notice-card {
+  background: var(--gold-pale);
+  border: 1px solid rgba(26, 79, 160, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.notice-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.notice-text { font-size: 13px; color: var(--gold-dark); line-height: 1.55; }
+.notice-text strong { font-weight: 600; }
+
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 20px 16px 32px;
+  font-size: 11px;
+  color: var(--text-l);
+  letter-spacing: 0.03em;
+}
+footer a { color: var(--blue-mid); text-decoration: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 400px) {
+  .app-grid { grid-template-columns: 1fr; }
+  .app-tile.wide { flex-direction: column; align-items: flex-start; }
+  .hero-greeting { font-size: 28px; }
+  .stats-strip { grid-template-columns: repeat(3,1fr); }
+}
+@media (min-width: 500px) {
+  .app-tile { min-height: 150px; }
+  .tile-name { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-wordmark">
+    <div class="h-title">Clearwater Farms</div>
+    <div class="h-sub">Caro, Michigan</div>
+  </div>
+  <div class="h-badge">CWF</div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-date" id="heroDate"></div>
+  <div class="hero-greeting" id="heroGreeting">Good Morning</div>
+  <div class="hero-location">142 W. Elmwood Rd. · Caro, MI 48723</div>
+</div>
+
+<!-- Quick stats -->
+<div class="stats-strip">
+  <div class="stat">
+    <div class="stat-value">66,800</div>
+    <div class="stat-label">Bu stored</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">50%</div>
+    <div class="stat-label">Facility full</div>
+  </div>
+  <div class="stat">
+    <div class="stat-value">5</div>
+    <div class="stat-label">Bins active</div>
+  </div>
+</div>
+
+<main>
+
+  <!-- Notice -->
+  <div class="notice-card">
+    <div class="notice-icon">🌱</div>
+    <div class="notice-text">
+      <strong>Clearwater Farms</strong> — Organic row crops, grain storage &amp; processing.<br>
+      Tap any app below to get started.
+    </div>
+  </div>
+
+  <!-- Primary apps -->
+  <div class="section-label">Operations</div>
+  <div class="app-grid">
+
+    <a class="app-tile primary" href="clearwater_bin_manager.html">
+      <div class="tile-icon">🌾</div>
+      <div class="tile-body">
+        <div class="tile-name">Bin Manager</div>
+        <div class="tile-desc">Grain storage, bushel tracking &amp; movements across all 8 bins</div>
+      </div>
+      <span class="tile-badge badge-live">Live</span>
+    </a>
+
+    <a class="app-tile blue-accent" href="clearwater_farms_assistant.html">
+      <div class="tile-icon">🤖</div>
+      <div class="tile-body">
+        <div class="tile-name">Farm Assistant</div>
+        <div class="tile-desc">AI-powered help for agronomy, equipment &amp; field decisions</div>
+      </div>
+      <span class="tile-badge badge-ai">AI</span>
+    </a>
+
+    <a class="app-tile gold-accent" href="cwf_field_log.html">
+      <div class="tile-icon">📋</div>
+      <div class="tile-body">
+        <div class="tile-name">Field Log</div>
+        <div class="tile-desc">Crop tracking, field notes, planting &amp; harvest records</div>
+      </div>
+      <span class="tile-badge badge-coming">Coming soon</span>
+    </a>
+
+    <a class="app-tile gold-accent" href="cwf_contracts.html">
+      <div class="tile-icon">📄</div>
+      <div class="tile-body">
+        <div class="tile-name">Grain Contracts</div>
+        <div class="tile-desc">Load-out tracking, buyer contracts &amp; delivery schedules</div>
+      </div>
+      <span class="tile-badge badge-coming">Coming soon</span>
+    </a>
+
+    <a class="app-tile wide primary" href="cwf_load_ticket.html">
+      <div class="tile-icon">🚛</div>
+      <div class="tile-body">
+        <div class="tile-name">Load Ticket</div>
+        <div class="tile-desc">Record incoming loads — truck, field, crop, weight, moisture, test weight &amp; temp. Routes bushels directly to a bin.</div>
+      </div>
+      <span class="tile-badge badge-live">Live</span>
+    </a>
+
+  </div>
+
+  <!-- Coming soon / future -->
+  <div class="section-label">Coming Soon</div>
+  <div class="app-grid">
+
+    <div class="app-tile coming-soon">
+      <div class="tile-icon">🚜</div>
+      <div class="tile-body">
+        <div class="tile-name">Equipment Log</div>
+        <div class="tile-desc">John Deere fleet, maintenance &amp; field hours</div>
+      </div>
+      <span class="tile-badge badge-coming">Planned</span>
+    </div>
+
+    <div class="app-tile coming-soon">
+      <div class="tile-icon">💧</div>
+      <div class="tile-body">
+        <div class="tile-name">Irrigation</div>
+        <div class="tile-desc">Valley pivot scheduling &amp; water management</div>
+      </div>
+      <span class="tile-badge badge-coming">Planned</span>
+    </div>
+
+    <div class="app-tile coming-soon">
+      <div class="tile-icon">🧪</div>
+      <div class="tile-body">
+        <div class="tile-name">Soil &amp; Agronomy</div>
+        <div class="tile-desc">Soil tests, fertility records &amp; crop inputs</div>
+      </div>
+      <span class="tile-badge badge-coming">Planned</span>
+    </div>
+
+    <div class="app-tile coming-soon">
+      <div class="tile-icon">📦</div>
+      <div class="tile-body">
+        <div class="tile-name">Facility 2 &amp; 3</div>
+        <div class="tile-desc">Additional grain storage sites</div>
+      </div>
+      <span class="tile-badge badge-coming">Planned</span>
+    </div>
+
+  </div>
+
+  <!-- HRP link -->
+  <div class="section-label">Related</div>
+  <div class="app-grid single">
+    <a class="app-tile wide" href="https://harvestridge.github.io/farm-apps/00_home.html">
+      <div class="tile-icon">🏭</div>
+      <div class="tile-body">
+        <div class="tile-name">Harvest Ridge Processing</div>
+        <div class="tile-desc">Daily processing, inspections, COA generator, PM schedule &amp; more</div>
+      </div>
+      <span class="tile-badge badge-live">Live →</span>
+    </a>
+  </div>
+
+</main>
+
+<footer>
+  Clearwater Farms · Caro, MI &nbsp;·&nbsp; <a href="https://github.com/harvestridge/farm-apps">github.com/harvestridge/farm-apps</a>
+</footer>
+
+<script>
+// Greeting & date
+function setGreeting() {
+  const now = new Date();
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
+  document.getElementById('heroGreeting').textContent = greeting;
+  const opts = { weekday:'long', month:'long', day:'numeric', year:'numeric' };
+  document.getElementById('heroDate').textContent = now.toLocaleDateString('en-US', opts);
+}
+setGreeting();
+
+// Tap feedback on tiles
+document.querySelectorAll('.app-tile:not(.coming-soon)').forEach(tile => {
+  tile.addEventListener('touchstart', () => tile.style.transform = 'scale(0.97)', { passive: true });
+  tile.addEventListener('touchend',   () => tile.style.transform = '');
+  tile.addEventListener('touchcancel',() => tile.style.transform = '');
+});
+</script>
+</body>
+</html>
