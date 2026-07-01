@@ -7,6 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
+  --blue-dark:  #0C2D6B;
+  --blue-mid:   #1A4FA0;
+  --blue-light: #2E7DD1;
+  --blue-pale:  #E6F0FB;
   --green-dark:  #27500A;
   --green-mid:   #3B6D11;
   --green-light: #639922;
@@ -32,7 +36,7 @@
 body{font-family:'DM Sans',sans-serif;background:#F0EDE4;color:var(--text-p);min-height:100vh;-webkit-font-smoothing:antialiased}
 
 /* HEADER */
-header{background:var(--green-dark);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
+header{background:var(--blue-dark);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
 .h-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:#fff;line-height:1}
 .h-sub{font-size:11px;color:#97C459;letter-spacing:0.04em}
 .h-left{display:flex;flex-direction:column;gap:1px}
@@ -59,7 +63,7 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 .map-wrap{background:var(--sand);border-radius:var(--radius);padding:12px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;user-select:none}
 .map-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent,transparent 18px,rgba(255,255,255,0.06) 18px,rgba(255,255,255,0.06) 19px);pointer-events:none}
 #mapCanvas{position:absolute;inset:0;pointer-events:none;z-index:1}
-#mapYard{position:relative;z-index:2;width:100%;height:420px}
+#mapYard{position:relative;z-index:2;width:100%;height:360px}
 .map-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;position:relative;z-index:2}
 .li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-m)}
 .ld{width:9px;height:9px;border-radius:50%}
@@ -187,6 +191,13 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
   </div>
 </header>
 
+<!-- Tab bar -->
+<div style="background:var(--blue-dark);border-top:1px solid rgba(255,255,255,0.12);display:flex;gap:0">
+  <a href="clearwater_bin_manager.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:#fff;text-decoration:none;background:rgba(255,255,255,0.12);border-bottom:2px solid #7DB8F0;letter-spacing:0.03em">🌾 Bin Manager</a>
+  <a href="cwf_load_ticket.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🚛 Load Ticket</a>
+  <a href="cwf_home.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🏠 Home</a>
+</div>
+
 <main>
   <div class="summary-strip">
     <div class="sc"><div class="sc-label">Total stored</div><div class="sc-value" id="totalBu">—</div><div class="sc-unit">bushels</div></div>
@@ -307,20 +318,20 @@ let equip = [
 
 // Default positions (% of yard dimensions so they scale)
 const defaultPos = {
-  // Positions locked from facility layout 7-1-26
-  B8:  {x:0.30,y:0.04},   // large, top center-left
-  B2:  {x:0.54,y:0.07},   // large, top right
-  B1:  {x:0.37,y:0.33},   // medium, mid center
-  B4:  {x:0.56,y:0.30},   // medium, mid right
-  B7:  {x:0.26,y:0.52},   // hopper, mid left
-  B6:  {x:0.38,y:0.52},   // hopper, mid center-left
-  B5:  {x:0.50,y:0.52},   // hopper, mid center-right
-  B3:  {x:0.58,y:0.62},   // large, lower right
-  leg_short:{x:0.455,y:0.36}, // short leg, center
-  leg_tall: {x:0.462,y:0.44}, // tall leg, just below short
-  auger:{x:0.455,y:0.56},     // 5-ft auger, below tall leg
-  dryer:{x:0.44,y:0.66},      // dryer, lower center
-  shop: {x:0.06,y:0.10},      // shop, top left
+  // Positions locked + tightened 7-1-26
+  B8:  {x:0.30,y:0.03},   // large, top center-left
+  B2:  {x:0.53,y:0.05},   // large, top right
+  B1:  {x:0.37,y:0.28},   // medium, mid center
+  B4:  {x:0.55,y:0.26},   // medium, mid right
+  B7:  {x:0.27,y:0.46},   // hopper, mid left
+  B6:  {x:0.38,y:0.46},   // hopper, mid center-left
+  B5:  {x:0.49,y:0.46},   // hopper, mid center-right
+  B3:  {x:0.57,y:0.54},   // large, lower right
+  leg_short:{x:0.452,y:0.31}, // short leg
+  leg_tall: {x:0.459,y:0.38}, // tall leg
+  auger:{x:0.452,y:0.49},     // 5-ft auger
+  dryer:{x:0.435,y:0.58},     // dryer
+  shop: {x:0.05,y:0.08},      // shop, top left
 };
 
 // Flow connections for canvas drawing
