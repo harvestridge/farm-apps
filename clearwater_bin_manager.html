@@ -176,8 +176,10 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 
 <header>
   <div class="h-left">
-    <div class="h-title">Clearwater Bin Manager</div>
-    <div class="h-sub">142 W. Elmwood Rd. · Caro, MI</div>
+    <a href="cwf_home.html" style="text-decoration:none">
+      <div class="h-title">Clearwater Bin Manager</div>
+      <div class="h-sub">↩ cwf_home · 142 W. Elmwood Rd. · Caro, MI</div>
+    </a>
   </div>
   <div class="h-right">
     <button class="hbtn" id="editLayoutBtn" onclick="toggleEditLayout()">✦ Edit Layout</button>
@@ -305,12 +307,20 @@ let equip = [
 
 // Default positions (% of yard dimensions so they scale)
 const defaultPos = {
-  B8: {x:0.42,y:0.04}, B2:{x:0.63,y:0.06}, B3:{x:0.26,y:0.24},
-  B4: {x:0.60,y:0.28}, B1:{x:0.44,y:0.38}, B6:{x:0.26,y:0.50},
-  B7: {x:0.62,y:0.50}, B5:{x:0.44,y:0.68},
-  leg_tall:{x:0.46,y:0.30}, leg_short:{x:0.40,y:0.16},
-  dryer:{x:0.32,y:0.60}, auger:{x:0.38,y:0.52},
-  shop:{x:0.03,y:0.06},
+  // Positions locked from facility layout 7-1-26
+  B8:  {x:0.30,y:0.04},   // large, top center-left
+  B2:  {x:0.54,y:0.07},   // large, top right
+  B1:  {x:0.37,y:0.33},   // medium, mid center
+  B4:  {x:0.56,y:0.30},   // medium, mid right
+  B7:  {x:0.26,y:0.52},   // hopper, mid left
+  B6:  {x:0.38,y:0.52},   // hopper, mid center-left
+  B5:  {x:0.50,y:0.52},   // hopper, mid center-right
+  B3:  {x:0.58,y:0.62},   // large, lower right
+  leg_short:{x:0.455,y:0.36}, // short leg, center
+  leg_tall: {x:0.462,y:0.44}, // tall leg, just below short
+  auger:{x:0.455,y:0.56},     // 5-ft auger, below tall leg
+  dryer:{x:0.44,y:0.66},      // dryer, lower center
+  shop: {x:0.06,y:0.10},      // shop, top left
 };
 
 // Flow connections for canvas drawing
