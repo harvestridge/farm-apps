@@ -464,6 +464,44 @@ footer a { color: var(--blue-mid); text-decoration: none; }
 </footer>
 
 <script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxop0ZUCf-0Rn9gBHdhVMS7uX79jGd3Ge2uw4e5n-_xhyRJJ2Rxas428QZNq2fzgthN5A/exec';
+const TOTAL_CAP = 134800;
+
+// Load live stats from Google Sheet
+function loadStats() {
+  // First load from localStorage for instant display
+  const saved = JSON.parse(localStorage.getItem('cwfBins') || '[]');
+  if (saved.length) {
+    updateStats(saved);
+  }
+  // Then fetch fresh from sheet
+  if (!SHEET_URL.includes('YOUR_DEPLOYMENT')) {
+    fetch(SHEET_URL + '?action=getBins')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.length) {
+          // Save fresh data to localStorage for other apps
+          localStorage.setItem('cwfBins', JSON.stringify(
+            data.map(b => ({id: b.id, currentBu: b.currentBu, commodity: b.commodity}))
+          ));
+          updateStats(data);
+        }
+      })
+      .catch(() => {
+        // Sheet unreachable — keep localStorage values shown
+      });
+  }
+}
+
+function updateStats(bins) {
+  const totalBu   = bins.reduce((a, b) => a + (b.currentBu || 0), 0);
+  const active    = bins.filter(b => (b.currentBu || 0) > 0).length;
+  const pct       = Math.round(totalBu / TOTAL_CAP * 100);
+  document.getElementById('statBu').textContent   = totalBu.toLocaleString();
+  document.getElementById('statPct').textContent  = pct + '%';
+  document.getElementById('statBins').textContent = active;
+}
+
 // Greeting & date
 function setGreeting() {
   const now = new Date();
@@ -474,6 +512,7 @@ function setGreeting() {
   document.getElementById('heroDate').textContent = now.toLocaleDateString('en-US', opts);
 }
 setGreeting();
+loadStats();
 
 // Tap feedback on tiles
 document.querySelectorAll('.app-tile:not(.coming-soon)').forEach(tile => {
