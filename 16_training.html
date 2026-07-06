@@ -515,24 +515,34 @@ function gradeQuiz() {
 }
 
 async function submitQuiz() {
-  const employee = document.getElementById('quiz-employee').value;
-  const date = document.getElementById('quiz-date').value;
-  if (!employee || !date) { showToast('Please select employee and date', true); return; }
+  try {
+    const employee = document.getElementById('quiz-employee').value;
+    const date = document.getElementById('quiz-date').value;
+    if (!employee || !date) { showToast('Please select employee and date', true); return; }
+    if (!currentQuizKey || !QUIZZES[currentQuizKey]) { showToast('Quiz error — please reload and try again', true); return; }
 
-  const result = gradeQuiz();
-  const pct = Math.round((result.correct / result.total) * 100);
-  const pass = pct >= 80;
+    const result = gradeQuiz();
+    const pct = Math.round((result.correct / result.total) * 100);
+    const pass = pct >= 80;
 
-  const ts = new Date().toLocaleString();
-  const headers = ['Timestamp','Employee','Date','Quiz','Score','Total','Percent','Pass/Fail'];
-  const row = [ts, employee, date, QUIZZES[currentQuizKey].title, result.correct, result.total, pct, pass ? 'Pass' : 'Fail'];
-  fetch(SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({tab:'TrainingQuizzes', headers, row})
-  }).catch(()=>{});
+    const ts = new Date().toLocaleString();
+    const headers = ['Timestamp','Employee','Date','Quiz','Score','Total','Percent','Pass/Fail'];
+    const row = [ts, employee, date, QUIZZES[currentQuizKey].title, result.correct, result.total, pct, pass ? 'Pass' : 'Fail'];
 
-  renderQuizResult(employee, result, pct, pass);
+    showToast('Submitting…', false);
+
+    fetch(SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({tab:'TrainingQuizzes', headers, row})
+    })
+    .then(() => showToast('✓ Results saved to Google Sheets!', false))
+    .catch(err => showToast('Submit error: ' + err.message, true));
+
+    renderQuizResult(employee, result, pct, pass);
+  } catch(err) {
+    showToast('Error: ' + err.message, true);
+  }
 }
 
 function renderQuizResult(employee, result, pct, pass) {
