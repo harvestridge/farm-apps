@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Clearwater Bin Manager</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -70,16 +73,15 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 .edit-hint{font-size:11px;color:rgba(255,255,255,0.7);text-align:center;margin-top:6px;position:relative;z-index:2}
 
 /* MAP ELEMENTS */
-.mbin{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;text-align:center;border:2px solid rgba(0,0,0,0.2);transition:box-shadow 0.1s}
-.mbin:active{cursor:grabbing}
-.mbin.sel{box-shadow:0 0 0 3px #fff,0 0 0 5px #378ADD}
-.mhopper{position:absolute;cursor:grab;touch-action:none}
-.mhopper:active{cursor:grabbing}
-.mhopper.sel .hsvg{filter:drop-shadow(0 0 4px #378ADD)}
+.mbin3d{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;text-align:center;transition:filter 0.1s}
+.mbin3d:active{cursor:grabbing}
+.mbin3d svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mbin3d .mlabel,.mbin3d .msub{position:relative;z-index:1}
+.mbin3d.sel svg{filter:drop-shadow(0 0 4px #378ADD) drop-shadow(0 0 4px #378ADD)}
 .mequip{position:absolute;cursor:grab;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
 .mequip:active{cursor:grabbing}
-.mlabel{font-size:10px;font-weight:600;color:#fff;line-height:1.15;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.55)}
-.msub{font-size:8px;color:rgba(255,255,255,0.88);pointer-events:none;margin-top:1px}
+.mlabel{font-size:10px;font-weight:600;color:#fff;line-height:1.15;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.75)}
+.msub{font-size:8px;color:rgba(255,255,255,0.92);pointer-events:none;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,0.75)}
 .mshop{position:absolute;background:#d0c898;border:1px solid #a09060;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#412402;cursor:grab;touch-action:none}
 
 /* BIN CARDS */
@@ -103,6 +105,8 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 .bcap{font-size:11px;color:var(--text-l)}
 .fill-wrap{height:6px;background:var(--stone-light);border-radius:3px;overflow:hidden}
 .fill-bar{height:100%;border-radius:3px;transition:width 0.5s ease}
+.bin3d-wrap{display:flex;justify-content:center;align-items:flex-end;background:linear-gradient(180deg,#F7F5EE 0%,#EFEBDD 100%);border-radius:var(--radius-sm);padding:6px 0 0;margin-bottom:10px}
+.bin3d-wrap svg{display:block}
 .bca{border-top:1px solid var(--stone-light);padding:9px 14px;display:flex;gap:7px}
 .abtn{flex:1;padding:8px 0;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:background 0.12s}
 .abtn:active{transform:scale(0.97)}
@@ -412,30 +416,18 @@ function initYard() {
   // Bins
   bins.forEach(b => {
     const el = document.createElement('div');
+    el.className = 'mbin3d';
     el.id = 'el-' + b.id;
     const pos = positions[b.id];
-
-    if (b.shape === 'hopper') {
-      el.className = 'mhopper'; el.id = 'el-' + b.id;
-      const s = b.size;
-      el.style.cssText = `left:${pos.x}px;top:${pos.y}px;width:${s}px;height:${s}px;`;
-      el.innerHTML = `<svg class="hsvg" width="${s}" height="${s}" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
-        <polygon id="hfill-${b.id}" points="5,0 55,0 60,20 40,60 20,60 0,20" fill="#b4b2a9" stroke="#7a6020" stroke-width="2"/>
-        <text x="30" y="24" text-anchor="middle" font-size="10" font-weight="600" fill="#fff" font-family="DM Sans,sans-serif" style="text-shadow:0 1px 2px rgba(0,0,0,0.5)">${b.name}</text>
-        <text id="mbl-${b.id}" x="30" y="37" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.88)" font-family="DM Sans,sans-serif"></text>
-        <text id="mbp-${b.id}" x="30" y="49" text-anchor="middle" font-size="8" fill="rgba(255,255,255,0.75)" font-family="DM Sans,sans-serif"></text>
-      </svg>`;
-      el.addEventListener('click', e => { if (!didDrag) openModal(b.id); });
-    } else {
-      el.className = 'mbin'; el.id = 'el-' + b.id;
-      const s = b.size;
-      el.style.cssText = `left:${pos.x}px;top:${pos.y}px;width:${s}px;height:${s}px;background:#b4b2a9;border:2px solid rgba(0,0,0,0.2);`;
-      el.id = 'el-' + b.id;
-      el.innerHTML = `<div class="mlabel">${b.name}</div>
-        <div class="msub" id="mbl-${b.id}"></div>
-        <div class="msub" id="mbp-${b.id}"></div>`;
-      el.addEventListener('click', e => { if (!didDrag) openModal(b.id); });
-    }
+    const s = b.size;
+    const pct = b.capacity > 0 ? b.currentBu / b.capacity * 100 : 0;
+    const col = fillColor(pct, b.commodity);
+    el.style.cssText = `left:${pos.x}px;top:${pos.y}px;width:${s}px;height:${s}px;`;
+    el.innerHTML = `${mapBinSVG(b, pct, col)}
+      <div class="mlabel">${b.name}</div>
+      <div class="msub" id="mbl-${b.id}"></div>
+      <div class="msub" id="mbp-${b.id}"></div>`;
+    el.addEventListener('click', e => { if (!didDrag) openModal(b.id); });
     yard.appendChild(el);
     makeDraggable(el, b.id);
   });
@@ -567,6 +559,145 @@ function fillColor(pct, commodity) {
   return pct>70?'#639922':pct>30?'#C8960C':'#b4b2a9';
 }
 
+function shade(hex, pct) {
+  // pct: -1 (black) to +1 (white)
+  const f = parseInt(hex.slice(1), 16);
+  const t = pct < 0 ? 0 : 255;
+  const p = Math.abs(pct);
+  const R = f >> 16, G = (f >> 8) & 0x00FF, B = f & 0x0000FF;
+  const nr = Math.round((t - R) * p) + R;
+  const ng = Math.round((t - G) * p) + G;
+  const nb = Math.round((t - B) * p) + B;
+  return '#' + (0x1000000 + nr * 0x10000 + ng * 0x100 + nb).toString(16).slice(1);
+}
+
+// ── 3D BIN / HOPPER ILLUSTRATION ────────────────────────────────
+function bin3DSVG(b, pct, col) {
+  const uid = b.id;
+  const grainTop = shade(col, 0.28);
+  const grainBot = shade(col, -0.12);
+  const clampPct = Math.max(0, Math.min(100, pct));
+  const showSurface = clampPct > 2;
+
+  if (b.shape === 'hopper') {
+    // outer silhouette: rim -> shoulder -> tip -> shoulder
+    const rimY = 32, shoulderY = 62, tipY = 176, rimL = 18, rimR = 122, tipX = 70;
+    const innerRimY = rimY + 6, innerShoulderY = shoulderY + 4, innerTipY = tipY - 5, innerL = rimL + 5, innerR = rimR - 5;
+    const innerTop = innerRimY, innerBottom = innerTipY;
+    const grainY = innerBottom - (clampPct / 100) * (innerBottom - innerTop);
+    return `<svg viewBox="0 0 140 190" width="118" height="150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="steel-${uid}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#f1f2f4"/><stop offset="48%" stop-color="#cdd1d7"/>
+          <stop offset="55%" stop-color="#aab0b8"/><stop offset="100%" stop-color="#868d97"/>
+        </linearGradient>
+        <linearGradient id="grain-${uid}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${grainTop}"/><stop offset="100%" stop-color="${grainBot}"/>
+        </linearGradient>
+        <clipPath id="clip-${uid}">
+          <polygon points="${innerL},${innerRimY} ${innerR},${innerRimY} ${innerR},${innerShoulderY} ${tipX},${innerTipY} ${innerL},${innerShoulderY}"/>
+        </clipPath>
+      </defs>
+      <polygon points="${rimL},${rimY} ${rimR},${rimY} ${rimR},${shoulderY} ${tipX},${tipY} ${rimL},${shoulderY}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+      <rect x="${rimL}" y="${rimY - 6}" width="${rimR - rimL}" height="7" rx="2" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.2"/>
+      <polygon points="${innerL},${innerRimY} ${innerR},${innerRimY} ${innerR},${innerShoulderY} ${tipX},${innerTipY} ${innerL},${innerShoulderY}" fill="#F4F1E6" stroke="#c9c4b0" stroke-width="1"/>
+      <rect x="${innerL}" y="${grainY}" width="${innerR - innerL}" height="${innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
+      ${showSurface ? `<line x1="${innerL}" y1="${grainY}" x2="${innerR}" y2="${grainY}" stroke="${shade(col,-0.2)}" stroke-width="1.4" opacity="0.55" clip-path="url(#clip-${uid})"/>` : ''}
+      <line x1="30" y1="${shoulderY + 4}" x2="20" y2="186" stroke="#77808a" stroke-width="3"/>
+      <line x1="${140 - 30}" y1="${shoulderY + 4}" x2="120" y2="186" stroke="#77808a" stroke-width="3"/>
+    </svg>`;
+  }
+
+  // cylindrical silo
+  const bodyTop = 46, bodyBottom = 164, bodyL = 18, bodyR = 122;
+  const innerTop = 52, innerBottom = 158, innerL = 24, innerR = 116;
+  const grainY = innerBottom - (clampPct / 100) * (innerBottom - innerTop);
+  const corrX = [];
+  for (let x = innerL + 8; x < innerR - 4; x += 12) corrX.push(x);
+  return `<svg viewBox="0 0 140 190" width="118" height="150" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="steel-${uid}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#f1f2f4"/><stop offset="48%" stop-color="#cdd1d7"/>
+        <stop offset="55%" stop-color="#aab0b8"/><stop offset="100%" stop-color="#868d97"/>
+      </linearGradient>
+      <linearGradient id="grain-${uid}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${grainTop}"/><stop offset="100%" stop-color="${grainBot}"/>
+      </linearGradient>
+      <clipPath id="clip-${uid}"><rect x="${innerL}" y="${innerTop}" width="${innerR - innerL}" height="${innerBottom - innerTop}" rx="3"/></clipPath>
+    </defs>
+    <path d="M${bodyL},${bodyTop} Q70,8 ${bodyR},${bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+    <rect x="67" y="0" width="6" height="10" fill="#77808a"/>
+    <rect x="${bodyL}" y="${bodyTop}" width="${bodyR - bodyL}" height="${bodyBottom - bodyTop}" rx="6" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+    ${corrX.map(x => `<line x1="${x}" y1="${bodyTop + 2}" x2="${x}" y2="${bodyBottom - 2}" stroke="#ffffff" stroke-opacity="0.28" stroke-width="1"/>`).join('')}
+    <rect x="${innerL}" y="${innerTop}" width="${innerR - innerL}" height="${innerBottom - innerTop}" rx="3" fill="#F4F1E6"/>
+    <rect x="${innerL}" y="${grainY}" width="${innerR - innerL}" height="${innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
+    ${showSurface ? `<ellipse cx="70" cy="${grainY}" rx="${(innerR - innerL) / 2}" ry="3" fill="${shade(col,-0.2)}" opacity="0.5" clip-path="url(#clip-${uid})"/>` : ''}
+    <rect x="${innerL}" y="${innerTop}" width="${innerR - innerL}" height="${innerBottom - innerTop}" rx="3" fill="none" stroke="#c9c4b0" stroke-width="1"/>
+    <line x1="30" y1="${bodyBottom}" x2="24" y2="186" stroke="#77808a" stroke-width="3"/>
+    <line x1="110" y1="${bodyBottom}" x2="116" y2="186" stroke="#77808a" stroke-width="3"/>
+  </svg>`;
+}
+
+// ── COMPACT MAP ICON (small 3D bin/hopper for facility map) ────
+function mapBinGeom(shape) {
+  if (shape === 'hopper') {
+    return { rimL:6, rimR:54, rimY:6, shoulderY:17, tipX:30, tipY:58,
+              innerL:10, innerR:50, innerTop:11, innerShoulder:19, innerBottom:53 };
+  }
+  return { bodyL:6, bodyR:54, bodyTop:14, bodyBottom:54,
+            innerL:10, innerR:50, innerTop:18, innerBottom:50 };
+}
+
+function mapBinSVG(b, pct, col) {
+  const uid = 'm-' + b.id;
+  const grainTop = shade(col, 0.28);
+  const grainBot = shade(col, -0.12);
+  const clampPct = Math.max(0, Math.min(100, pct));
+  const showSurface = clampPct > 4;
+  const g = mapBinGeom(b.shape);
+
+  if (b.shape === 'hopper') {
+    const grainY = g.innerBottom - (clampPct / 100) * (g.innerBottom - g.innerTop);
+    return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      <defs>
+        <linearGradient id="steel-${uid}" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#f1f2f4"/><stop offset="48%" stop-color="#cdd1d7"/>
+          <stop offset="55%" stop-color="#aab0b8"/><stop offset="100%" stop-color="#868d97"/>
+        </linearGradient>
+        <linearGradient id="grain-${uid}" x1="0" y1="0" x2="0" y2="1">
+          <stop id="gstop1-${b.id}" offset="0%" stop-color="${grainTop}"/><stop id="gstop2-${b.id}" offset="100%" stop-color="${grainBot}"/>
+        </linearGradient>
+        <clipPath id="clip-${uid}">
+          <polygon points="${g.innerL},${g.innerTop} ${g.innerR},${g.innerTop} ${g.innerR},${g.innerShoulder} ${g.tipX},${g.innerBottom} ${g.innerL},${g.innerShoulder}"/>
+        </clipPath>
+      </defs>
+      <polygon points="${g.rimL},${g.rimY} ${g.rimR},${g.rimY} ${g.rimR},${g.shoulderY} ${g.tipX},${g.tipY} ${g.rimL},${g.shoulderY}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+      <polygon points="${g.innerL},${g.innerTop} ${g.innerR},${g.innerTop} ${g.innerR},${g.innerShoulder} ${g.tipX},${g.innerBottom} ${g.innerL},${g.innerShoulder}" fill="#F4F1E6"/>
+      <rect id="mgrain-${b.id}" x="${g.innerL}" y="${grainY}" width="${g.innerR - g.innerL}" height="${g.innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
+      <line id="msurf-${b.id}" x1="${g.innerL}" y1="${grainY}" x2="${g.innerR}" y2="${grainY}" stroke="${shade(col,-0.2)}" stroke-width="1.2" opacity="${showSurface ? 0.55 : 0}" clip-path="url(#clip-${uid})"/>
+    </svg>`;
+  }
+
+  const grainY = g.innerBottom - (clampPct / 100) * (g.innerBottom - g.innerTop);
+  return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+    <defs>
+      <linearGradient id="steel-${uid}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#f1f2f4"/><stop offset="48%" stop-color="#cdd1d7"/>
+        <stop offset="55%" stop-color="#aab0b8"/><stop offset="100%" stop-color="#868d97"/>
+      </linearGradient>
+      <linearGradient id="grain-${uid}" x1="0" y1="0" x2="0" y2="1">
+        <stop id="gstop1-${b.id}" offset="0%" stop-color="${grainTop}"/><stop id="gstop2-${b.id}" offset="100%" stop-color="${grainBot}"/>
+      </linearGradient>
+      <clipPath id="clip-${uid}"><rect x="${g.innerL}" y="${g.innerTop}" width="${g.innerR - g.innerL}" height="${g.innerBottom - g.innerTop}" rx="2"/></clipPath>
+    </defs>
+    <path d="M${g.bodyL},${g.bodyTop} Q30,3 ${g.bodyR},${g.bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+    <rect x="${g.bodyL}" y="${g.bodyTop}" width="${g.bodyR - g.bodyL}" height="${g.bodyBottom - g.bodyTop}" rx="4" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+    <rect x="${g.innerL}" y="${g.innerTop}" width="${g.innerR - g.innerL}" height="${g.innerBottom - g.innerTop}" rx="2" fill="#F4F1E6"/>
+    <rect id="mgrain-${b.id}" x="${g.innerL}" y="${grainY}" width="${g.innerR - g.innerL}" height="${g.innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
+    <ellipse id="msurf-${b.id}" cx="30" cy="${grainY}" rx="${(g.innerR - g.innerL) / 2}" ry="1.6" fill="${shade(col,-0.2)}" opacity="${showSurface ? 0.5 : 0}" clip-path="url(#clip-${uid})"/>
+  </svg>`;
+}
+
 function badgeClass(com) {
   if (!com||com==='Empty') return 'bempty';
   const c=com.toLowerCase();
@@ -584,13 +715,29 @@ function updateMapColors() {
     const col = fillColor(pct, b.commodity);
     const buStr = b.currentBu>0 ? b.currentBu.toLocaleString()+' bu' : 'Empty';
     const pctStr = Math.round(pct)+'%';
+    const clampPct = Math.max(0, Math.min(100, pct));
+    const showSurface = clampPct > 4;
+    const g = mapBinGeom(b.shape);
+    const grainY = g.innerBottom - (clampPct / 100) * (g.innerBottom - g.innerTop);
 
-    if (b.shape === 'hopper') {
-      const poly = document.getElementById('hfill-'+b.id);
-      if (poly) poly.setAttribute('fill', col);
-    } else {
-      const el = document.getElementById('el-'+b.id);
-      if (el) el.style.background = col;
+    const grainEl = document.getElementById('mgrain-'+b.id);
+    const surfEl  = document.getElementById('msurf-'+b.id);
+    const stop1   = document.getElementById('gstop1-'+b.id);
+    const stop2   = document.getElementById('gstop2-'+b.id);
+    if (stop1) stop1.setAttribute('stop-color', shade(col, 0.28));
+    if (stop2) stop2.setAttribute('stop-color', shade(col, -0.12));
+    if (grainEl) {
+      grainEl.setAttribute('y', grainY);
+      grainEl.setAttribute('height', g.innerBottom - grainY);
+    }
+    if (surfEl) {
+      surfEl.setAttribute('opacity', showSurface ? (b.shape==='hopper'?0.55:0.5) : 0);
+      surfEl.setAttribute(b.shape==='hopper' ? 'stroke' : 'fill', shade(col,-0.2));
+      if (b.shape === 'hopper') {
+        surfEl.setAttribute('y1', grainY); surfEl.setAttribute('y2', grainY);
+      } else {
+        surfEl.setAttribute('cy', grainY);
+      }
     }
     const lbl = document.getElementById('mbl-'+b.id);
     const pp  = document.getElementById('mbp-'+b.id);
@@ -622,6 +769,7 @@ function render() {
           <div><div class="bc-name">${b.name}</div><div class="bc-type">${b.type} · ${b.legSystem}</div></div>
           <span class="bbadge ${badgeClass(b.commodity)}">${b.commodity}</span>
         </div>
+        <div class="bin3d-wrap">${bin3DSVG(b, pct, col)}</div>
         <div class="bbu-row">
           <div><span class="bbu">${b.currentBu.toLocaleString()}</span><span class="bbu-u">bu</span></div>
           <div class="bpct" style="color:${col}">${Math.round(pct)}%</div>
