@@ -6,7 +6,7 @@
 <title>Harvest Ridge – Warehouse</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--gold-pale:#fdf3de;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
 .app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
@@ -50,15 +50,17 @@ textarea{resize:none;}
 .inv-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
 .inv-filter input,.inv-filter select{flex:1;min-width:120px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
 .lot-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
-.lot-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--border);}
+.lot-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--border);cursor:pointer;}
 .lot-num{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--green);}
 .lot-crop{font-size:12px;color:var(--muted);margin-top:1px;}
-.lot-status{margin-left:auto;}
-.status-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;}
+.lot-status{margin-left:auto;text-align:right;}
+.lot-caret{font-size:11px;color:var(--muted);margin-top:2px;}
+.status-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-block;}
 .pill-approved{background:var(--green-pale);color:var(--green);}
 .pill-pending{background:#fef3c7;color:#92400e;}
 .pill-rejected{background:var(--red-light);color:var(--red);}
 .pill-depleted{background:#f3f4f6;color:#6b7280;}
+.pill-mixed{background:#e8e4fb;color:#5b3ec9;}
 .lot-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .lot-stat{text-align:center;}
 .lot-stat-val{font-size:18px;font-weight:700;color:var(--text);}
@@ -77,16 +79,32 @@ textarea{resize:none;}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 .toast.error{background:var(--red);}
-.movement-row{font-size:12px;padding:6px 0;border-bottom:0.5px solid #f0ece6;display:grid;grid-template-columns:80px 1fr auto;gap:6px;align-items:center;}
-.movement-row:last-child{border-bottom:none;}
-.mov-date{color:var(--muted);}
-.mov-type{font-weight:600;}
-.mov-type.in{color:var(--green);}
-.mov-type.out{color:var(--red);}
-.mov-totes{font-weight:600;}
 .loading{text-align:center;padding:30px 20px;color:var(--muted);}
 .loading .spinner{font-size:28px;animation:spin 1s linear infinite;display:inline-block;margin-bottom:8px;}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+/* tote / batch UI */
+.tote-list{padding:4px 16px 12px;}
+.batch-group{margin-bottom:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.batch-head{background:#faf8f4;padding:8px 12px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.batch-head b{color:var(--text);}
+.tote-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;}
+.tote-chip{font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:white;display:flex;align-items:center;gap:5px;}
+.tote-chip.shipped{background:#f3f4f6;color:#9ca3af;text-decoration:line-through;border-color:#e5e7eb;}
+.tote-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.dot-approved{background:var(--green);}
+.dot-pending{background:var(--gold);}
+.dot-rejected{background:var(--red);}
+.select-all-row{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--green);}
+.batch-check-group{padding:6px 12px 10px;}
+.tote-check-row{display:flex;align-items:center;gap:9px;padding:7px 4px;border-bottom:0.5px solid #f3efe9;font-size:13.5px;}
+.tote-check-row:last-child{border-bottom:none;}
+.tote-check-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);flex-shrink:0;}
+.tote-check-lbs{margin-left:auto;color:var(--muted);font-size:12px;}
+.partial-warn{font-size:11.5px;color:#92400e;background:var(--gold-pale);padding:6px 10px;border-radius:7px;margin:0 12px 10px;display:none;}
+.partial-warn.show{display:block;}
+.ship-summary{display:flex;gap:14px;padding:10px 16px 4px;font-size:13px;}
+.ship-summary b{color:var(--green);}
+.tote-numbering-note{font-size:11.5px;color:var(--muted);margin-top:-4px;margin-bottom:2px;}
 </style>
 </head>
 <body>
@@ -110,7 +128,7 @@ textarea{resize:none;}
 
   <!-- GRADING TAB -->
   <div class="section active" id="tab-grading">
-    <div class="section-note">Complete a grading sheet for each incoming lot. Select crop type to load the correct grade fields.</div>
+    <div class="section-note">Grade a micro-lot (2–6 totes). Every tote in this batch shares the grade below, but each one gets its own tote number automatically — e.g. Lot BB26-001 with 4 totes becomes BB26-001-01 through -04.</div>
     <div class="card">
       <div class="card-head">Lot Information</div>
       <div class="card-body">
@@ -121,7 +139,7 @@ textarea{resize:none;}
           <option>Mike</option></select>
           </div>
         </div>
-        <div class="field-group"><div class="field-label">Lot #</div><input type="text" id="g-lot" placeholder="e.g. BB26-001"></div>
+        <div class="field-group"><div class="field-label">Lot #</div><input type="text" id="g-lot" placeholder="e.g. BB26-001" oninput="updateToteNumberPreview()"></div>
         <div class="two-col">
           <div class="field-group"><div class="field-label">Crop Type</div>
             <select id="g-crop" onchange="loadGradeFields()">
@@ -157,9 +175,10 @@ textarea{resize:none;}
       <div class="card-head">Tote Count & Weight</div>
       <div class="card-body">
         <div class="two-col">
-          <div class="field-group"><div class="field-label">Number of Totes</div><input type="number" id="g-totes" min="1" placeholder="e.g. 10"></div>
+          <div class="field-group"><div class="field-label">Number of Totes (2–6)</div><input type="number" id="g-totes" min="1" max="6" placeholder="e.g. 4" oninput="updateToteNumberPreview()"></div>
           <div class="field-group"><div class="field-label">Total Lbs</div><input type="number" id="g-lbs" min="0" placeholder="e.g. 42000"></div>
         </div>
+        <div class="tote-numbering-note" id="tote-preview"></div>
         <div class="field-group"><div class="field-label">Notes</div><textarea id="g-notes" rows="2" placeholder="Any additional notes..."></textarea></div>
       </div>
     </div>
@@ -180,12 +199,13 @@ textarea{resize:none;}
   <!-- INVENTORY TAB -->
   <div class="section" id="tab-inventory">
     <div class="inv-filter">
-      <input type="text" id="inv-search" placeholder="Search lot # or crop..." oninput="renderInventory()">
+      <input type="text" id="inv-search" placeholder="Search lot #, tote #, or crop..." oninput="renderInventory()">
       <select id="inv-filter-status" onchange="renderInventory()">
         <option value="">All Statuses</option>
         <option value="Approved">Approved</option>
         <option value="Pending">Pending</option>
         <option value="Rejected">Rejected</option>
+        <option value="Mixed">Mixed</option>
         <option value="Depleted">Depleted</option>
       </select>
     </div>
@@ -195,7 +215,7 @@ textarea{resize:none;}
   <!-- SHIPMENTS TAB -->
   <div class="section" id="tab-shipments">
     <div id="ship-list-view">
-      <div class="section-note">Select a lot to log an outgoing shipment. Totes will be deducted from inventory.</div>
+      <div class="section-note">Select a lot, then check off the specific totes going out. Only approved, unshipped totes are shown.</div>
       <div class="card"><div id="ship-lots-list"></div></div>
     </div>
     <div id="ship-detail-view" style="display:none;">
@@ -229,67 +249,140 @@ const GRADE_FIELDS = {
 
 let gradeStatus = '';
 let gradeValues = {};
-let inventory = {}; // keyed by lot #
+let inventory = {};   // keyed by lot #, aggregated from toteList
+let toteList = [];    // flat list of every tote record
+let expandedLots = {}; // track which lot cards are expanded in Inventory tab
+let shipSelections = {}; // toteNum -> true when checked in ship detail view
+
+// ===== TOTE NUMBER HELPERS =====
+function getExistingTotesForLot(lot) {
+  return toteList.filter(t => t.lot === lot);
+}
+
+function nextToteNumbers(lot, count) {
+  const existing = getExistingTotesForLot(lot);
+  let maxN = 0;
+  existing.forEach(t => {
+    const suffix = t.toteNum.slice(lot.length + 1);
+    const n = parseInt(suffix, 10);
+    if(!isNaN(n) && n > maxN) maxN = n;
+  });
+  const nums = [];
+  for(let i = 1; i <= count; i++){
+    nums.push(`${lot}-${String(maxN + i).padStart(2,'0')}`);
+  }
+  return nums;
+}
+
+function updateToteNumberPreview() {
+  const lot = document.getElementById('g-lot').value.trim();
+  const totes = parseInt(document.getElementById('g-totes').value) || 0;
+  const preview = document.getElementById('tote-preview');
+  if(!lot || totes < 1){ preview.textContent = ''; return; }
+  const nums = nextToteNumbers(lot, Math.min(totes, 6));
+  preview.textContent = `Will create: ${nums.join(', ')}${totes>6?'...':''}`;
+}
 
 // ===== LOAD INVENTORY FROM SHEETS =====
 async function loadInventoryFromSheets() {
   document.getElementById('sync-status').textContent = '⏳ Syncing...';
   try {
-    // Load grading (IN movements)
     const gradingResp = await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`);
-    const gradingText = await gradingResp.text();
-    const gradingRows = JSON.parse(gradingText);
+    const gradingRows = JSON.parse(await gradingResp.text());
 
-    // Load shipments (OUT movements)
+    const totesResp = await fetch(`${SCRIPT_URL}?tab=WarehouseTotes`);
+    const totesRows = JSON.parse(await totesResp.text());
+
     const shipResp = await fetch(`${SCRIPT_URL}?tab=WarehouseShipments`);
-    const shipText = await shipResp.text();
-    const shipRows = JSON.parse(shipText);
+    const shipRows = JSON.parse(await shipResp.text());
 
-    inventory = {};
-
-    // Process grading rows (skip header row 0)
-    if(gradingRows.length > 1) {
-      for(let i = 1; i < gradingRows.length; i++) {
+    // ---- batch (grade) data, keyed by Batch ID ----
+    const gradingByBatch = {};
+    if(gradingRows.length > 1){
+      const hdrs = gradingRows[0];
+      for(let i=1;i<gradingRows.length;i++){
         const r = gradingRows[i];
-        const ts=r[0],date=r[1],inspector=r[2],lotNum=r[3],sampleNum=r[4],crop=r[5],grower=r[6],status=r[7],totes=parseInt(r[8])||0,lbs=parseInt(r[9])||0,notes=r[10];
-        // Grade data is now in individual columns starting at index 11
-        // Headers row tells us the field names
+        const batchId=r[1];
+        if(!batchId) continue;
         let gradeData={};
-        if(gradingRows[0]) {
-          const hdrs = gradingRows[0];
-          for(let h=11;h<hdrs.length;h++){
-            if(hdrs[h] && r[h]!==undefined && r[h]!=='') gradeData[hdrs[h]]=r[h];
-          }
+        for(let h=12;h<hdrs.length;h++){
+          if(hdrs[h] && r[h]!==undefined && r[h]!=='') gradeData[hdrs[h]]=r[h];
         }
-        if(!lotNum) continue;
-        if(!inventory[lotNum]) {
-          inventory[lotNum] = {lotNum,crop,grower,status,createdDate:date,inspector,sampleNum,totesIn:0,lbsIn:0,totesRemaining:0,lbsRemaining:0,notes,gradeData,movements:[]};
-        }
-        inventory[lotNum].totesIn += totes;
-        inventory[lotNum].lbsIn += lbs;
-        inventory[lotNum].totesRemaining += totes;
-        inventory[lotNum].lbsRemaining += lbs;
-        inventory[lotNum].status = status;
-        inventory[lotNum].movements.push({type:'IN',date,totes,lbs,by:inspector,notes});
+        gradingByBatch[batchId] = {
+          ts:r[0],batchId,date:r[2],inspector:r[3],lot:r[4],sample:r[5],crop:r[6],
+          grower:r[7],status:r[8],totesIn:parseInt(r[9])||0,lbsIn:parseInt(r[10])||0,notes:r[11],gradeData
+        };
       }
     }
 
-    // Process shipment rows (subtract OUT movements)
-    if(shipRows.length > 1) {
-      for(let i = 1; i < shipRows.length; i++) {
+    // ---- individual totes ----
+    toteList = [];
+    if(totesRows.length > 1){
+      for(let i=1;i<totesRows.length;i++){
+        const r = totesRows[i];
+        const [ts,batchId,date,lot,toteNum,sample,crop,grower,status,lbs,inspector,notes] = r;
+        if(!lot || !toteNum) continue;
+        toteList.push({
+          ts,batchId,date,lot,toteNum,sample,crop,grower,status,
+          lbs:parseInt(lbs)||0,inspector,notes,shipped:false,shipInfo:null
+        });
+      }
+    }
+
+    // ---- mark shipped totes ----
+    if(shipRows.length > 1){
+      for(let i=1;i<shipRows.length;i++){
         const r = shipRows[i];
-        const ts=r[0],date=r[1],lotNum=r[2],crop=r[3],grower=r[4],totes=parseInt(r[5])||0,lbs=parseInt(r[6])||0,buyer=r[7],bol=r[8],invoice=r[9],po=r[10],contract=r[11],by=r[12],notes=r[13];
-        if(!lotNum || !inventory[lotNum]) continue;
-        inventory[lotNum].totesRemaining = Math.max(0, inventory[lotNum].totesRemaining - totes);
-        inventory[lotNum].lbsRemaining = Math.max(0, inventory[lotNum].lbsRemaining - lbs);
-        if(inventory[lotNum].totesRemaining === 0) inventory[lotNum].status = 'Depleted';
-        inventory[lotNum].movements.push({type:'OUT',date,totes,lbs,by,buyer,bol,invoice,notes});
+        const ts=r[0],date=r[1],lot=r[2],crop=r[3],grower=r[4],toteNumsStr=r[5]||'',
+              totesOut=parseInt(r[6])||0,lbsOut=parseInt(r[7])||0,buyer=r[8],bol=r[9],
+              invoice=r[10],po=r[11],contract=r[12],by=r[13],notes=r[14];
+        const shippedNums = toteNumsStr.split(',').map(s=>s.trim()).filter(Boolean);
+        shippedNums.forEach(tn=>{
+          const tote = toteList.find(t=>t.toteNum===tn);
+          if(tote){
+            tote.shipped = true;
+            tote.shipInfo = {date,buyer,bol,invoice,po,contract,by,notes};
+          }
+        });
       }
     }
 
-    const count = Object.keys(inventory).length;
+    // ---- build inventory grouped by lot ----
+    inventory = {};
+    toteList.forEach(t=>{
+      if(!inventory[t.lot]){
+        inventory[t.lot] = {lotNum:t.lot,crop:t.crop,grower:t.grower,totes:[],batches:{}};
+      }
+      inventory[t.lot].totes.push(t);
+      if(!inventory[t.lot].batches[t.batchId]){
+        const b = gradingByBatch[t.batchId];
+        inventory[t.lot].batches[t.batchId] = {
+          batchId:t.batchId, date:t.date, inspector:t.inspector, sample:t.sample,
+          status:t.status, gradeData: b ? b.gradeData : {}, totes:[]
+        };
+      }
+      inventory[t.lot].batches[t.batchId].totes.push(t);
+    });
+
+    Object.values(inventory).forEach(lot=>{
+      lot.totesIn = lot.totes.length;
+      lot.totesRemaining = lot.totes.filter(t=>!t.shipped).length;
+      lot.lbsIn = lot.totes.reduce((s,t)=>s+t.lbs,0);
+      lot.lbsRemaining = lot.totes.filter(t=>!t.shipped).reduce((s,t)=>s+t.lbs,0);
+      const statuses = [...new Set(lot.totes.map(t=>t.status))];
+      if(lot.totesRemaining === 0){
+        lot.status = 'Depleted';
+      } else if(statuses.length === 1){
+        lot.status = statuses[0];
+      } else {
+        lot.status = 'Mixed';
+      }
+    });
+
+    const lotCount = Object.keys(inventory).length;
+    const toteCount = toteList.length;
     const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    document.getElementById('sync-status').textContent = `✓ ${count} lots synced at ${ts}`;
+    document.getElementById('sync-status').textContent = `✓ ${lotCount} lots · ${toteCount} totes synced at ${ts}`;
     renderInventory();
     renderShipList();
   } catch(err) {
@@ -343,21 +436,35 @@ async function submitGrading() {
   btn.disabled=true;btn.textContent='Submitting...';
 
   const ts=new Date().toLocaleString();
-  // Send each grade field as its own column instead of JSON blob
+  const batchId=`${Date.now()}-${Math.floor(Math.random()*10000)}`;
+  const toteNums = nextToteNumbers(lot, totes);
+
+  // split lbs evenly across totes, remainder on the last tote(s)
+  const base = Math.floor(lbs/totes);
+  const remainder = lbs - base*totes;
+  const toteLbs = toteNums.map((_,i)=> base + (i < remainder ? 1 : 0));
+
   const gradeKeys = Object.keys(gradeValues);
   const gradeVals = Object.values(gradeValues);
-  const gradeHeaders=['Timestamp','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes',...gradeKeys];
-  const gradeRow=[ts,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,...gradeVals];
+  const gradeHeaders=['Timestamp','Batch ID','Date','Inspector','Lot #','Sample #','Crop','Grower','Status','Totes In','Lbs In','Notes',...gradeKeys];
+  const gradeRow=[ts,batchId,date,inspector,lot,sampleNum,crop,grower,gradeStatus,totes,lbs,notes,...gradeVals];
+
+  const toteHeaders=['Timestamp','Batch ID','Date','Lot #','Tote #','Sample #','Crop','Grower','Status','Lbs','Inspector','Notes'];
 
   try {
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseGrading',headers:gradeHeaders,row:gradeRow})});
-    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes'],row:[ts,date,lot,crop,'IN',totes,lbs,inspector,notes]})});
 
-    showToast(`✓ ${lot} submitted! Refreshing inventory...`,false);
+    for(let i=0;i<toteNums.length;i++){
+      const toteRow=[ts,batchId,date,lot,toteNums[i],sampleNum,crop,grower,gradeStatus,toteLbs[i],inspector,notes];
+      await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseTotes',headers:toteHeaders,row:toteRow})});
+    }
+
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes','Tote Numbers'],row:[ts,date,lot,crop,'IN',totes,lbs,inspector,notes,toteNums.join(', ')]})});
+
+    showToast(`✓ ${lot} submitted! ${toteNums.length} totes created. Refreshing...`,false);
     btn.textContent='✓ Submitted!';
     btn.style.background='#1a5c1a';
 
-    // Reset form
     setTimeout(async ()=>{
       document.getElementById('g-lot').value='';
       document.getElementById('g-crop').value='';
@@ -366,6 +473,7 @@ async function submitGrading() {
       document.getElementById('g-totes').value='';
       document.getElementById('g-lbs').value='';
       document.getElementById('g-notes').value='';
+      document.getElementById('tote-preview').textContent='';
       document.getElementById('grade-fields-card').style.display='none';
       gradeStatus='';
       ['approved','pending','rejected'].forEach(s=>document.getElementById(`sbtn-${s}`).className='status-btn');
@@ -379,34 +487,59 @@ async function submitGrading() {
 }
 
 // ===== INVENTORY =====
+function statusPillClass(status){
+  return status==='Approved'?'pill-approved':status==='Pending'?'pill-pending':status==='Rejected'?'pill-rejected':status==='Mixed'?'pill-mixed':'pill-depleted';
+}
+function statusDotClass(status){
+  return status==='Approved'?'dot-approved':status==='Pending'?'dot-pending':'dot-rejected';
+}
+
+function toggleLotExpand(lotNum){
+  expandedLots[lotNum] = !expandedLots[lotNum];
+  renderInventory();
+}
+
 function renderInventory() {
   const search=(document.getElementById('inv-search')?.value||'').toLowerCase();
   const statusFilter=document.getElementById('inv-filter-status')?.value||'';
   const list=document.getElementById('inventory-list');
   let lots=Object.values(inventory);
-  if(search) lots=lots.filter(l=>l.lotNum.toLowerCase().includes(search)||l.crop.toLowerCase().includes(search)||(l.grower||'').toLowerCase().includes(search));
+  if(search) lots=lots.filter(l=>l.lotNum.toLowerCase().includes(search)||l.crop.toLowerCase().includes(search)||(l.grower||'').toLowerCase().includes(search)||l.totes.some(t=>t.toteNum.toLowerCase().includes(search)));
   if(statusFilter) lots=lots.filter(l=>l.status===statusFilter);
   if(lots.length===0){
     list.innerHTML='<div class="empty-state"><div class="big">📦</div><p>No lots found.<br>Grade incoming product to add inventory.</p></div>';return;
   }
   list.innerHTML='';
   lots.reverse().forEach(lot=>{
-    const statusClass=lot.status==='Approved'?'pill-approved':lot.status==='Pending'?'pill-pending':lot.status==='Rejected'?'pill-rejected':'pill-depleted';
+    const statusClass=statusPillClass(lot.status);
+    const isOpen = !!expandedLots[lot.lotNum];
     const div=document.createElement('div');
     div.className='lot-card';
+    let batchesHtml='';
+    if(isOpen){
+      const batches = Object.values(lot.batches).sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+      batchesHtml = '<div class="tote-list">' + batches.map(b=>{
+        const chips = b.totes.slice().sort((x,y)=>x.toteNum.localeCompare(y.toteNum)).map(t=>{
+          const shippedCls = t.shipped ? ' shipped' : '';
+          return `<span class="tote-chip${shippedCls}"><span class="tote-dot ${statusDotClass(t.status)}"></span>${t.toteNum}${t.shipped?' · shipped':''}</span>`;
+        }).join('');
+        return `<div class="batch-group">
+          <div class="batch-head"><span>Batch ${b.date||''} · <b>${b.inspector||''}</b>${b.sample?' · Sample '+b.sample:''}</span><span class="status-pill ${statusPillClass(b.status)}">${b.status}</span></div>
+          <div class="tote-chip-wrap">${chips}</div>
+        </div>`;
+      }).join('') + '</div>';
+    }
     div.innerHTML=`
-      <div class="lot-head">
+      <div class="lot-head" onclick="toggleLotExpand('${lot.lotNum}')">
         <div><div class="lot-num">${lot.lotNum}</div><div class="lot-crop">${lot.crop} · ${lot.grower}</div></div>
-        <div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span></div>
+        <div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span><div class="lot-caret">${isOpen?'▲ hide totes':'▼ show totes'}</div></div>
       </div>
       <div class="lot-body">
         <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Left</div></div>
         <div class="lot-stat"><div class="lot-stat-val">${lot.totesIn}</div><div class="lot-stat-label">Totes In</div></div>
         <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Left</div></div>
       </div>
-      <div style="padding:0 16px 12px;">
-        ${(lot.movements||[]).map(m=>`<div class="movement-row"><span class="mov-date">${m.date}</span><span class="mov-type ${m.type==='IN'?'in':'out'}">${m.type==='IN'?'↑ IN':'↓ OUT'} ${m.by||''}</span><span class="mov-totes">${m.type==='IN'?'+':'−'}${m.totes} totes</span></div>`).join('')}
-      </div>
+      ${batchesHtml}
     `;
     list.appendChild(div);
   });
@@ -421,43 +554,67 @@ function showShipList(){
 
 function renderShipList(){
   const list=document.getElementById('ship-lots-list');
-  const available=Object.values(inventory).filter(l=>l.totesRemaining>0&&l.status==='Approved');
+  const available=Object.values(inventory).filter(l=>l.totes.some(t=>!t.shipped && t.status==='Approved'));
   if(available.length===0){
-    list.innerHTML='<div class="empty-state"><div class="big">🚚</div><p>No approved lots with totes remaining.</p></div>';return;
+    list.innerHTML='<div class="empty-state"><div class="big">🚚</div><p>No approved totes available to ship.</p></div>';return;
   }
   list.innerHTML='';
   available.forEach(lot=>{
+    const shippable = lot.totes.filter(t=>!t.shipped && t.status==='Approved');
+    const lbs = shippable.reduce((s,t)=>s+t.lbs,0);
     const div=document.createElement('div');
     div.className='ship-lot-row';
     div.onclick=()=>showShipDetail(lot.lotNum);
-    div.innerHTML=`<div class="ship-lot-info"><div class="ship-lot-num">${lot.lotNum}</div><div class="ship-lot-meta">${lot.crop} · ${lot.grower} · ${(lot.lbsRemaining||0).toLocaleString()} lbs</div></div><div class="ship-lot-totes">${lot.totesRemaining} totes ›</div>`;
+    div.innerHTML=`<div class="ship-lot-info"><div class="ship-lot-num">${lot.lotNum}</div><div class="ship-lot-meta">${lot.crop} · ${lot.grower} · ${lbs.toLocaleString()} lbs</div></div><div class="ship-lot-totes">${shippable.length} totes ›</div>`;
     list.appendChild(div);
   });
 }
 
 function showShipDetail(lotNum){
   const lot=inventory[lotNum];
+  shipSelections = {};
   document.getElementById('ship-list-view').style.display='none';
   document.getElementById('ship-detail-view').style.display='block';
+
+  const batches = Object.values(lot.batches)
+    .map(b=>({...b, totes: b.totes.filter(t=>!t.shipped && t.status==='Approved')}))
+    .filter(b=>b.totes.length>0)
+    .sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+
+  const batchesHtml = batches.map(b=>{
+    const rows = b.totes.slice().sort((x,y)=>x.toteNum.localeCompare(y.toteNum)).map(t=>`
+      <div class="tote-check-row">
+        <input type="checkbox" id="chk-${t.toteNum}" onchange="onToteCheckChange('${lotNum}','${b.batchId}')">
+        <label for="chk-${t.toteNum}">${t.toteNum}</label>
+        <span class="tote-check-lbs">${t.lbs.toLocaleString()} lbs</span>
+      </div>`).join('');
+    return `<div class="batch-group" id="batch-${b.batchId}">
+      <div class="batch-head">
+        <span>Batch ${b.date||''} · <b>${b.inspector||''}</b> · ${b.totes.length} totes eligible</span>
+        <span class="select-all-row"><input type="checkbox" id="selall-${b.batchId}" onchange="toggleBatchAll('${lotNum}','${b.batchId}')"> All</span>
+      </div>
+      <div class="batch-check-group">${rows}</div>
+      <div class="partial-warn" id="warn-${b.batchId}">⚠ You're about to ship only part of this micro-lot batch. Double-check that's intentional.</div>
+    </div>`;
+  }).join('');
+
   document.getElementById('ship-detail-content').innerHTML=`
     <div class="card">
       <div class="card-head">${lot.lotNum} — ${lot.crop}</div>
-      <div class="card-body">
-        <div class="three-col" style="margin-bottom:4px;">
-          <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Available</div></div>
-          <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Available</div></div>
-          <div class="lot-stat"><div class="lot-stat-val" style="font-size:13px;">${lot.grower}</div><div class="lot-stat-label">Grower</div></div>
-        </div>
+      <div class="card-body" style="padding-bottom:6px;">
+        <div class="lot-crop" style="margin-bottom:6px;">${lot.grower}</div>
       </div>
     </div>
     <div class="card">
-      <div class="card-head">Log Outgoing Shipment</div>
+      <div class="card-head">Select Totes to Ship</div>
+      <div id="ship-batches">${batchesHtml}</div>
+      <div class="ship-summary"><span>Selected: <b id="sel-count">0</b> totes</span><span>Lbs: <b id="sel-lbs">0</b></span></div>
+    </div>
+    <div class="card">
+      <div class="card-head">Shipment Details</div>
       <div class="card-body">
         <div class="field-group"><div class="field-label">Ship Date</div><input type="date" id="sh-date" value="${new Date().toISOString().split('T')[0]}"></div>
-        <div class="two-col">
-          <div class="field-group"><div class="field-label">Totes Out</div><input type="number" id="sh-totes" min="1" max="${lot.totesRemaining}" placeholder="0"></div>
-          <div class="field-group"><div class="field-label">Lbs Out</div><input type="number" id="sh-lbs" min="0" placeholder="0"></div>
-        </div>
+        <div class="field-group"><div class="field-label">Lbs Out (auto-filled, adjust if scaled weight differs)</div><input type="number" id="sh-lbs" min="0" value="0"></div>
         <div class="field-group"><div class="field-label">Buyer</div><input type="text" id="sh-buyer" placeholder="e.g. Amy's, HCI, Cargill..."></div>
         <div class="two-col">
           <div class="field-group"><div class="field-label">BOL #</div><input type="text" id="sh-bol" placeholder="e.g. 03211"></div>
@@ -478,9 +635,59 @@ function showShipDetail(lotNum){
   `;
 }
 
+function toggleBatchAll(lotNum, batchId){
+  const lot = inventory[lotNum];
+  const batch = lot.batches[batchId];
+  const allCheckbox = document.getElementById(`selall-${batchId}`);
+  batch.totes.filter(t=>!t.shipped && t.status==='Approved').forEach(t=>{
+    const cb = document.getElementById(`chk-${t.toteNum}`);
+    if(cb) cb.checked = allCheckbox.checked;
+  });
+  onToteCheckChange(lotNum, batchId);
+}
+
+function onToteCheckChange(lotNum, batchId){
+  const lot = inventory[lotNum];
+  const batch = lot.batches[batchId];
+  const eligibleTotes = batch.totes.filter(t=>!t.shipped && t.status==='Approved');
+  const checkedCount = eligibleTotes.filter(t=>{
+    const cb = document.getElementById(`chk-${t.toteNum}`);
+    return cb && cb.checked;
+  }).length;
+
+  const warn = document.getElementById(`warn-${batchId}`);
+  if(checkedCount > 0 && checkedCount < eligibleTotes.length){
+    warn.classList.add('show');
+  } else {
+    warn.classList.remove('show');
+  }
+  const allCb = document.getElementById(`selall-${batchId}`);
+  if(allCb) allCb.checked = (checkedCount === eligibleTotes.length && eligibleTotes.length>0);
+
+  // recompute overall selection summary across all batches
+  let totalCount=0, totalLbs=0;
+  Object.values(lot.batches).forEach(b=>{
+    b.totes.filter(t=>!t.shipped && t.status==='Approved').forEach(t=>{
+      const cb = document.getElementById(`chk-${t.toteNum}`);
+      if(cb && cb.checked){ totalCount++; totalLbs += t.lbs; }
+    });
+  });
+  document.getElementById('sel-count').textContent = totalCount;
+  document.getElementById('sel-lbs').textContent = totalLbs.toLocaleString();
+  document.getElementById('sh-lbs').value = totalLbs;
+}
+
 async function submitShipment(lotNum){
+  const lot=inventory[lotNum];
+  const selectedTotes=[];
+  Object.values(lot.batches).forEach(b=>{
+    b.totes.filter(t=>!t.shipped && t.status==='Approved').forEach(t=>{
+      const cb = document.getElementById(`chk-${t.toteNum}`);
+      if(cb && cb.checked) selectedTotes.push(t);
+    });
+  });
+
   const date=document.getElementById('sh-date').value;
-  const totes=parseInt(document.getElementById('sh-totes').value)||0;
   const lbs=parseInt(document.getElementById('sh-lbs').value)||0;
   const buyer=document.getElementById('sh-buyer').value.trim();
   const bol=document.getElementById('sh-bol').value.trim();
@@ -489,22 +696,21 @@ async function submitShipment(lotNum){
   const contract=document.getElementById('sh-contract').value.trim();
   const by=document.getElementById('sh-by').value;
   const notes=document.getElementById('sh-notes').value;
-  const lot=inventory[lotNum];
 
-  if(!date||totes<1||!buyer||!by){showToast('Please fill required fields',true);return;}
-  if(totes>lot.totesRemaining){showToast(`Only ${lot.totesRemaining} totes available`,true);return;}
+  if(!date||selectedTotes.length<1||!buyer||!by){showToast('Please select totes and fill required fields',true);return;}
 
   const btn=document.getElementById('shipSubmitBtn');
   btn.disabled=true;btn.textContent='Submitting...';
 
   const ts=new Date().toLocaleString();
-  const headers=['Timestamp','Date','Lot #','Crop','Grower','Totes Out','Lbs Out','Buyer','BOL #','Invoice #','PO #','Contract #','Shipped By','Notes'];
-  const row=[ts,date,lotNum,lot.crop,lot.grower,totes,lbs,buyer,bol,invoice,po,contract,by,notes];
+  const toteNumsStr = selectedTotes.map(t=>t.toteNum).join(', ');
+  const headers=['Timestamp','Date','Lot #','Crop','Grower','Tote Numbers','Totes Out','Lbs Out','Buyer','BOL #','Invoice #','PO #','Contract #','Shipped By','Notes'];
+  const row=[ts,date,lotNum,lot.crop,lot.grower,toteNumsStr,selectedTotes.length,lbs,buyer,bol,invoice,po,contract,by,notes];
 
   try {
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseShipments',headers,row})});
-    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes','Buyer'],row:[ts,date,lotNum,lot.crop,'OUT',totes,lbs,by,notes,buyer]})});
-    showToast(`✓ ${totes} totes shipped from ${lotNum}!`,false);
+    await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({tab:'WarehouseMovements',headers:['Timestamp','Date','Lot #','Crop','Type','Totes','Lbs','By','Notes','Tote Numbers','Buyer'],row:[ts,date,lotNum,lot.crop,'OUT',selectedTotes.length,lbs,by,notes,toteNumsStr,buyer]})});
+    showToast(`✓ ${selectedTotes.length} totes shipped from ${lotNum}!`,false);
     btn.textContent='✓ Logged!';btn.style.background='#1a5c1a';
     setTimeout(async()=>{await loadInventoryFromSheets();showShipList();},2000);
   } catch(err){
