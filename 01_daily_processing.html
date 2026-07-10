@@ -52,6 +52,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 .prod-field{margin-bottom:10px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.time-stamp-btn{width:100%;padding:10px 8px;border:1.5px solid var(--green);border-radius:8px;background:var(--green-pale);color:var(--green);font-size:13px;font-weight:600;cursor:pointer;}
+.time-stamp-btn.time-stamped{background:var(--green);color:white;}
 </style>
 </head>
 <body>
@@ -63,7 +65,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
     <input type="date" id="formDate">
     <select id="operatorName">
       <option value="">Select Operator</option>
-      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
+      <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Mike</option>
     </select>
   </div>
 </div>
@@ -89,7 +91,15 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
 
   <!-- MAGNETS -->
   <div class="section" id="tab-magnets">
-    <div class="section-note">Record findings for each magnet check. Pieces will flag red.</div>
+    <div class="section-note">Magnets are checked 3x daily. Select which check this is, record findings, then submit — repeat for each check.</div>
+    <div class="prod-field">
+      <div class="prod-label">Check Round</div>
+      <select id="magnetRound" onchange="switchMagnetRound()">
+        <option value="1">1st Check</option>
+        <option value="2">2nd Check</option>
+        <option value="3">3rd Check</option>
+      </select>
+    </div>
     <div class="card">
       <div class="card-head">Magnet Checks</div>
       <div class="card-body">
@@ -181,9 +191,14 @@ const POST_OP = [
 ];
 
 const MAGNETS = ["Outside Plate","Main Line","Roller Mill","Self-Cleaning Magnet","Crush Line"];
-const EMPLOYEES = ["Tyler","Allen","Andy","Tim","Aaron","Garrett","Lupe"];
+const EMPLOYEES = ["Tyler","Allen","Andy","Tim","Aaron","Mike","Garrett","Lupe"];
+
+const CROPS_1 = ["Black Beans","Pinto Beans","Sm Red Beans","Navy Beans","Blue Corn","Yellow Corn","Rye","Wheat","Spelt","Other"];
+const CROPS_2 = ["Halves","Pieces","Whole Beans","Other"];
 
 let runCount = 0;
+let magnetRound = 1;
+const magnetData = {1:{}, 2:{}, 3:{}};
 
 // ── Build Pre/Post Op checklist ──
 function buildChecklist(items, containerId) {
@@ -236,8 +251,19 @@ function buildMagnets() {
 }
 
 function setMagnet(i, val) {
+  magnetData[magnetRound][i] = val;
   const sel = document.getElementById(`mag-${i}`);
   sel.className = val === 'Pieces' ? 'magnet-select red-flag' : 'magnet-select';
+}
+
+function switchMagnetRound() {
+  magnetRound = parseInt(document.getElementById('magnetRound').value);
+  MAGNETS.forEach((_, i) => {
+    const sel = document.getElementById(`mag-${i}`);
+    const val = magnetData[magnetRound][i] || '';
+    sel.value = val;
+    sel.className = val === 'Pieces' ? 'magnet-select red-flag' : 'magnet-select';
+  });
 }
 
 // ── Build Production Run Card ──
@@ -245,6 +271,7 @@ function addRun(line) {
   const container = document.getElementById(`task-body-${line}`);
   const i = runCount++;
   const lineName = line === 1 ? 'DryBean/Corn' : 'Soybeans';
+  const cropOptions = line === 1 ? CROPS_1 : CROPS_2;
   const card = document.createElement('div');
   card.className = 'card';
   card.style.marginBottom = '10px';
@@ -256,10 +283,25 @@ function addRun(line) {
       <button onclick="this.closest('.card').remove();" style="background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;">✕</button>
     </div>
     <div class="card-body">
-      <div class="prod-field"><div class="prod-label">Task / Product</div><input type="text" placeholder="e.g. Dry Beans" id="t-task-${i}"></div>
+      <div class="prod-field">
+        <div class="prod-label">Crop / Product</div>
+        <select id="t-task-${i}" onchange="toggleOtherCrop(${i})">
+          <option value="">— Select —</option>
+          ${cropOptions.map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+        <input type="text" placeholder="Specify crop..." id="t-task-other-${i}" style="display:none;margin-top:6px;">
+      </div>
       <div class="two-col">
-        <div class="prod-field"><div class="prod-label">Start Time</div><input type="time" id="t-start-${i}"></div>
-        <div class="prod-field"><div class="prod-label">End Time</div><input type="time" id="t-end-${i}"></div>
+        <div class="prod-field">
+          <div class="prod-label">Start Time</div>
+          <button type="button" class="time-stamp-btn" id="t-start-btn-${i}" onclick="stampTime(${i},'start')">▶ Tap to Start</button>
+          <input type="hidden" id="t-start-${i}">
+        </div>
+        <div class="prod-field">
+          <div class="prod-label">End Time</div>
+          <button type="button" class="time-stamp-btn" id="t-end-btn-${i}" onclick="stampTime(${i},'end')">■ Tap to End</button>
+          <input type="hidden" id="t-end-${i}">
+        </div>
       </div>
       <div class="two-col">
         <div class="prod-field"><div class="prod-label">Pkg Lot #</div><input type="text" placeholder="Pkg Lot #" id="t-pkglot-${i}"></div>
@@ -285,6 +327,23 @@ function calcTotes(i) {
   const beg = parseInt(document.getElementById(`t-begtote-${i}`)?.value) || 0;
   const end = parseInt(document.getElementById(`t-endtote-${i}`)?.value) || 0;
   if (end >= beg && end > 0) document.getElementById(`t-totaltotes-${i}`).value = end - beg + 1;
+}
+
+function toggleOtherCrop(i) {
+  const sel = document.getElementById(`t-task-${i}`);
+  const other = document.getElementById(`t-task-other-${i}`);
+  other.style.display = sel.value === 'Other' ? 'block' : 'none';
+}
+
+function stampTime(i, which) {
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById(`t-${which}-${i}`).value = `${hh}:${mm}`;
+  const btn = document.getElementById(`t-${which}-btn-${i}`);
+  const display = now.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  btn.textContent = (which === 'start' ? '▶ Started ' : '■ Ended ') + display;
+  btn.classList.add('time-stamped');
 }
 
 // ── Build Knives ──
@@ -340,10 +399,12 @@ function buildReview() {
     if (document.getElementById(`btn-fail-postop-list-${i}`)?.classList.contains('fail-active')) postFail++;
   });
 
-  // Count magnet pieces
+  // Count magnet pieces across all 3 check rounds
   let pieces = 0;
-  MAGNETS.forEach((_, i) => {
-    if (document.getElementById(`mag-${i}`)?.value === 'Pieces') pieces++;
+  [1,2,3].forEach(r => {
+    MAGNETS.forEach((_, i) => {
+      if (magnetData[r][i] === 'Pieces') pieces++;
+    });
   });
 
   const line1 = document.getElementById('task-body-1')?.children.length || 0;
@@ -409,10 +470,11 @@ async function submitPreOp() {
 // ── Submit Magnets ──
 async function submitMagnets() {
   const {date, op, ts} = getDateOp();
-  const h = ['Timestamp','Date','Operator','Section','Magnet','Findings'];
+  const roundLabel = {1:'1st Check',2:'2nd Check',3:'3rd Check'}[magnetRound];
+  const h = ['Timestamp','Date','Operator','Section','Check Round','Magnet','Findings'];
   const rows = MAGNETS.map((label, i) => ({
     headers: h,
-    row: [ts, date, op, 'Magnets', label, document.getElementById(`mag-${i}`)?.value || '']
+    row: [ts, date, op, 'Magnets', roundLabel, label, magnetData[magnetRound][i] || document.getElementById(`mag-${i}`)?.value || '']
   }));
   await sendRows(rows, 'btn-submit-magnets');
 }
@@ -427,7 +489,9 @@ async function submitProd(line) {
     const id = card.dataset.runId;
     const lineName = card.dataset.line || '';
     const g = field => document.getElementById(`t-${field}-${id}`)?.value || '';
-    rows.push({ headers: h, row: [ts, date, op, 'Production', lineName, g('task'), g('start'), g('end'), g('pkglot'), g('prodlot'), g('begtote'), g('endtote'), g('totaltotes'), g('toteweight'), g('lbs'), g('init'), g('comments')] });
+    const taskSel = g('task');
+    const taskVal = taskSel === 'Other' ? (g('task-other') || 'Other') : taskSel;
+    rows.push({ headers: h, row: [ts, date, op, 'Production', lineName, taskVal, g('start'), g('end'), g('pkglot'), g('prodlot'), g('begtote'), g('endtote'), g('totaltotes'), g('toteweight'), g('lbs'), g('init'), g('comments')] });
   });
   await sendRows(rows, `btn-submit-prod${line}`);
 }
