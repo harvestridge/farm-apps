@@ -4,55 +4,55 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Harvest Ridge – Master Cleaning Schedule</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+:root{--green:#1E4A2E;--green-light:#2E6B44;--green-pale:#E3EBE0;--gold:#C99A3D;--gold-pale:#F6ECD6;--red:#8C3229;--red-light:#F3E0DC;--bg:#EEE7D6;--card:#FBF7EC;--border:#DCCFAE;--text:#2B2620;--muted:#7A7060;--radius:10px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
-.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:#F6EFDC;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:3px solid var(--gold);}
 .app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
-.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.app-header .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;}
 .header-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
-.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:white;font-family:'DM Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
+.header-meta input,.header-meta select{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;color:#F6EFDC;font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:6px 10px;outline:none;}
 .header-meta input::placeholder{color:rgba(255,255,255,.6);}
 .header-meta select option{color:#000;}
 .tab-bar{display:flex;background:var(--green-light);overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:0 0 auto;padding:10px 18px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
-.tab-btn.active{color:white;border-bottom-color:var(--gold);}
+.tab-btn{flex:0 0 auto;padding:10px 18px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;}
+.tab-btn.active{color:#F6EFDC;border-bottom-color:var(--gold);}
 .content{padding:16px;max-width:680px;margin:0 auto;}
 .section{display:none;}
 .section.active{display:block;}
 .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
-.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;}
-.card-head .prog{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;}
-.progress-wrap{background:#e0ddd8;height:4px;}
+.card-head{padding:12px 16px;background:var(--gold-pale);border-bottom:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.8px;display:flex;justify-content:space-between;align-items:center;}
+.card-head .prog{font-size:11px;color:var(--muted);font-weight:400;text-transform:none;font-family:'IBM Plex Sans',sans-serif;}
+.progress-wrap{background:#E3D9BC;height:4px;}
 .progress-fill{height:100%;background:var(--green);border-radius:2px;transition:width .3s;}
-.task-row{padding:10px 16px;border-bottom:0.5px solid #f0ece6;}
+.task-row{padding:10px 16px;border-bottom:0.5px solid #E9E0C8;}
 .task-row:last-child{border-bottom:none;}
 .task-top{display:flex;align-items:flex-start;gap:8px;}
 .task-label{flex:1;font-size:13px;font-weight:500;line-height:1.5;padding-top:3px;}
 .pf-btns{display:flex;gap:5px;flex-shrink:0;}
-.pf-btns button{padding:5px 10px;border-radius:14px;border:1.5px solid var(--border);background:none;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
-.btn-pass.sel{background:var(--green);border-color:var(--green);color:white;}
-.btn-fail.sel{background:var(--red);border-color:var(--red);color:white;}
+.pf-btns button{padding:5px 10px;border-radius:6px;border:1.5px solid var(--border);background:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+.btn-pass.sel{background:var(--green);border-color:var(--green);color:#F6EFDC;}
+.btn-fail.sel{background:var(--red);border-color:var(--red);color:#F6EFDC;}
 .task-extra{margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-.task-extra input,.task-extra select,.task-extra textarea{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;background:white;width:100%;}
+.task-extra input,.task-extra select,.task-extra textarea{padding:6px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:'IBM Plex Sans',sans-serif;background:white;width:100%;}
 .task-extra textarea{grid-column:1/-1;resize:none;}
 .task-extra input:focus,.task-extra select:focus,.task-extra textarea:focus{border-color:var(--green);outline:none;}
 .task-extra select option{color:#000;}
-.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:var(--card);border-radius:8px;border-left:3px solid var(--gold);}
 .verif-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
 .verif-body{padding:14px 16px;}
 .field-group{margin-bottom:12px;}
-.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+.field-label{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
+input[type=text],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;background:white;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
 textarea{resize:none;}
-.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.submit-btn{width:100%;padding:14px;background:var(--green);color:#F6EFDC;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
 .submit-btn:hover{background:var(--green-light);}
 .submit-btn:disabled{background:#aaa;cursor:not-allowed;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#F6EFDC;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 .toast.error{background:var(--red);}
 </style>
@@ -60,7 +60,7 @@ textarea{resize:none;}
 <body>
 
 <div class="app-header">
-  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:white;text-decoration:none;">Harvest Ridge</a></h1>
+  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html" style="color:#F6EFDC;text-decoration:none;">Harvest Ridge</a></h1>
   <div class="sub">Master Cleaning Schedule</div>
   <div class="header-meta">
     <input type="date" id="formDate">
