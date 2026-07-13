@@ -63,7 +63,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--green);}
   <div class="sub">Daily Processing Sheet</div>
   <div class="header-meta">
     <input type="date" id="formDate">
-    <select id="operatorName">
+    <select id="operatorName" onchange="clearOperatorHighlight()">
       <option value="">Select Operator</option>
       <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option><option>Mike</option>
     </select>
@@ -443,6 +443,24 @@ async function sendRows(rows, btnId) {
   }
 }
 
+function requireOperator() {
+  const opEl = document.getElementById('operatorName');
+  if (!opEl.value) {
+    opEl.style.borderColor = 'var(--red)';
+    opEl.style.background = 'rgba(140,50,41,.25)';
+    opEl.focus();
+    showToast('Select an Operator before submitting', true);
+    return false;
+  }
+  return true;
+}
+
+function clearOperatorHighlight() {
+  const opEl = document.getElementById('operatorName');
+  opEl.style.borderColor = '';
+  opEl.style.background = '';
+}
+
 function getDateOp() {
   return {
     date: document.getElementById('formDate').value,
@@ -453,6 +471,7 @@ function getDateOp() {
 
 // ── Submit Pre-Op ──
 async function submitPreOp() {
+  if (!requireOperator()) return;
   const {date, op, ts} = getDateOp();
   const h = ['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
   const rows = PRE_OP.map((label, i) => ({
@@ -469,6 +488,7 @@ async function submitPreOp() {
 
 // ── Submit Magnets ──
 async function submitMagnets() {
+  if (!requireOperator()) return;
   const {date, op, ts} = getDateOp();
   const roundLabel = {1:'1st Check',2:'2nd Check',3:'3rd Check'}[magnetRound];
   const h = ['Timestamp','Date','Operator','Section','Check Round','Magnet','Findings'];
@@ -481,6 +501,7 @@ async function submitMagnets() {
 
 // ── Submit Production Line ──
 async function submitProd(line) {
+  if (!requireOperator()) return;
   const {date, op, ts} = getDateOp();
   const h = ['Timestamp','Date','Operator','Section','Line','Task','Start Time','End Time','Pkg Lot #','Product Lot #','Beg Tote #','End Tote #','Total Totes','Tote Weight','Total Lbs','Initials','Comments'];
   const cards = document.getElementById(`task-body-${line}`)?.querySelectorAll('.card') || [];
@@ -498,6 +519,7 @@ async function submitProd(line) {
 
 // ── Submit Knives ──
 async function submitKnives() {
+  if (!requireOperator()) return;
   const {date, op, ts} = getDateOp();
   const h = ['Timestamp','Date','Operator','Section','Employee','Knife Result'];
   const rows = EMPLOYEES.map((emp, i) => ({
@@ -514,6 +536,7 @@ async function submitKnives() {
 
 // ── Submit Post-Op ──
 async function submitPostOp() {
+  if (!requireOperator()) return;
   const {date, op, ts} = getDateOp();
   const h = ['Timestamp','Date','Operator','Section','Area/Item','Result','Initials','Comment'];
   const rows = POST_OP.map((label, i) => ({
