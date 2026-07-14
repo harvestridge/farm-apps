@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Clearwater Bin Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --blue-dark:  #0C2D6B;
@@ -21,162 +21,193 @@
   --gold:        #C8960C;
   --gold-pale:   #FDF3DC;
   --blue:        #185FA5;
-  --blue-pale:   #E6F1FB;
   --sand:        #B0A878;
   --sand-light:  #F2F0E8;
   --stone:       #888780;
   --stone-light: #E8E7E2;
-  --text-p:      #1A1A18;
-  --text-m:      #444441;
-  --text-l:      #888780;
+  --text-p:      #12181F;
+  --text-m:      #4C5560;
+  --text-l:      #808894;
   --white:       #FFFFFF;
-  --radius:      10px;
-  --radius-sm:   6px;
-  --shadow:      0 2px 12px rgba(0,0,0,0.10);
-  --shadow-lg:   0 8px 32px rgba(0,0,0,0.14);
+  --glass:       rgba(255,255,255,0.78);
+  --border-soft: rgba(15,30,50,0.07);
+  --radius:      18px;
+  --radius-sm:   11px;
+  --radius-lg:   22px;
+  --shadow-sm:   0 1px 3px rgba(20,30,50,0.06);
+  --shadow:      0 6px 20px rgba(20,30,50,0.08), 0 1px 3px rgba(20,30,50,0.06);
+  --shadow-lg:   0 20px 48px rgba(15,30,60,0.16), 0 4px 14px rgba(15,30,60,0.08);
+  --grad-brand:  linear-gradient(135deg,#0C2D6B 0%,#154A9C 55%,#1A6B4E 130%);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:#F0EDE4;color:var(--text-p);min-height:100vh;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;color:var(--text-p);min-height:100vh;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1000px 500px at 85% -10%, rgba(46,125,209,0.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 15%, rgba(99,153,34,0.10), transparent 55%),
+    #F3F1E9;
+}
 
 /* HEADER */
-header{background:var(--blue-dark);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.25)}
-.h-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:#fff;line-height:1}
-.h-sub{font-size:11px;color:#97C459;letter-spacing:0.04em}
-.h-left{display:flex;flex-direction:column;gap:1px}
+header{background:var(--grad-brand);padding:0 18px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(9,20,45,0.28);border-bottom:1px solid rgba(255,255,255,0.08)}
+.h-left{display:flex;align-items:center;gap:10px}
+.h-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(150deg,#97C459,#2E7DD1);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;color:#0C2D6B;letter-spacing:0.02em;box-shadow:0 2px 8px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.5);flex-shrink:0}
+.h-text{display:flex;flex-direction:column;gap:1px}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:0.05em;color:#fff;line-height:1}
+.h-sub{font-size:10.5px;color:#9FD46A;letter-spacing:0.03em;font-weight:500}
 .h-right{display:flex;gap:8px;align-items:center}
-.hbtn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);border-radius:var(--radius-sm);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 11px;cursor:pointer;transition:background 0.15s}
-.hbtn:hover{background:rgba(255,255,255,0.22)}
-.hbtn.active{background:rgba(255,200,0,0.25);border-color:rgba(255,200,0,0.5);color:#FFE066}
+.hbtn{background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.20);border-radius:20px;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:7px 13px;cursor:pointer;transition:all 0.15s;backdrop-filter:blur(6px)}
+.hbtn:hover{background:rgba(255,255,255,0.22);transform:translateY(-1px)}
+.hbtn.active{background:rgba(255,201,79,0.22);border-color:rgba(255,201,79,0.55);color:#FFDE94;box-shadow:0 0 0 3px rgba(255,201,79,0.12)}
+
+/* TAB BAR */
+.tabbar{background:rgba(9,20,45,0.94);padding:6px 10px;display:flex;gap:4px;position:sticky;top:60px;z-index:99;backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,0.06)}
+.tabbar a{flex:1;padding:9px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,0.55);text-decoration:none;letter-spacing:0.03em;border-radius:9px;transition:all 0.15s}
+.tabbar a.tab-active{color:#0C2D6B;background:linear-gradient(150deg,#ffffff,#EAF3E2);box-shadow:0 3px 10px rgba(0,0,0,0.25)}
+.tabbar a:not(.tab-active):hover{color:#fff;background:rgba(255,255,255,0.08)}
 
 /* MAIN */
-main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
+main{max-width:960px;margin:0 auto;padding:20px 16px 60px}
 
 /* SUMMARY */
-.summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.sc{background:var(--white);border-radius:var(--radius);padding:12px 14px;box-shadow:var(--shadow)}
-.sc-label{font-size:11px;font-weight:500;color:var(--text-l);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px}
-.sc-value{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:0.03em;color:var(--green-dark);line-height:1}
-.sc-unit{font-size:11px;color:var(--text-l);margin-top:1px}
+.levels-wrap{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 14px 14px;margin-bottom:22px;display:flex;gap:8px;overflow-x:auto}
+.lvl-col{flex:1 0 56px;display:flex;flex-direction:column;align-items:center;gap:7px}
+.lvl-bu{font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;color:var(--text-p);white-space:nowrap;line-height:1}
+.lvl-bu-u{font-size:9px;color:var(--text-l);font-weight:500;margin-left:2px}
+.lvl-bar-track{width:100%;max-width:36px;height:130px;background:var(--stone-light);border-radius:7px;overflow:hidden;display:flex;align-items:flex-end;box-shadow:inset 0 1px 3px rgba(0,0,0,0.08)}
+.lvl-bar-fill{width:100%;border-radius:7px 7px 0 0;transition:height 0.6s cubic-bezier(.2,.8,.3,1);box-shadow:inset 0 1px 0 rgba(255,255,255,0.35)}
+.lvl-name{font-size:10.5px;font-weight:700;color:var(--text-m);text-transform:uppercase;letter-spacing:0.03em}
 
 /* SECTION LABEL */
-.slabel{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-l);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.slabel-action{font-size:11px;font-weight:500;color:var(--green-mid);cursor:pointer;text-transform:none;letter-spacing:0}
+.slabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-m);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.slabel::before{content:'';width:4px;height:13px;border-radius:2px;background:linear-gradient(180deg,#639922,#2E7DD1);margin-right:2px;display:inline-block}
+.slabel-inner{display:flex;align-items:center;gap:7px}
+.slabel-action{font-size:11px;font-weight:600;color:var(--green-mid);cursor:pointer;text-transform:none;letter-spacing:0}
 
 /* MAP */
-.map-wrap{background:var(--sand);border-radius:var(--radius);padding:12px;margin-bottom:16px;box-shadow:var(--shadow);position:relative;overflow:hidden;user-select:none}
-.map-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent,transparent 18px,rgba(255,255,255,0.06) 18px,rgba(255,255,255,0.06) 19px);pointer-events:none}
+.map-wrap{background:linear-gradient(160deg,#C4BB8E,#AFA476);border-radius:var(--radius);padding:14px;margin-bottom:22px;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;user-select:none;border:1px solid rgba(0,0,0,0.08)}
+.map-wrap::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(180deg,transparent,transparent 18px,rgba(255,255,255,0.07) 18px,rgba(255,255,255,0.07) 19px);pointer-events:none}
+.map-wrap::after{content:'';position:absolute;inset:0;box-shadow:inset 0 0 60px rgba(0,0,0,0.14);pointer-events:none}
+.map-scroll{position:relative;overflow-x:auto;overflow-y:hidden;border-radius:var(--radius-sm);-webkit-overflow-scrolling:touch}
 #mapCanvas{position:absolute;inset:0;pointer-events:none;z-index:1}
-#mapYard{position:relative;z-index:2;width:100%;height:360px}
-.map-legend{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;position:relative;z-index:2}
-.li{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-m)}
-.ld{width:9px;height:9px;border-radius:50%}
-.edit-hint{font-size:11px;color:rgba(255,255,255,0.7);text-align:center;margin-top:6px;position:relative;z-index:2}
+#mapYard{position:relative;z-index:2;width:100%;min-width:560px;height:520px}
+.map-legend{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;position:relative;z-index:2}
+.li{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--text-p);background:rgba(255,255,255,0.55);backdrop-filter:blur(4px);padding:4px 10px 4px 8px;border-radius:20px;border:1px solid rgba(255,255,255,0.6)}
+.ld{width:8px;height:8px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,0.5)}
+.edit-hint{font-size:11px;color:rgba(255,255,255,0.85);text-align:center;margin-top:8px;position:relative;z-index:2;font-weight:500}
 
 /* MAP ELEMENTS */
-.mbin3d{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;text-align:center;transition:filter 0.1s}
+.mbin3d{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:grab;touch-action:none;text-align:center;transition:filter 0.15s,transform 0.15s}
+.mbin3d:hover{filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3))}
 .mbin3d:active{cursor:grabbing}
 .mbin3d svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .mbin3d .mlabel,.mbin3d .msub{position:relative;z-index:1}
 .mbin3d.sel svg{filter:drop-shadow(0 0 4px #378ADD) drop-shadow(0 0 4px #378ADD)}
-.mequip{position:absolute;cursor:grab;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.mequip{position:absolute;cursor:grab;touch-action:none;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:filter 0.15s}
 .mequip:active{cursor:grabbing}
-.mlabel{font-size:10px;font-weight:600;color:#fff;line-height:1.15;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.75)}
-.msub{font-size:8px;color:rgba(255,255,255,0.92);pointer-events:none;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,0.75)}
-.mshop{position:absolute;background:#d0c898;border:1px solid #a09060;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:#412402;cursor:grab;touch-action:none}
+.mequip:hover{filter:drop-shadow(0 4px 10px rgba(0,0,0,0.3))}
+.mequip svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mlabel{font-size:11px;font-weight:700;color:#fff;line-height:1.2;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8);position:relative;z-index:1}
+.msub{font-size:9px;color:rgba(255,255,255,0.95);pointer-events:none;margin-top:1px;text-shadow:0 1px 2px rgba(0,0,0,0.8);font-weight:600;position:relative;z-index:1}
 
 /* BIN CARDS */
-.bin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:10px;margin-bottom:20px}
-.bin-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid transparent;transition:transform 0.1s,box-shadow 0.1s}
-.bin-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.bct{padding:13px 15px 10px}
-.bc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px}
-.bc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;color:var(--green-dark);line-height:1}
-.bc-type{font-size:10px;font-weight:500;color:var(--text-l);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px}
-.bbadge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.03em}
+.bin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:24px}
+.bin-card{background:var(--glass);backdrop-filter:blur(14px);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border-soft);transition:transform 0.18s cubic-bezier(.2,.8,.3,1.2),box-shadow 0.18s}
+.bin-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.bct{padding:16px 17px 12px}
+.bc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px}
+.bc-name{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;letter-spacing:-0.01em;color:var(--text-p);line-height:1}
+.bc-type{font-size:10px;font-weight:500;color:var(--text-l);text-transform:uppercase;letter-spacing:0.04em;margin-top:3px}
+.bbadge{font-size:10px;font-weight:700;padding:4px 10px 4px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.03em;display:inline-flex;align-items:center;gap:5px}
+.bbadge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
 .bcorn{background:var(--green-pale);color:var(--green-dark)}
 .bsoy{background:var(--blue-pale);color:var(--blue)}
 .bhull{background:var(--gold-pale);color:#7A5200}
 .bempty{background:var(--stone-light);color:var(--stone)}
 .bwet{background:var(--blue-pale);color:var(--blue)}
-.bbu-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
-.bbu{font-size:25px;font-weight:300;color:var(--text-p);line-height:1}
-.bbu-u{font-size:12px;color:var(--text-l);margin-left:2px}
-.bpct{font-size:13px;font-weight:600}
+.bbu-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.bbu{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--text-p);line-height:1;letter-spacing:-0.01em}
+.bbu-u{font-size:12px;color:var(--text-l);margin-left:3px;font-weight:500}
+.bpct{font-size:13px;font-weight:700}
 .bcap{font-size:11px;color:var(--text-l)}
-.fill-wrap{height:6px;background:var(--stone-light);border-radius:3px;overflow:hidden}
-.fill-bar{height:100%;border-radius:3px;transition:width 0.5s ease}
-.bin3d-wrap{display:flex;justify-content:center;align-items:flex-end;background:linear-gradient(180deg,#F7F5EE 0%,#EFEBDD 100%);border-radius:var(--radius-sm);padding:6px 0 0;margin-bottom:10px}
-.bin3d-wrap svg{display:block}
-.bca{border-top:1px solid var(--stone-light);padding:9px 14px;display:flex;gap:7px}
-.abtn{flex:1;padding:8px 0;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:background 0.12s}
-.abtn:active{transform:scale(0.97)}
+.fill-wrap{height:7px;background:var(--stone-light);border-radius:4px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,0.08)}
+.fill-bar{height:100%;border-radius:4px;transition:width 0.6s cubic-bezier(.2,.8,.3,1);position:relative;box-shadow:inset 0 1px 0 rgba(255,255,255,0.35)}
+.bin3d-wrap{display:flex;justify-content:center;align-items:flex-end;background:radial-gradient(120px 90px at 50% 20%,rgba(255,255,255,0.9),transparent),linear-gradient(180deg,#F7F5EE 0%,#E9E4D2 100%);border-radius:var(--radius-sm);padding:8px 0 0;margin-bottom:12px;border:1px solid rgba(0,0,0,0.04)}
+.bin3d-wrap svg{display:block;filter:drop-shadow(0 6px 10px rgba(0,0,0,0.12))}
+.bca{border-top:1px solid var(--border-soft);padding:10px 15px;display:flex;gap:8px}
+.abtn{flex:1;padding:9px 0;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all 0.14s}
+.abtn:active{transform:scale(0.96)}
 .aadd{background:var(--green-pale);color:var(--green-dark)}
-.aadd:hover{background:#d4e9b8}
+.aadd:hover{background:#639922;color:#fff;box-shadow:0 4px 12px rgba(99,153,34,0.35)}
 .arem{background:#FDE8E8;color:#8B1A1A}
-.arem:hover{background:#f5d0d0}
+.arem:hover{background:#c84040;color:#fff;box-shadow:0 4px 12px rgba(200,64,64,0.3)}
 .aset{background:var(--sand-light);color:var(--text-m)}
-.aset:hover{background:#e4e1d5}
+.aset:hover{background:#B0A878;color:#fff;box-shadow:0 4px 12px rgba(176,168,120,0.35)}
 
 /* MODAL */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:200;align-items:flex-end;justify-content:center}
+.overlay{display:none;position:fixed;inset:0;background:rgba(10,18,35,0.55);backdrop-filter:blur(3px);z-index:200;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:var(--white);border-radius:var(--radius) var(--radius) 0 0;width:100%;max-width:500px;padding:22px 22px 30px;box-shadow:var(--shadow-lg);animation:slideUp 0.2s ease}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mhandle{width:36px;height:4px;background:var(--stone-light);border-radius:2px;margin:0 auto 18px}
-.mtitle{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.04em;color:var(--green-dark);margin-bottom:3px}
-.msub2{font-size:12px;color:var(--text-l);margin-bottom:17px}
-.mtype{display:flex;gap:7px;margin-bottom:16px}
-.tbtn{flex:1;padding:8px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--text-m);transition:all 0.1s}
-.tbtn.ta{background:var(--green-pale);border-color:var(--green-mid);color:var(--green-dark)}
-.tbtn.tr{background:#FDE8E8;border-color:#c84040;color:#8B1A1A}
-.tbtn.ts{background:var(--sand-light);border-color:var(--sand);color:var(--text-m)}
-.flabel{font-size:11px;font-weight:600;color:var(--text-m);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;display:block}
-.frow{margin-bottom:14px}
+.modal{background:var(--white);border-radius:var(--radius-lg) var(--radius-lg) 0 0;width:100%;max-width:500px;padding:24px 22px 30px;box-shadow:0 -10px 50px rgba(10,18,35,0.35);animation:slideUp 0.25s cubic-bezier(.2,.8,.3,1.1)}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mhandle{width:38px;height:4px;background:var(--stone-light);border-radius:2px;margin:0 auto 18px}
+.mtitle{font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:700;letter-spacing:-0.01em;color:var(--text-p);margin-bottom:3px}
+.msub2{font-size:12px;color:var(--text-l);margin-bottom:18px}
+.mtype{display:flex;gap:7px;margin-bottom:16px;background:var(--sand-light);padding:4px;border-radius:var(--radius-sm)}
+.tbtn{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;color:var(--text-m);transition:all 0.14s}
+.tbtn.ta{background:var(--white);color:var(--green-dark);box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.tbtn.tr{background:var(--white);color:#8B1A1A;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.tbtn.ts{background:var(--white);color:var(--text-m);box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+.flabel{font-size:11px;font-weight:700;color:var(--text-m);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;display:block}
+.frow{margin-bottom:15px}
 .etabs{display:flex;gap:5px;margin-bottom:10px}
-.etab{flex:1;padding:6px;border-radius:var(--radius-sm);border:1px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;color:var(--text-l);transition:all 0.1s}
-.etab.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark)}
-.finput{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text-p);background:var(--white);-webkit-appearance:none}
-.finput:focus{outline:none;border-color:var(--green-mid)}
+.etab{flex:1;padding:7px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;color:var(--text-l);transition:all 0.14s}
+.etab.active{background:var(--green-dark);color:#fff;border-color:var(--green-dark);box-shadow:0 3px 10px rgba(39,80,10,0.3)}
+.finput{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:16px;color:var(--text-p);background:var(--white);-webkit-appearance:none;transition:border-color 0.14s,box-shadow 0.14s}
+.finput:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 4px rgba(59,109,17,0.12)}
 .finput-row{display:flex;gap:7px;align-items:center}
 .finput-row .finput{flex:1}
 .funit{font-size:13px;color:var(--text-l);white-space:nowrap}
-.fselect{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text-p);background:var(--white);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
-.fselect:focus{outline:none;border-color:var(--green-mid)}
-.fnotes{width:100%;padding:9px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-p);background:var(--white);resize:none;height:56px}
-.fnotes:focus{outline:none;border-color:var(--green-mid)}
-.mpreview{background:var(--sand-light);border-radius:var(--radius-sm);padding:9px 13px;margin-bottom:16px;font-size:13px;color:var(--text-m);min-height:36px}
-.mb{font-weight:600;color:var(--text-p)}
+.fselect{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text-p);background:var(--white);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;transition:border-color 0.14s,box-shadow 0.14s}
+.fselect:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 4px rgba(59,109,17,0.12)}
+.fnotes{width:100%;padding:9px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-p);background:var(--white);resize:none;height:56px;transition:border-color 0.14s,box-shadow 0.14s}
+.fnotes:focus{outline:none;border-color:var(--green-mid);box-shadow:0 0 0 4px rgba(59,109,17,0.12)}
+.mpreview{background:linear-gradient(135deg,var(--sand-light),#EAE6D4);border-radius:var(--radius-sm);padding:10px 13px;margin-bottom:16px;font-size:13px;color:var(--text-m);min-height:36px;border:1px solid rgba(0,0,0,0.04)}
+.mb{font-weight:700;color:var(--text-p)}
 .mbtns{display:flex;gap:8px}
-.bcancel{flex:0 0 76px;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-m)}
-.bsubmit{flex:1;padding:12px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:#fff;background:var(--green-mid);transition:background 0.12s}
-.bsubmit:hover{background:var(--green-dark)}
-.bsubmit:disabled{background:var(--stone);cursor:not-allowed}
+.bcancel{flex:0 0 76px;padding:12px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;color:var(--text-m)}
+.bsubmit{flex:1;padding:12px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;color:#fff;background:linear-gradient(135deg,var(--green-mid),var(--green-dark));transition:all 0.14s;box-shadow:0 4px 14px rgba(39,80,10,0.28)}
+.bsubmit:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.bsubmit:disabled{background:var(--stone);cursor:not-allowed;box-shadow:none}
 
 /* LOG */
-.log-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.log-hdr{padding:12px 15px 9px;border-bottom:1px solid var(--stone-light);display:flex;justify-content:space-between;align-items:center}
-.log-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--green-dark)}
-.log-clr{font-size:11px;color:var(--text-l);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.log-wrap{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border-soft);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.log-hdr{padding:14px 16px 11px;border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center}
+.log-title{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;letter-spacing:-0.01em;color:var(--text-p)}
+.log-clr{font-size:11px;color:var(--text-l);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;font-weight:600}
 .log-clr:hover{color:#c84040}
-.log-empty{padding:22px 15px;text-align:center;font-size:13px;color:var(--text-l)}
-.log-entry{padding:11px 15px;border-bottom:1px solid var(--stone-light);display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.log-empty{padding:26px 15px;text-align:center;font-size:13px;color:var(--text-l)}
+.log-entry{padding:12px 16px;border-bottom:1px solid var(--border-soft);border-left:3px solid transparent;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;transition:background 0.12s}
+.log-entry:hover{background:rgba(0,0,0,0.015)}
+.log-entry:has(.la){border-left-color:var(--green-light)}
+.log-entry:has(.lr){border-left-color:#c84040}
+.log-entry:has(.ls){border-left-color:var(--blue)}
 .log-entry:last-child{border-bottom:none}
-.le-bin{font-size:13px;font-weight:600;color:var(--text-p)}
+.le-bin{font-size:13px;font-weight:700;color:var(--text-p)}
 .le-com{font-size:11px;color:var(--text-l);margin-top:1px}
 .le-note{font-size:11px;color:var(--text-l);font-style:italic;margin-top:1px}
 .le-time{font-size:11px;color:var(--text-l);text-align:right;white-space:nowrap}
-.le-amt{font-size:14px;font-weight:600;text-align:right}
+.le-amt{font-size:14px;font-weight:700;text-align:right}
 .la{color:var(--green-light)}.lr{color:#c84040}.ls{color:var(--blue)}
 
 /* TOAST */
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-dark);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:24px;box-shadow:var(--shadow-lg);z-index:300;transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,var(--green-mid),var(--green-dark));color:#fff;font-size:13px;font-weight:600;padding:11px 22px;border-radius:24px;box-shadow:0 12px 30px rgba(39,80,10,0.35);z-index:300;transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
 /* LAYOUT SAVE BANNER */
-.layout-banner{background:var(--gold-pale);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:#5A3A00}
-.layout-banner button{background:var(--gold);border:none;border-radius:var(--radius-sm);padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;color:#fff;white-space:nowrap}
+.layout-banner{background:linear-gradient(135deg,var(--gold-pale),#FBE8BE);border:1px solid var(--gold);border-radius:var(--radius-sm);padding:11px 15px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:#5A3A00;box-shadow:var(--shadow-sm)}
+.layout-banner button{background:linear-gradient(135deg,#D9A61C,var(--gold));border:none;border-radius:var(--radius-sm);padding:7px 16px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;color:#fff;white-space:nowrap;box-shadow:0 3px 10px rgba(200,150,12,0.3)}
 
-@media(max-width:480px){.summary-strip{gap:5px}.sc-value{font-size:20px}.bin-grid{grid-template-columns:1fr}.modal{padding:18px 16px 26px}header{padding:0 12px}}
+@media(max-width:480px){.levels-wrap{gap:5px;padding:14px 10px 10px}.lvl-bar-track{height:100px}.bin-grid{grid-template-columns:1fr}.modal{padding:20px 16px 26px}header{padding:0 12px}main{padding:16px 12px 60px}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 </style>
 </head>
@@ -184,9 +215,12 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 
 <header>
   <div class="h-left">
-    <a href="cwf_home.html" style="text-decoration:none">
-      <div class="h-title">Clearwater Bin Manager</div>
-      <div class="h-sub">↩ cwf_home · 142 W. Elmwood Rd. · Caro, MI</div>
+    <a href="cwf_home.html" style="text-decoration:none;display:flex;align-items:center;gap:10px">
+      <div class="h-mark">CW</div>
+      <div class="h-text">
+        <div class="h-title">Clearwater Bin Manager</div>
+        <div class="h-sub">↩ cwf_home · 142 W. Elmwood Rd. · Caro, MI</div>
+      </div>
     </a>
   </div>
   <div class="h-right">
@@ -196,33 +230,27 @@ main{max-width:920px;margin:0 auto;padding:16px 14px 60px}
 </header>
 
 <!-- Tab bar -->
-<div style="background:var(--blue-dark);border-top:1px solid rgba(255,255,255,0.12);display:flex;gap:0">
-  <a href="clearwater_bin_manager.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:#fff;text-decoration:none;background:rgba(255,255,255,0.12);border-bottom:2px solid #7DB8F0;letter-spacing:0.03em">🌾 Bin Manager</a>
-  <a href="cwf_load_ticket.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🚛 Load Ticket</a>
-  <a href="cwf_home.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🏠 Home</a>
+<div class="tabbar">
+  <a href="clearwater_bin_manager.html" class="tab-active">🌾 Bin Manager</a>
+  <a href="cwf_load_ticket.html">🚛 Load Ticket</a>
+  <a href="cwf_home.html">🏠 Home</a>
 </div>
 
 <main>
-  <div class="summary-strip">
-    <div class="sc"><div class="sc-label">Total stored</div><div class="sc-value" id="totalBu">—</div><div class="sc-unit">bushels</div></div>
-    <div class="sc"><div class="sc-label">Capacity used</div><div class="sc-value" id="totalPct">—</div><div class="sc-unit">of 134,800 bu</div></div>
-    <div class="sc"><div class="sc-label">Bins active</div><div class="sc-value" id="binsActive">—</div><div class="sc-unit">of 8 bins</div></div>
-  </div>
+  <div class="slabel">Bin levels</div>
+  <div class="levels-wrap" id="levelsWrap"></div>
 
   <div class="slabel">Facility map</div>
   <div id="layoutBanner" style="display:none" class="layout-banner">
-    <span>🖐 Drag bins, legs, and dryer into position</span>
+    <span>🖐 Drag bins and dryer into position</span>
     <button onclick="saveLayout()">Save layout</button>
   </div>
   <div class="map-wrap" id="mapWrap">
-    <canvas id="mapCanvas"></canvas>
-    <div id="mapYard"></div>
-    <div class="map-legend">
-      <div class="li"><div class="ld" style="background:#2e5a10"></div>Full</div>
-      <div class="li"><div class="ld" style="background:#639922"></div>Mid</div>
-      <div class="li"><div class="ld" style="background:#b4b2a9"></div>Empty</div>
-      <div class="li"><div class="ld" style="background:#c84040;border-radius:0;height:3px;width:16px;margin-right:2px"></div>Jumper auger</div>
+    <div class="map-scroll">
+      <canvas id="mapCanvas"></canvas>
+      <div id="mapYard"></div>
     </div>
+    <div class="map-legend" id="mapLegend"></div>
   </div>
 
   <div class="slabel">Bin inventory</div>
@@ -302,59 +330,41 @@ const TOTAL_CAP = 134800;
 
 // ── BIN DEFINITIONS ───────────────────────────────────────────
 let bins = [
-  {id:'B1',name:'Bin 1',capacity:6500, currentBu:6500, commodity:'Soy (dried)',   type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:52},
-  {id:'B2',name:'Bin 2',capacity:24000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Jumper from B3', shape:'circle',size:76},
-  {id:'B3',name:'Bin 3',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:72},
-  {id:'B4',name:'Bin 4',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall only',      shape:'circle',size:72},
-  {id:'B5',name:'Bin 5',capacity:2800, currentBu:2800, commodity:'Wet Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:52},
-  {id:'B6',name:'Bin 6',capacity:3600, currentBu:3600, commodity:'Dry Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:50},
-  {id:'B7',name:'Bin 7',capacity:2900, currentBu:2900, commodity:'Soy Hulls',     type:'Hopper', legSystem:'Short only',     shape:'hopper',size:48},
-  {id:'B8',name:'Bin 8',capacity:50000,currentBu:50000,commodity:'Org. Blue Corn',type:'Bin',    legSystem:'Jumper from B1', shape:'circle',size:104},
+  {id:'B1',name:'Bin 1',capacity:6500, currentBu:6500, commodity:'Soy (dried)',   type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:82},
+  {id:'B2',name:'Bin 2',capacity:24000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Jumper from B3', shape:'circle',size:122},
+  {id:'B3',name:'Bin 3',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall + Short',   shape:'circle',size:115},
+  {id:'B4',name:'Bin 4',capacity:21000,currentBu:0,    commodity:'Empty',         type:'Bin',    legSystem:'Tall only',      shape:'circle',size:115},
+  {id:'B5',name:'Bin 5',capacity:2800, currentBu:2800, commodity:'Wet Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:82},
+  {id:'B6',name:'Bin 6',capacity:3600, currentBu:3600, commodity:'Dry Soybeans',  type:'Hopper', legSystem:'Tall + Short',   shape:'hopper',size:80},
+  {id:'B7',name:'Bin 7',capacity:2900, currentBu:2900, commodity:'Soy Hulls',     type:'Hopper', legSystem:'Short only',     shape:'hopper',size:78},
+  {id:'B8',name:'Bin 8',capacity:50000,currentBu:50000,commodity:'Org. Blue Corn',type:'Bin',    legSystem:'Jumper from B1', shape:'circle',size:165},
 ];
 
-// Equipment items
+// Equipment items (legs + jumper auger removed for a cleaner map — grain routing
+// is still tracked per-bin via legSystem, just not drawn as separate boxes)
 let equip = [
-  {id:'leg_tall', label:'Tall Leg',  sub:'Bins 1,3,4,5,6', color:'#555', border:'#222', w:14, h:62},
-  {id:'leg_short',label:'Short Leg', sub:'Bins 1,3,5,6,7', color:'#336699',border:'#1a3d5c',w:14,h:50},
-  {id:'dryer',    label:'Dryer',     sub:'Nat. gas',        color:'#c87830',border:'#7a4010',w:42,h:60},
-  {id:'auger',    label:'5-ft Auger',sub:'Dryer→Leg',       color:'#888',  border:'#444',   w:12,h:44},
+  {id:'dryer', label:'Dryer', sub:'Nat. gas', color:'#c87830', border:'#7a4010', w:68, h:95},
 ];
 
 // Default positions (% of yard dimensions so they scale)
+// Restored to the original farm layout — matches the physical arrangement
+// on-site. Legs & jumper auger boxes stay dropped (dryer remains).
 const defaultPos = {
-  // Positions locked + tightened 7-1-26
-  B8:  {x:0.30,y:0.03},   // large, top center-left
-  B2:  {x:0.53,y:0.05},   // large, top right
-  B1:  {x:0.37,y:0.28},   // medium, mid center
-  B4:  {x:0.55,y:0.26},   // medium, mid right
-  B7:  {x:0.27,y:0.46},   // hopper, mid left
-  B6:  {x:0.38,y:0.46},   // hopper, mid center-left
-  B5:  {x:0.49,y:0.46},   // hopper, mid center-right
-  B3:  {x:0.57,y:0.54},   // large, lower right
-  leg_short:{x:0.452,y:0.31}, // short leg
-  leg_tall: {x:0.459,y:0.38}, // tall leg
-  auger:{x:0.452,y:0.49},     // 5-ft auger
-  dryer:{x:0.435,y:0.58},     // dryer
-  shop: {x:0.05,y:0.08},      // shop, top left
+  B8:  {x:0.17,y:0.02},   // large, top center-left
+  B2:  {x:0.57,y:0.04},   // large, top right
+  B1:  {x:0.40,y:0.37},   // medium, mid center
+  B4:  {x:0.59,y:0.31},   // medium, mid right
+  B7:  {x:0.18,y:0.58},   // hopper, mid left
+  B6:  {x:0.32,y:0.57},   // hopper, mid center-left
+  B5:  {x:0.45,y:0.57},   // hopper, mid center-right
+  B3:  {x:0.60,y:0.56},   // large, lower right
+  dryer:{x:0.40,y:0.75},      // dryer
 };
 
-// Flow connections for canvas drawing
+// Flow connections for canvas drawing — just the one that still matters
+// visually: wet beans routing to the dryer.
 const flows = [
-  {from:'dryer',to:'auger',color:'#888',dash:[],lw:2},
-  {from:'auger',to:'leg_tall',color:'#888',dash:[],lw:2},
-  {from:'leg_tall',to:'B1',color:'#e8a030',dash:[],lw:1.5},
-  {from:'leg_tall',to:'B3',color:'#e8a030',dash:[],lw:1.5},
-  {from:'leg_tall',to:'B4',color:'#e8a030',dash:[],lw:1.5},
-  {from:'leg_tall',to:'B5',color:'#e8a030',dash:[],lw:1.5},
-  {from:'leg_tall',to:'B6',color:'#e8a030',dash:[],lw:1.5},
-  {from:'leg_short',to:'B1',color:'#378ADD',dash:[],lw:1.5},
-  {from:'leg_short',to:'B3',color:'#378ADD',dash:[],lw:1.5},
-  {from:'leg_short',to:'B5',color:'#378ADD',dash:[],lw:1.5},
-  {from:'leg_short',to:'B6',color:'#378ADD',dash:[],lw:1.5},
-  {from:'leg_short',to:'B7',color:'#378ADD',dash:[],lw:1.5},
   {from:'B5',to:'dryer',color:'#c87830',dash:[4,4],lw:1.5},
-  {from:'B1',to:'B8',color:'#c84040',dash:[6,4],lw:1.8},
-  {from:'B3',to:'B2',color:'#c84040',dash:[6,4],lw:1.8},
 ];
 
 let positions = {}; // pixel positions, built on init
@@ -364,11 +374,28 @@ let activeType = 'Add';
 let entryMethod = 'free';
 let log = JSON.parse(localStorage.getItem('cwfLog') || '[]');
 
+// ── LEGEND (commodity-based, matches bin/badge colors exactly) ─
+const legendItems = [
+  {label:'Corn',      color:'#3B6D11'},
+  {label:'Soybeans',  color:'#185FA5'},
+  {label:'Hulls',     color:'#C8960C'},
+  {label:'Empty',     color:'#b4b2a9'},
+];
+function renderLegend() {
+  const el = document.getElementById('mapLegend');
+  if (!el) return;
+  el.innerHTML = legendItems.map(li =>
+    `<div class="li"><div class="ld" style="background:${li.color}"></div>${li.label}</div>`
+  ).join('');
+}
+
 // ── YARD SETUP ────────────────────────────────────────────────
 function initYard() {
   const yard = document.getElementById('mapYard');
   const canvas = document.getElementById('mapCanvas');
   const saved = JSON.parse(localStorage.getItem('cwfLayout') || 'null');
+
+  renderLegend();
 
   // Build positions from saved or defaults
   const W = yard.offsetWidth  || 600;
@@ -378,7 +405,7 @@ function initYard() {
   canvas.style.width  = W + 'px';
   canvas.style.height = H + 'px';
 
-  const keys = [...bins.map(b=>b.id), ...equip.map(e=>e.id), 'shop'];
+  const keys = [...bins.map(b=>b.id), ...equip.map(e=>e.id)];
   keys.forEach(k => {
     if (saved && saved[k]) {
       positions[k] = saved[k];
@@ -392,23 +419,26 @@ function initYard() {
   // Clear yard
   yard.innerHTML = '';
 
-  // Shop
-  const shop = document.createElement('div');
-  shop.className = 'mshop'; shop.id = 'el-shop';
-  shop.style.cssText = `left:${positions.shop.x}px;top:${positions.shop.y}px;width:72px;height:44px;`;
-  shop.textContent = 'Shop';
-  yard.appendChild(shop);
-  makeDraggable(shop, 'shop');
-
-  // Equipment
+  // Equipment — dryer gets the same steel-shell treatment as the bins,
+  // with its accent color as an inset "window" rather than a flat block.
   equip.forEach(eq => {
     const el = document.createElement('div');
     el.className = 'mequip'; el.id = 'el-' + eq.id;
     el.style.cssText = `left:${positions[eq.id].x}px;top:${positions[eq.id].y}px;width:${eq.w}px;height:${eq.h}px;`;
-    el.innerHTML = `<div style="width:100%;height:100%;background:${eq.color};border:1.5px solid ${eq.border};border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px">
-      <div class="mlabel" style="font-size:8px">${eq.label}</div>
-      <div class="msub">${eq.sub}</div>
-    </div>`;
+    el.innerHTML = `<svg viewBox="0 0 50 66" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="steel-${eq.id}" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#f1f2f4"/><stop offset="48%" stop-color="#cdd1d7"/>
+            <stop offset="55%" stop-color="#aab0b8"/><stop offset="100%" stop-color="#868d97"/>
+          </linearGradient>
+        </defs>
+        <rect x="4" y="4" width="42" height="58" rx="5" fill="url(#steel-${eq.id})" stroke="#77808a" stroke-width="1.5"/>
+        <rect x="10" y="13" width="30" height="28" rx="3" fill="${eq.color}" stroke="${eq.border}" stroke-width="1.2"/>
+        <circle cx="25" cy="27" r="7" fill="none" stroke="#fff" stroke-width="1.4" opacity="0.55"/>
+        <rect x="18" y="47" width="14" height="10" rx="1.5" fill="#5c6169"/>
+      </svg>
+      <div class="mlabel">${eq.label}</div>
+      <div class="msub">${eq.sub}</div>`;
     yard.appendChild(el);
     makeDraggable(el, eq.id);
   });
@@ -441,7 +471,7 @@ let didDrag = false;
 function makeDraggable(el, id) {
   let sx,sy,sl,st,dragging=false;
   function start(e) {
-    if (!editMode && !['shop','leg_tall','leg_short','dryer','auger'].includes(id)) {
+    if (!editMode && id !== 'dryer') {
       // In view mode, bins open modal on tap — don't drag
       return;
     }
@@ -551,12 +581,19 @@ function drawFlows() {
 }
 
 // ── FILL COLOR ────────────────────────────────────────────────
+// Color now encodes commodity only (matches the map legend and the
+// bin-card badges exactly). Fill LEVEL is already shown by the grain
+// height inside the silo/hopper and the % label, so it no longer needs
+// to also shift the color — that double-encoding was what made "Full"
+// and "Mid" hard to tell apart on the old legend.
 function fillColor(pct, commodity) {
   if (pct === 0) return '#b4b2a9';
   const c = (commodity||'').toLowerCase();
-  if (c.includes('corn')) return pct>70?'#2e5a10':pct>30?'#639922':'#97C459';
-  if (c.includes('soy')||c.includes('hull')) return pct>70?'#185FA5':pct>30?'#378ADD':'#85B7EB';
-  return pct>70?'#639922':pct>30?'#C8960C':'#b4b2a9';
+  if (c.includes('corn')) return '#3B6D11';   // matches --green-mid / bcorn badge
+  if (c.includes('hull')) return '#C8960C';   // matches --gold / bhull badge
+  if (c.includes('wet'))  return '#2E7DD1';   // matches --blue-light (wet soy)
+  if (c.includes('soy'))  return '#185FA5';   // matches --blue / bsoy badge
+  return '#B0A878';                            // other grains (spelt, wheat, etc.)
 }
 
 function shade(hex, pct) {
@@ -598,6 +635,8 @@ function bin3DSVG(b, pct, col) {
           <polygon points="${innerL},${innerRimY} ${innerR},${innerRimY} ${innerR},${innerShoulderY} ${tipX},${innerTipY} ${innerL},${innerShoulderY}"/>
         </clipPath>
       </defs>
+      <polygon points="${rimL},${rimY - 6} 70,10 ${rimR},${rimY - 6}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5" stroke-linejoin="round"/>
+      <line x1="70" y1="12" x2="70" y2="${rimY - 6}" stroke="#77808a" stroke-width="1" opacity="0.4"/>
       <polygon points="${rimL},${rimY} ${rimR},${rimY} ${rimR},${shoulderY} ${tipX},${tipY} ${rimL},${shoulderY}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
       <rect x="${rimL}" y="${rimY - 6}" width="${rimR - rimL}" height="7" rx="2" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.2"/>
       <polygon points="${innerL},${innerRimY} ${innerR},${innerRimY} ${innerR},${innerShoulderY} ${tipX},${innerTipY} ${innerL},${innerShoulderY}" fill="#F4F1E6" stroke="#c9c4b0" stroke-width="1"/>
@@ -625,8 +664,9 @@ function bin3DSVG(b, pct, col) {
       </linearGradient>
       <clipPath id="clip-${uid}"><rect x="${innerL}" y="${innerTop}" width="${innerR - innerL}" height="${innerBottom - innerTop}" rx="3"/></clipPath>
     </defs>
-    <path d="M${bodyL},${bodyTop} Q70,8 ${bodyR},${bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
-    <rect x="67" y="0" width="6" height="10" fill="#77808a"/>
+    <path d="M${bodyL},${bodyTop} L70,10 L${bodyR},${bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5" stroke-linejoin="round"/>
+    <line x1="70" y1="12" x2="70" y2="${bodyTop}" stroke="#77808a" stroke-width="1" opacity="0.45"/>
+    <rect x="67" y="2" width="6" height="10" fill="#77808a"/>
     <rect x="${bodyL}" y="${bodyTop}" width="${bodyR - bodyL}" height="${bodyBottom - bodyTop}" rx="6" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
     ${corrX.map(x => `<line x1="${x}" y1="${bodyTop + 2}" x2="${x}" y2="${bodyBottom - 2}" stroke="#ffffff" stroke-opacity="0.28" stroke-width="1"/>`).join('')}
     <rect x="${innerL}" y="${innerTop}" width="${innerR - innerL}" height="${innerBottom - innerTop}" rx="3" fill="#F4F1E6"/>
@@ -641,8 +681,8 @@ function bin3DSVG(b, pct, col) {
 // ── COMPACT MAP ICON (small 3D bin/hopper for facility map) ────
 function mapBinGeom(shape) {
   if (shape === 'hopper') {
-    return { rimL:6, rimR:54, rimY:6, shoulderY:17, tipX:30, tipY:58,
-              innerL:10, innerR:50, innerTop:11, innerShoulder:19, innerBottom:53 };
+    return { rimL:6, rimR:54, rimY:14, shoulderY:24, tipX:30, tipY:58,
+              innerL:10, innerR:50, innerTop:19, innerShoulder:26, innerBottom:53, peakY:2 };
   }
   return { bodyL:6, bodyR:54, bodyTop:14, bodyBottom:54,
             innerL:10, innerR:50, innerTop:18, innerBottom:50 };
@@ -671,6 +711,7 @@ function mapBinSVG(b, pct, col) {
           <polygon points="${g.innerL},${g.innerTop} ${g.innerR},${g.innerTop} ${g.innerR},${g.innerShoulder} ${g.tipX},${g.innerBottom} ${g.innerL},${g.innerShoulder}"/>
         </clipPath>
       </defs>
+      <polygon points="${g.rimL},${g.rimY} ${g.tipX},${g.peakY} ${g.rimR},${g.rimY}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5" stroke-linejoin="round"/>
       <polygon points="${g.rimL},${g.rimY} ${g.rimR},${g.rimY} ${g.rimR},${g.shoulderY} ${g.tipX},${g.tipY} ${g.rimL},${g.shoulderY}" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
       <polygon points="${g.innerL},${g.innerTop} ${g.innerR},${g.innerTop} ${g.innerR},${g.innerShoulder} ${g.tipX},${g.innerBottom} ${g.innerL},${g.innerShoulder}" fill="#F4F1E6"/>
       <rect id="mgrain-${b.id}" x="${g.innerL}" y="${grainY}" width="${g.innerR - g.innerL}" height="${g.innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
@@ -690,7 +731,7 @@ function mapBinSVG(b, pct, col) {
       </linearGradient>
       <clipPath id="clip-${uid}"><rect x="${g.innerL}" y="${g.innerTop}" width="${g.innerR - g.innerL}" height="${g.innerBottom - g.innerTop}" rx="2"/></clipPath>
     </defs>
-    <path d="M${g.bodyL},${g.bodyTop} Q30,3 ${g.bodyR},${g.bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
+    <path d="M${g.bodyL},${g.bodyTop} L30,2 ${g.bodyR},${g.bodyTop} Z" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5" stroke-linejoin="round"/>
     <rect x="${g.bodyL}" y="${g.bodyTop}" width="${g.bodyR - g.bodyL}" height="${g.bodyBottom - g.bodyTop}" rx="4" fill="url(#steel-${uid})" stroke="#77808a" stroke-width="1.5"/>
     <rect x="${g.innerL}" y="${g.innerTop}" width="${g.innerR - g.innerL}" height="${g.innerBottom - g.innerTop}" rx="2" fill="#F4F1E6"/>
     <rect id="mgrain-${b.id}" x="${g.innerL}" y="${grainY}" width="${g.innerR - g.innerL}" height="${g.innerBottom - grainY}" fill="url(#grain-${uid})" clip-path="url(#clip-${uid})"/>
@@ -746,15 +787,26 @@ function updateMapColors() {
   });
 }
 
+// ── BIN LEVELS BAR CHART (bushels, one bar per bin) ─────────────
+function renderLevels() {
+  const wrap = document.getElementById('levelsWrap');
+  if (!wrap) return;
+  wrap.innerHTML = bins.map(b => {
+    const pct = b.capacity>0 ? b.currentBu/b.capacity*100 : 0;
+    const col = fillColor(pct, b.commodity);
+    const h = Math.max(0, Math.min(100, pct));
+    return `<div class="lvl-col">
+      <div class="lvl-bu">${b.currentBu.toLocaleString()}<span class="lvl-bu-u">bu</span></div>
+      <div class="lvl-bar-track"><div class="lvl-bar-fill" style="height:${h}%;background:${col}"></div></div>
+      <div class="lvl-name">${b.name}</div>
+    </div>`;
+  }).join('');
+}
+
 // ── RENDER CARDS ──────────────────────────────────────────────
 function render() {
-  const totalBu  = bins.reduce((a,b)=>a+b.currentBu,0);
-  const active   = bins.filter(b=>b.currentBu>0).length;
-  document.getElementById('totalBu').textContent  = totalBu.toLocaleString();
-  document.getElementById('totalPct').textContent = Math.round(totalBu/TOTAL_CAP*100)+'%';
-  document.getElementById('binsActive').textContent = active;
-
   updateMapColors();
+  renderLevels();
 
   const grid = document.getElementById('binGrid');
   grid.innerHTML = '';
