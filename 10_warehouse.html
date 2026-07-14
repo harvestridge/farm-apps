@@ -4,79 +4,83 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Harvest Ridge – Warehouse</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2d6a2d;--green-light:#3d8c3d;--green-pale:#e8f3e8;--gold:#c8960c;--gold-pale:#fdf3de;--red:#c0392b;--red-light:#fdecea;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
+:root{--green:#1E4A2E;--green-light:#2E6B44;--green-pale:#E3EBE0;--gold:#C99A3D;--gold-pale:#F6ECD6;--red:#8C3229;--red-light:#F3E0DC;--bg:#EEE7D6;--card:#FBF7EC;--border:#DCCFAE;--text:#2B2620;--muted:#7A7060;--radius:10px;}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
-.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.app-header{background:var(--green);color:#F6EFDC;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);border-bottom:3px solid var(--gold);}
 .app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
-.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
-.app-header .sync-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;}
-.sync-status{font-size:11px;opacity:.8;}
-.sync-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3);border-radius:6px;color:white;font-size:11px;font-weight:600;padding:4px 10px;cursor:pointer;}
+.app-header .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.8;text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;}
+.app-header .sync-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+.sync-status{font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:.85;}
+.sync-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;color:#F6EFDC;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:4px 10px;cursor:pointer;text-transform:uppercase;letter-spacing:.4px;}
 .tab-bar{display:flex;background:var(--green-light);overflow-x:auto;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:1;padding:11px 8px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;text-align:center;}
-.tab-btn.active{color:white;border-bottom-color:var(--gold);}
-.content{padding:16px;max-width:680px;margin:0 auto;}
+.tab-btn{flex:1;padding:11px 8px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);background:none;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;border-bottom:3px solid transparent;text-align:center;}
+.tab-btn.active{color:#F6EFDC;border-bottom-color:var(--gold);}
+.content{padding:16px;max-width:680px;margin:0 auto;padding-bottom:40px;}
 .section{display:none;}
 .section.active{display:block;}
 .card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
-.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center;}
+.card-head{padding:12px 16px;background:var(--gold-pale);border-bottom:1px dashed var(--border);font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.8px;display:flex;justify-content:space-between;align-items:center;}
 .card-body{padding:14px 16px;}
 .field-group{margin-bottom:13px;}
-.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
+.field-label{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+input[type=text],input[type=number],input[type=date],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'IBM Plex Sans',sans-serif;outline:none;background:white;}
 input:focus,select:focus,textarea:focus{border-color:var(--green);}
 textarea{resize:none;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
-.grade-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid #f0ece6;}
+.grade-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid #EAE1CB;}
 .grade-row:last-child{border-bottom:none;}
 .grade-label{flex:1;font-size:13px;font-weight:500;}
-.grade-input{width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;text-align:center;}
+.grade-input{width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px;text-align:center;font-family:'IBM Plex Sans',sans-serif;}
 .grade-input:focus{border-color:var(--green);outline:none;}
-.grade-unit{font-size:12px;color:var(--muted);width:30px;}
+.grade-unit{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);width:30px;}
 .status-btns{display:flex;gap:8px;}
-.status-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:none;font-size:13px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s;}
-.status-btn.sel-approved{background:var(--green);border-color:var(--green);color:white;}
-.status-btn.sel-pending{background:var(--gold);border-color:var(--gold);color:white;}
-.status-btn.sel-rejected{background:var(--red);border-color:var(--red);color:white;}
-.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;transition:background .2s;}
+.status-btn{flex:1;padding:10px;border:1.5px solid var(--border);border-radius:8px;background:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;cursor:pointer;text-align:center;transition:all .15s;}
+.status-btn.sel-approved{background:var(--green);border-color:var(--green);color:#F6EFDC;}
+.status-btn.sel-pending{background:var(--gold);border-color:var(--gold);color:#F6EFDC;}
+.status-btn.sel-rejected{background:var(--red);border-color:var(--red);color:#F6EFDC;}
+.submit-btn{width:100%;padding:16px;background:var(--green);color:#F6EFDC;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:background .2s;}
 .submit-btn:hover{background:var(--green-light);}
 .submit-btn:disabled{background:#aaa;cursor:not-allowed;}
-.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);}
+.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:var(--card);border-radius:8px;border-left:3px solid var(--gold);}
 .inv-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
-.inv-filter input,.inv-filter select{flex:1;min-width:120px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+.inv-filter input,.inv-filter select{flex:1;min-width:120px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'IBM Plex Sans',sans-serif;outline:none;}
+.crop-group{margin-bottom:18px;}
+.crop-group-head{display:flex;align-items:center;gap:10px;padding:8px 4px;margin-bottom:8px;border-bottom:2px solid var(--gold);}
+.crop-group-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:1px;color:var(--green);}
+.crop-group-count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-left:auto;}
 .lot-card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:10px;overflow:hidden;}
 .lot-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--border);cursor:pointer;}
 .lot-num{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--green);}
-.lot-crop{font-size:12px;color:var(--muted);margin-top:1px;}
+.lot-crop{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.4px;}
 .lot-status{margin-left:auto;text-align:right;}
 .lot-caret{font-size:11px;color:var(--muted);margin-top:2px;}
-.status-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-block;}
+.status-pill{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-block;text-transform:uppercase;letter-spacing:.4px;}
 .pill-approved{background:var(--green-pale);color:var(--green);}
-.pill-pending{background:#fef3c7;color:#92400e;}
+.pill-pending{background:var(--gold-pale);color:#8a6416;}
 .pill-rejected{background:var(--red-light);color:var(--red);}
-.pill-depleted{background:#f3f4f6;color:#6b7280;}
-.pill-mixed{background:#e8e4fb;color:#5b3ec9;}
+.pill-depleted{background:#EFEAE0;color:#8a8072;}
+.pill-mixed{background:#E5E0F3;color:#5b3ec9;}
 .lot-body{padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
 .lot-stat{text-align:center;}
 .lot-stat-val{font-size:18px;font-weight:700;color:var(--text);}
 .lot-stat-val.green{color:var(--green);}
-.lot-stat-label{font-size:11px;color:var(--muted);margin-top:2px;}
+.lot-stat-label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.4px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
 .empty-state .big{font-size:40px;margin-bottom:8px;}
-.ship-lot-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:0.5px solid #f0ece6;cursor:pointer;}
+.ship-lot-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:0.5px solid #EAE1CB;cursor:pointer;}
 .ship-lot-row:last-child{border-bottom:none;}
-.ship-lot-row:active{background:#f9f7f4;}
+.ship-lot-row:active{background:var(--gold-pale);}
 .ship-lot-info{flex:1;}
 .ship-lot-num{font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--green);letter-spacing:.5px;}
-.ship-lot-meta{font-size:12px;color:var(--muted);}
+.ship-lot-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
 .ship-lot-totes{font-size:13px;font-weight:600;color:var(--text);}
-.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--green);font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;text-transform:uppercase;letter-spacing:.4px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#F6EFDC;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 .toast.error{background:var(--red);}
 .loading{text-align:center;padding:30px 20px;color:var(--muted);}
@@ -85,22 +89,22 @@ textarea{resize:none;}
 /* tote / batch UI */
 .tote-list{padding:4px 16px 12px;}
 .batch-group{margin-bottom:10px;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
-.batch-head{background:#faf8f4;padding:8px 12px;font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.batch-head{background:var(--gold-pale);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.3px;}
 .batch-head b{color:var(--text);}
 .tote-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px;}
-.tote-chip{font-size:12px;font-weight:600;padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:white;display:flex;align-items:center;gap:5px;}
-.tote-chip.shipped{background:#f3f4f6;color:#9ca3af;text-decoration:line-through;border-color:#e5e7eb;}
+.tote-chip{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;padding:4px 9px;border-radius:7px;border:1px solid var(--border);background:white;display:flex;align-items:center;gap:5px;}
+.tote-chip.shipped{background:#EFEAE0;color:#9c9284;text-decoration:line-through;border-color:#E3DBC9;}
 .tote-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
 .dot-approved{background:var(--green);}
 .dot-pending{background:var(--gold);}
 .dot-rejected{background:var(--red);}
-.select-all-row{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--green);}
+.select-all-row{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.3px;}
 .batch-check-group{padding:6px 12px 10px;}
-.tote-check-row{display:flex;align-items:center;gap:9px;padding:7px 4px;border-bottom:0.5px solid #f3efe9;font-size:13.5px;}
+.tote-check-row{display:flex;align-items:center;gap:9px;padding:7px 4px;border-bottom:0.5px solid #EFE8D9;font-size:13.5px;}
 .tote-check-row:last-child{border-bottom:none;}
 .tote-check-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--green);flex-shrink:0;}
 .tote-check-lbs{margin-left:auto;color:var(--muted);font-size:12px;}
-.partial-warn{font-size:11.5px;color:#92400e;background:var(--gold-pale);padding:6px 10px;border-radius:7px;margin:0 12px 10px;display:none;}
+.partial-warn{font-size:11.5px;color:#8a6416;background:var(--gold-pale);padding:6px 10px;border-radius:7px;margin:0 12px 10px;display:none;}
 .partial-warn.show{display:block;}
 .ship-summary{display:flex;gap:14px;padding:10px 16px 4px;font-size:13px;}
 .ship-summary b{color:var(--green);}
@@ -503,6 +507,40 @@ function toggleLotExpand(lotNum){
   renderInventory();
 }
 
+function buildLotCard(lot){
+  const statusClass=statusPillClass(lot.status);
+  const isOpen = !!expandedLots[lot.lotNum];
+  const div=document.createElement('div');
+  div.className='lot-card';
+  let batchesHtml='';
+  if(isOpen){
+    const batches = Object.values(lot.batches).sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+    batchesHtml = '<div class="tote-list">' + batches.map(b=>{
+      const chips = b.totes.slice().sort((x,y)=>x.toteNum.localeCompare(y.toteNum)).map(t=>{
+        const shippedCls = t.shipped ? ' shipped' : '';
+        return `<span class="tote-chip${shippedCls}"><span class="tote-dot ${statusDotClass(t.status)}"></span>${t.toteNum}${t.shipped?' · shipped':''}</span>`;
+      }).join('');
+      return `<div class="batch-group">
+        <div class="batch-head"><span>Batch ${b.date||''} · <b>${b.inspector||''}</b>${b.sample?' · Sample '+b.sample:''}</span><span class="status-pill ${statusPillClass(b.status)}">${b.status}</span></div>
+        <div class="tote-chip-wrap">${chips}</div>
+      </div>`;
+    }).join('') + '</div>';
+  }
+  div.innerHTML=`
+    <div class="lot-head" onclick="toggleLotExpand('${lot.lotNum}')">
+      <div><div class="lot-num">${lot.lotNum}</div><div class="lot-crop">${lot.crop} · ${lot.grower}</div></div>
+      <div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span><div class="lot-caret">${isOpen?'▲ hide totes':'▼ show totes'}</div></div>
+    </div>
+    <div class="lot-body">
+      <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Left</div></div>
+      <div class="lot-stat"><div class="lot-stat-val">${lot.totesIn}</div><div class="lot-stat-label">Totes In</div></div>
+      <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Left</div></div>
+    </div>
+    ${batchesHtml}
+  `;
+  return div;
+}
+
 function renderInventory() {
   const search=(document.getElementById('inv-search')?.value||'').toLowerCase();
   const statusFilter=document.getElementById('inv-filter-status')?.value||'';
@@ -514,38 +552,27 @@ function renderInventory() {
     list.innerHTML='<div class="empty-state"><div class="big">📦</div><p>No lots found.<br>Grade incoming product to add inventory.</p></div>';return;
   }
   list.innerHTML='';
-  lots.reverse().forEach(lot=>{
-    const statusClass=statusPillClass(lot.status);
-    const isOpen = !!expandedLots[lot.lotNum];
-    const div=document.createElement('div');
-    div.className='lot-card';
-    let batchesHtml='';
-    if(isOpen){
-      const batches = Object.values(lot.batches).sort((a,b)=> (a.date||'').localeCompare(b.date||''));
-      batchesHtml = '<div class="tote-list">' + batches.map(b=>{
-        const chips = b.totes.slice().sort((x,y)=>x.toteNum.localeCompare(y.toteNum)).map(t=>{
-          const shippedCls = t.shipped ? ' shipped' : '';
-          return `<span class="tote-chip${shippedCls}"><span class="tote-dot ${statusDotClass(t.status)}"></span>${t.toteNum}${t.shipped?' · shipped':''}</span>`;
-        }).join('');
-        return `<div class="batch-group">
-          <div class="batch-head"><span>Batch ${b.date||''} · <b>${b.inspector||''}</b>${b.sample?' · Sample '+b.sample:''}</span><span class="status-pill ${statusPillClass(b.status)}">${b.status}</span></div>
-          <div class="tote-chip-wrap">${chips}</div>
-        </div>`;
-      }).join('') + '</div>';
-    }
-    div.innerHTML=`
-      <div class="lot-head" onclick="toggleLotExpand('${lot.lotNum}')">
-        <div><div class="lot-num">${lot.lotNum}</div><div class="lot-crop">${lot.crop} · ${lot.grower}</div></div>
-        <div class="lot-status"><span class="status-pill ${statusClass}">${lot.status}</span><div class="lot-caret">${isOpen?'▲ hide totes':'▼ show totes'}</div></div>
-      </div>
-      <div class="lot-body">
-        <div class="lot-stat"><div class="lot-stat-val green">${lot.totesRemaining}</div><div class="lot-stat-label">Totes Left</div></div>
-        <div class="lot-stat"><div class="lot-stat-val">${lot.totesIn}</div><div class="lot-stat-label">Totes In</div></div>
-        <div class="lot-stat"><div class="lot-stat-val">${(lot.lbsRemaining||0).toLocaleString()}</div><div class="lot-stat-label">Lbs Left</div></div>
-      </div>
-      ${batchesHtml}
-    `;
-    list.appendChild(div);
+  lots.reverse();
+
+  // group lots by crop, most recently-touched lot within each group first
+  const groups={};
+  lots.forEach(lot=>{
+    const crop=lot.crop||'Other';
+    if(!groups[crop]) groups[crop]=[];
+    groups[crop].push(lot);
+  });
+  const cropNames=Object.keys(groups).sort((a,b)=>a.localeCompare(b));
+
+  cropNames.forEach(crop=>{
+    const groupLots=groups[crop];
+    const groupDiv=document.createElement('div');
+    groupDiv.className='crop-group';
+    const head=document.createElement('div');
+    head.className='crop-group-head';
+    head.innerHTML=`<span class="crop-group-name">${crop}</span><span class="crop-group-count">${groupLots.length} lot${groupLots.length===1?'':'s'}</span>`;
+    groupDiv.appendChild(head);
+    groupLots.forEach(lot=>groupDiv.appendChild(buildLotCard(lot)));
+    list.appendChild(groupDiv);
   });
 }
 
