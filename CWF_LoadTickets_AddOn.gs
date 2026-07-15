@@ -1,116 +1,638 @@
-// ============================================================
-// Clearwater Bin Manager — Load Tickets Add-On
-// Paste this into your existing Apps Script alongside
-// ClearwaterBinManager_Setup.gs
-// ============================================================
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Load Ticket — Clearwater Farms</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue-dark:  #0C2D6B;
+  --blue-mid:   #1A4FA0;
+  --blue-light: #2E7DD1;
+  --blue-pale:  #E6F0FB;
+  --gold:       #C8960C;
+  --gold-pale:  #FDF3DC;
+  --gold-dark:  #7A5200;
+  --stone:      #888780;
+  --stone-light:#E8E7E2;
+  --red:        #C84040;
+  --red-pale:   #FDE8E8;
+  --green:      #3B6D11;
+  --green-pale: #EAF3DE;
+  --text-p:     #1A1A18;
+  --text-m:     #444441;
+  --text-l:     #888780;
+  --bg:         #F0EDE4;
+  --white:      #FFFFFF;
+  --radius:     10px;
+  --radius-sm:  6px;
+  --shadow:     0 2px 12px rgba(0,0,0,0.09);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text-p);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-// Run once to create the LoadTickets sheet
-function setupLoadTicketsSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+/* HEADER */
+header{background:var(--blue-dark);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,0.28)}
+.h-left{display:flex;flex-direction:column;gap:1px}
+.h-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;color:#fff;line-height:1}
+.h-sub{font-size:11px;color:#7DB8F0;letter-spacing:0.04em}
+.h-back{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);border-radius:var(--radius-sm);color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px}
+.h-back:hover{background:rgba(255,255,255,0.2)}
 
-  let sheet = ss.getSheetByName("LoadTickets");
-  if (sheet) ss.deleteSheet(sheet);
-  sheet = ss.insertSheet("LoadTickets");
+/* MAIN */
+main{max-width:640px;margin:0 auto;padding:20px 14px 60px}
 
-  const headers = [
-    "Timestamp", "Ticket #", "Date/Time", "Truck", "Crop", "Field",
-    "Net Weight (lbs)", "Bushels", "Moisture %", "Test Weight (lbs)",
-    "Temp (°F)", "Destination Bin", "Bin ID", "Notes"
-  ];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+/* TICKET CARD */
+.ticket-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.ticket-header{background:var(--blue-mid);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.ticket-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.05em;color:#fff}
+.ticket-num{font-size:13px;color:rgba(255,255,255,0.65);font-weight:500}
+.ticket-body{padding:20px}
 
-  // Formatting
-  sheet.getRange(1, 1, 1, headers.length)
-    .setBackground("#0C2D6B")
-    .setFontColor("#FFFFFF")
-    .setFontWeight("bold");
+/* FORM */
+.form-row{margin-bottom:16px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.flabel{font-size:11px;font-weight:600;color:var(--text-m);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;display:block}
+.flabel .opt{font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-l)}
+.finput{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text-p);background:var(--white);-webkit-appearance:none;transition:border-color 0.12s}
+.finput:focus{outline:none;border-color:var(--blue-mid)}
+.finput.required-flash{border-color:var(--red)!important;animation:flash 0.4s ease}
+@keyframes flash{0%,100%{border-color:var(--red)}50%{border-color:var(--red-pale)}}
+.fselect{width:100%;padding:11px 13px;border:1.5px solid var(--stone-light);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:15px;color:var(--text-p);background:var(--white);-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;transition:border-color 0.12s}
+.fselect:focus{outline:none;border-color:var(--blue-mid)}
+.finput-unit{position:relative}
+.finput-unit .finput{padding-right:48px}
+.unit-label{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text-l);pointer-events:none;font-weight:500}
 
-  sheet.setColumnWidth(1, 140);   // Timestamp
-  sheet.setColumnWidth(2, 90);    // Ticket #
-  sheet.setColumnWidth(3, 140);   // Date/Time
-  sheet.setColumnWidth(4, 110);   // Truck
-  sheet.setColumnWidth(5, 130);   // Crop
-  sheet.setColumnWidth(6, 140);   // Field
-  sheet.setColumnWidth(7, 120);   // Net Weight
-  sheet.setColumnWidth(8, 90);    // Bushels
-  sheet.setColumnWidth(9, 90);    // Moisture
-  sheet.setColumnWidth(10, 120);  // Test Weight
-  sheet.setColumnWidth(11, 80);   // Temp
-  sheet.setColumnWidth(12, 110);  // Dest Bin
-  sheet.setColumnWidth(13, 70);   // Bin ID
-  sheet.setColumnWidth(14, 200);  // Notes
-  sheet.setFrozenRows(1);
+/* AUTO BU */
+.bu-calc{background:var(--blue-pale);border-radius:var(--radius-sm);padding:10px 13px;margin-top:7px;font-size:13px;color:var(--blue-mid);font-weight:500;display:none}
+.bu-calc.show{display:block}
 
-  SpreadsheetApp.getUi().alert("LoadTickets sheet created!");
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--stone-light);margin:4px 0 18px}
+
+/* SECTION TITLE */
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.04em;color:var(--blue-dark);margin-bottom:14px}
+
+/* DESTINATION BIN */
+.bin-picker{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:6px}
+.bin-btn{padding:10px 6px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;text-align:center;transition:all 0.1s;color:var(--text-m);line-height:1.3}
+.bin-btn:hover{border-color:var(--blue-mid);color:var(--blue-mid)}
+.bin-btn.selected{background:var(--blue-mid);border-color:var(--blue-mid);color:#fff}
+.bin-btn.empty-bin{opacity:0.5}
+.bin-btn .bname{font-weight:600;font-size:13px}
+.bin-btn .binfo{font-size:10px;margin-top:2px;opacity:0.8}
+
+/* PREVIEW PANEL */
+.preview-panel{background:var(--blue-pale);border:1px solid rgba(26,79,160,0.2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:18px}
+.preview-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--blue-mid);margin-bottom:10px}
+.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.preview-item{font-size:12px;color:var(--text-m)}
+.preview-item .pkey{color:var(--text-l);font-size:11px}
+.preview-item .pval{font-weight:500;color:var(--text-p)}
+.preview-highlight{grid-column:1/-1;background:var(--blue-mid);border-radius:var(--radius-sm);padding:8px 12px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+.preview-highlight .ph-label{font-size:12px;color:rgba(255,255,255,0.8)}
+.preview-highlight .ph-value{font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:0.03em}
+
+/* SUBMIT */
+.submit-row{display:flex;gap:10px}
+.btn-cancel{flex:0 0 80px;padding:14px;border-radius:var(--radius-sm);border:1.5px solid var(--stone-light);background:var(--white);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;color:var(--text-m);text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.btn-submit{flex:1;padding:14px;border-radius:var(--radius-sm);border:none;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;color:#fff;background:var(--blue-mid);transition:background 0.12s;letter-spacing:0.01em}
+.btn-submit:hover{background:var(--blue-dark)}
+.btn-submit:disabled{background:var(--stone);cursor:not-allowed}
+
+/* LOG */
+.log-wrap{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.log-hdr{padding:14px 16px 10px;border-bottom:1px solid var(--stone-light);display:flex;justify-content:space-between;align-items:center}
+.log-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.04em;color:var(--blue-dark)}
+.log-clr{font-size:11px;color:var(--text-l);cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif}
+.log-clr:hover{color:var(--red)}
+.log-empty{padding:22px 16px;text-align:center;font-size:13px;color:var(--text-l)}
+.log-entry{padding:13px 16px;border-bottom:1px solid var(--stone-light)}
+.log-entry:last-child{border-bottom:none}
+.le-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
+.le-main{font-size:13px;font-weight:600;color:var(--text-p)}
+.le-bu{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--blue-mid);letter-spacing:0.03em}
+.le-meta{display:flex;gap:12px;flex-wrap:wrap}
+.le-chip{font-size:11px;color:var(--text-l);display:flex;align-items:center;gap:3px}
+.le-chip strong{color:var(--text-m);font-weight:500}
+
+/* SUCCESS OVERLAY */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(12,45,107,0.92);z-index:200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
+.success-overlay.show{display:flex}
+.success-icon{font-size:64px;margin-bottom:16px}
+.success-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:0.05em;color:#fff;margin-bottom:8px}
+.success-sub{font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:28px;line-height:1.5}
+.success-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.sbtn{padding:13px 24px;border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:background 0.12s}
+.sbtn-new{background:#fff;color:var(--blue-dark)}
+.sbtn-home{background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.3)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--blue-dark);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:24px;box-shadow:var(--shadow-lg);z-index:300;transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-l);margin-bottom:8px}
+
+@media(max-width:420px){
+  .form-row-2{grid-template-columns:1fr}
+  .form-row-3{grid-template-columns:1fr 1fr}
+  .bin-picker{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-left">
+    <div class="h-title">Load Ticket</div>
+    <div class="h-sub">Clearwater Farms · Caro, MI</div>
+  </div>
+  <a class="h-back" href="cwf_home.html">← Home</a>
+</header>
+
+<!-- Tab bar -->
+<div style="background:#0C2D6B;border-top:1px solid rgba(255,255,255,0.12);display:flex;gap:0">
+  <a href="clearwater_bin_manager.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🌾 Bin Manager</a>
+  <a href="cwf_load_ticket.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:#fff;text-decoration:none;background:rgba(255,255,255,0.12);border-bottom:2px solid #7DB8F0;letter-spacing:0.03em">🚛 Load Ticket</a>
+  <a href="cwf_home.html" style="flex:1;padding:10px 0;text-align:center;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,0.65);text-decoration:none;letter-spacing:0.03em">🏠 Home</a>
+</div>
+
+<main>
+
+  <!-- Ticket form -->
+  <div class="ticket-card">
+    <div class="ticket-header">
+      <div class="ticket-title">New Load Ticket</div>
+      <div class="ticket-num" id="ticketNumDisplay">Auto-assigned</div>
+    </div>
+    <div class="ticket-body">
+
+      <!-- Row 1: Date/time + Ticket # -->
+      <div class="form-row-2">
+        <div>
+          <label class="flabel">Date &amp; Time</label>
+          <input type="datetime-local" class="finput" id="fDateTime">
+        </div>
+        <div>
+          <label class="flabel">Ticket #</label>
+          <input type="text" class="finput" id="fTicket" placeholder="e.g. 1042">
+        </div>
+      </div>
+
+      <!-- Row 2: Truck + Crop -->
+      <div class="form-row-2">
+        <div>
+          <label class="flabel">Truck</label>
+          <select class="fselect" id="fTruck">
+            <option value="">— Select truck —</option>
+            <option>Red Volvo</option>
+            <option>Blue Kenworth</option>
+            <option>Yellow Truck</option>
+            <option>Malburg</option>
+            <option>Finn Flyer</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div>
+          <label class="flabel">Crop</label>
+          <select class="fselect" id="fCrop" onchange="updateBuCalc()">
+            <option value="">— Select crop —</option>
+            <option value="Org. Blue Corn" data-lbs="56">Org. Blue Corn</option>
+            <option value="Dry Soybeans" data-lbs="60">Dry Soybeans</option>
+            <option value="Wet Soybeans" data-lbs="60">Wet Soybeans</option>
+            <option value="Soy Hulls" data-lbs="60">Soy Hulls</option>
+            <option value="Yellow Corn" data-lbs="56">Yellow Corn</option>
+            <option value="Spelt" data-lbs="30">Spelt</option>
+            <option value="Wheat" data-lbs="60">Wheat</option>
+            <option value="Rye" data-lbs="56">Rye</option>
+            <option value="Black Beans" data-lbs="60">Black Beans</option>
+            <option value="Pinto Beans" data-lbs="60">Pinto Beans</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Field -->
+      <div class="form-row">
+        <label class="flabel">Field of Origin</label>
+        <select class="fselect" id="fField">
+          <option value="">— Select field —</option>
+          <option>76 ACRE</option>
+          <option>ANDY'S</option>
+          <option>ASHBRECK</option>
+          <option>BEDELL (SOUTH)</option>
+          <option>BENNETT C</option>
+          <option>BENNETT E</option>
+          <option>BENNETT W</option>
+          <option>BERTHA</option>
+          <option>CASS CITY</option>
+          <option>CHILDS</option>
+          <option>CHURCH</option>
+          <option>CHURCH (NORTH)</option>
+          <option>COLLING RD</option>
+          <option>COWBOY</option>
+          <option>DARBEE</option>
+          <option>DAVE'S EAST</option>
+          <option>ED SOUTH</option>
+          <option>ED'S HOUSE</option>
+          <option>GIBBS NE</option>
+          <option>GIBBS W</option>
+          <option>HOME</option>
+          <option>HOME E</option>
+          <option>HOME W</option>
+          <option>KEVIN E</option>
+          <option>KEVIN W</option>
+          <option>KIEL</option>
+          <option>LIGHTHOUSE</option>
+          <option>LONG NARROW</option>
+          <option>MAY</option>
+          <option>MELANIE</option>
+          <option>MONTEI E</option>
+          <option>MONTEI W</option>
+          <option>MUZ</option>
+          <option>RANDY'S EAST</option>
+          <option>RANDY'S WEST</option>
+          <option>RAY</option>
+          <option>ROMAIN COLLING</option>
+          <option>ROMAIN E DARBEE</option>
+          <option>ROMAIN LUDER</option>
+          <option>ROMAIN W DARBEE</option>
+          <option>SMITH</option>
+          <option>STRUNZ</option>
+          <option>SUE'S</option>
+          <option>SURIN</option>
+          <option>TAGGETT</option>
+          <option>TAYLOR N</option>
+          <option>TAYLOR S</option>
+          <option>TUBBY'S EAST</option>
+          <option>TUBBY'S WEST</option>
+        </select>
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">Weight &amp; Quality</div>
+
+      <!-- Net weight + auto bu -->
+      <div class="form-row">
+        <label class="flabel">Net Weight</label>
+        <div class="finput-unit">
+          <input type="number" class="finput" id="fNetWeight" placeholder="0" min="0" oninput="updateBuCalc()">
+          <span class="unit-label">lbs</span>
+        </div>
+        <div class="bu-calc" id="buCalc"></div>
+      </div>
+
+      <!-- Moisture + Test weight + Temp -->
+      <div class="form-row-3">
+        <div>
+          <label class="flabel">Moisture</label>
+          <div class="finput-unit">
+            <input type="number" class="finput" id="fMoisture" placeholder="0.0" step="0.1" min="0" max="40">
+            <span class="unit-label">%</span>
+          </div>
+        </div>
+        <div>
+          <label class="flabel">Test Weight</label>
+          <div class="finput-unit">
+            <input type="number" class="finput" id="fTestWeight" placeholder="0.0" step="0.1" min="0">
+            <span class="unit-label">lbs</span>
+          </div>
+        </div>
+        <div>
+          <label class="flabel">Temp</label>
+          <div class="finput-unit">
+            <input type="number" class="finput" id="fTemp" placeholder="0" min="0" max="120">
+            <span class="unit-label">°F</span>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">Destination</div>
+
+      <!-- Bin picker -->
+      <div class="form-row">
+        <label class="flabel">Destination Bin</label>
+        <div class="bin-picker" id="binPicker"></div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-row">
+        <label class="flabel">Notes <span class="opt">(optional)</span></label>
+        <input type="text" class="finput" id="fNotes" placeholder="Any additional notes...">
+      </div>
+
+      <hr class="divider">
+
+      <!-- Preview -->
+      <div class="preview-panel" id="previewPanel" style="display:none">
+        <div class="preview-title">Load Summary</div>
+        <div class="preview-grid" id="previewGrid"></div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-row">
+        <a class="btn-cancel" href="cwf_home.html">Cancel</a>
+        <button class="btn-submit" onclick="submitTicket()">Record Load →</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Recent tickets -->
+  <div class="section-label">Recent Load Tickets</div>
+  <div class="log-wrap">
+    <div class="log-hdr">
+      <div class="log-title">Load Log</div>
+      <button class="log-clr" onclick="clearLog()">Clear local log</button>
+    </div>
+    <div id="logEntries"><div class="log-empty">No loads recorded yet.</div></div>
+  </div>
+
+</main>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon">✅</div>
+  <div class="success-title" id="successTitle">Load Recorded!</div>
+  <div class="success-sub" id="successSub"></div>
+  <div class="success-btns">
+    <button class="sbtn sbtn-new" onclick="resetForm()">+ New Ticket</button>
+    <a class="sbtn sbtn-home" href="cwf_home.html">← Home</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxop0ZUCf-0Rn9gBHdhVMS7uX79jGd3Ge2uw4e5n-_xhyRJJ2Rxas428QZNq2fzgthN5A/exec';
+
+// ── BINS ──────────────────────────────────────────────────────
+let bins = [
+  {id:'B1',name:'Bin 1',nick:"Dryer Bin",   capacity:6500, currentBu:6500, commodity:'Soy (dried)'},
+  {id:'B2',name:'Bin 2',nick:"Little GSI",  capacity:24000,currentBu:0,    commodity:'Empty'},
+  {id:'B3',name:'Bin 3',nick:"Original",    capacity:21000,currentBu:0,    commodity:'Empty'},
+  {id:'B4',name:'Bin 4',nick:"Tubby's",     capacity:21000,currentBu:0,    commodity:'Empty'},
+  {id:'B5',name:'Bin 5',nick:"Wet Tank",    capacity:2800, currentBu:2800, commodity:'Wet Soybeans'},
+  {id:'B6',name:'Bin 6',nick:"Middle Hopper",capacity:3600,currentBu:3600, commodity:'Dry Soybeans'},
+  {id:'B7',name:'Bin 7',nick:"West Hopper", capacity:2900, currentBu:2900, commodity:'Soy Hulls'},
+  {id:'B8',name:'Bin 8',nick:"Big GSI",     capacity:50000,currentBu:50000,commodity:'Org. Blue Corn'},
+];
+
+let selectedBin = null;
+let log = JSON.parse(localStorage.getItem('cwfLoadLog') || '[]');
+let ticketCounter = parseInt(localStorage.getItem('cwfTicketCounter') || '1000');
+
+// ── INIT ──────────────────────────────────────────────────────
+function init() {
+  // Load saved bin state
+  const saved = JSON.parse(localStorage.getItem('cwfBins') || '[]');
+  saved.forEach(s => {
+    const b = bins.find(x => x.id === s.id);
+    if (b) { b.currentBu = s.currentBu; b.commodity = s.commodity; }
+  });
+
+  // Set datetime to now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('fDateTime').value = now.toISOString().slice(0,16);
+
+  buildBinPicker();
+  renderLog();
+  setupPreviewListeners();
 }
 
-// ── UPDATED doPost — handles both load tickets and bin movements ──
-function doPost(e) {
-  try {
-    const data = JSON.parse(e.postData.contents);
+function buildBinPicker() {
+  const picker = document.getElementById('binPicker');
+  picker.innerHTML = '';
+  bins.forEach(b => {
+    const pct = Math.round(b.currentBu / b.capacity * 100);
+    const avail = b.capacity - b.currentBu;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'bin-btn' + (b.currentBu === 0 ? ' empty-bin' : '');
+    btn.dataset.binId = b.id;
+    btn.innerHTML = `<div class="bname">${b.name} · ${b.nick}</div><div class="binfo">${pct}% full</div><div class="binfo">${avail.toLocaleString()} av.</div>`;
+    btn.onclick = () => selectBin(b.id, btn);
+    picker.appendChild(btn);
+  });
+}
 
-    if (data.action === 'loadTicket') {
-      recordLoadTicket(data);
-    } else {
-      // Standard bin movement from Bin Manager
-      recordMovement(
-        data.binId, data.movementType, data.bushels,
-        data.commodity, null, '', '', data.notes || ''
-      );
+function selectBin(binId, btn) {
+  document.querySelectorAll('.bin-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedBin = binId;
+  updatePreview();
+}
+
+// ── BU CALCULATION ────────────────────────────────────────────
+function getLbsPerBu() {
+  const crop = document.getElementById('fCrop');
+  const opt = crop.options[crop.selectedIndex];
+  return opt ? parseInt(opt.dataset.lbs || '60') : 60;
+}
+
+function calcBushels() {
+  const lbs = parseFloat(document.getElementById('fNetWeight').value) || 0;
+  return lbs > 0 ? Math.round(lbs / getLbsPerBu()) : 0;
+}
+
+function updateBuCalc() {
+  const bu = calcBushels();
+  const calc = document.getElementById('buCalc');
+  const crop = document.getElementById('fCrop').value;
+  if (bu > 0 && crop) {
+    const lbsbu = getLbsPerBu();
+    calc.textContent = `≈ ${bu.toLocaleString()} bu (${lbsbu} lbs/bu for ${crop})`;
+    calc.classList.add('show');
+  } else {
+    calc.classList.remove('show');
+  }
+  updatePreview();
+}
+
+// ── PREVIEW ───────────────────────────────────────────────────
+function setupPreviewListeners() {
+  ['fDateTime','fTicket','fTruck','fCrop','fField','fNetWeight','fMoisture','fTestWeight','fTemp','fNotes']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', updatePreview);
+      if (el && el.tagName === 'SELECT') el.addEventListener('change', updatePreview);
+    });
+}
+
+function updatePreview() {
+  const bu = calcBushels();
+  const crop = document.getElementById('fCrop').value;
+  const bin = selectedBin ? bins.find(b => b.id === selectedBin) : null;
+  const panel = document.getElementById('previewPanel');
+
+  const hasEnough = crop && bu > 0 && bin;
+  panel.style.display = hasEnough ? 'block' : 'none';
+  if (!hasEnough) return;
+
+  const newBu = Math.min(bin.currentBu + bu, bin.capacity);
+  const newPct = Math.round(newBu / bin.capacity * 100);
+
+  document.getElementById('previewGrid').innerHTML = `
+    <div class="preview-item"><div class="pkey">Truck</div><div class="pval">${document.getElementById('fTruck').value || '—'}</div></div>
+    <div class="preview-item"><div class="pkey">Field</div><div class="pval">${document.getElementById('fField').value || '—'}</div></div>
+    <div class="preview-item"><div class="pkey">Moisture</div><div class="pval">${document.getElementById('fMoisture').value || '—'}%</div></div>
+    <div class="preview-item"><div class="pkey">Test Weight</div><div class="pval">${document.getElementById('fTestWeight').value || '—'} lbs</div></div>
+    <div class="preview-item"><div class="pkey">Temp</div><div class="pval">${document.getElementById('fTemp').value || '—'}°F</div></div>
+    <div class="preview-item"><div class="pkey">Destination</div><div class="pval">${bin.name} · ${bin.nick}</div></div>
+    <div class="preview-highlight">
+      <div><div class="ph-label">Net weight → Bushels</div><div style="font-size:11px;color:rgba(255,255,255,0.65)">${(parseFloat(document.getElementById('fNetWeight').value)||0).toLocaleString()} lbs ÷ ${getLbsPerBu()} = ${bu.toLocaleString()} bu · ${bin.name} → ${newPct}% full</div></div>
+      <div class="ph-value">${bu.toLocaleString()} bu</div>
+    </div>`;
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+function submitTicket() {
+  // Validate required fields
+  const required = [{id:'fTruck',label:'Truck'},{id:'fCrop',label:'Crop'},{id:'fField',label:'Field'},{id:'fNetWeight',label:'Net weight'}];
+  for (const r of required) {
+    const el = document.getElementById(r.id);
+    if (!el.value) {
+      el.classList.add('required-flash');
+      setTimeout(() => el.classList.remove('required-flash'), 1200);
+      showToast(r.label + ' is required');
+      return;
     }
+  }
+  if (!selectedBin) { showToast('Select a destination bin'); return; }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({success: true}))
-      .setMimeType(ContentService.MimeType.JSON);
+  const bu = calcBushels();
+  if (bu <= 0) { showToast('Enter a valid net weight'); return; }
 
-  } catch (err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({success: false, error: err.message}))
-      .setMimeType(ContentService.MimeType.JSON);
+  const bin = bins.find(b => b.id === selectedBin);
+  const dateVal = document.getElementById('fDateTime').value;
+  const ticketNum = document.getElementById('fTicket').value || ('CWF-' + (++ticketCounter));
+  localStorage.setItem('cwfTicketCounter', ticketCounter);
+
+  const entry = {
+    ticketNum,
+    dateTime:   dateVal,
+    truck:      document.getElementById('fTruck').value,
+    crop:       document.getElementById('fCrop').value,
+    field:      document.getElementById('fField').value,
+    netWeight:  parseFloat(document.getElementById('fNetWeight').value) || 0,
+    bushels:    bu,
+    moisture:   document.getElementById('fMoisture').value,
+    testWeight: document.getElementById('fTestWeight').value,
+    temp:       document.getElementById('fTemp').value,
+    binId:      selectedBin,
+    binName:    bin.name,
+    notes:      document.getElementById('fNotes').value,
+    recorded:   new Date().toISOString(),
+  };
+
+  // Update bin locally
+  bin.currentBu = Math.min(bin.currentBu + bu, bin.capacity);
+  bin.commodity = entry.crop;
+
+  // Save bin state
+  const allBins = JSON.parse(localStorage.getItem('cwfBins') || '[]');
+  const idx = allBins.findIndex(b => b.id === bin.id);
+  const update = {id:bin.id, currentBu:bin.currentBu, commodity:bin.commodity};
+  if (idx >= 0) allBins[idx] = update; else allBins.push(update);
+  localStorage.setItem('cwfBins', JSON.stringify(allBins));
+
+  // Save to local log
+  log.unshift(entry);
+  localStorage.setItem('cwfLoadLog', JSON.stringify(log));
+
+  // Fire to Google Sheets
+  sendToSheet(entry);
+
+  // Show success
+  document.getElementById('successTitle').textContent = 'Load Recorded!';
+  document.getElementById('successSub').textContent =
+    `${bu.toLocaleString()} bu of ${entry.crop}\nfrom ${entry.field} → ${bin.name}\nTicket #${ticketNum}`;
+  document.getElementById('successOverlay').classList.add('show');
+
+  renderLog();
+  buildBinPicker();
+}
+
+function sendToSheet(entry) {
+  if (SHEET_URL.includes('YOUR_DEPLOYMENT')) return;
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({action:'loadTicket', ...entry})
+  }).catch(() => {});
+}
+
+function resetForm() {
+  document.getElementById('successOverlay').classList.remove('show');
+  document.getElementById('fTicket').value = '';
+  document.getElementById('fTruck').value = '';
+  document.getElementById('fCrop').value = '';
+  document.getElementById('fField').value = '';
+  document.getElementById('fNetWeight').value = '';
+  document.getElementById('fMoisture').value = '';
+  document.getElementById('fTestWeight').value = '';
+  document.getElementById('fTemp').value = '';
+  document.getElementById('fNotes').value = '';
+  document.querySelectorAll('.bin-btn').forEach(b => b.classList.remove('selected'));
+  selectedBin = null;
+  document.getElementById('buCalc').classList.remove('show');
+  document.getElementById('previewPanel').style.display = 'none';
+  // Reset datetime to now
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('fDateTime').value = now.toISOString().slice(0,16);
+  window.scrollTo(0,0);
+}
+
+// ── LOG ───────────────────────────────────────────────────────
+function renderLog() {
+  const el = document.getElementById('logEntries');
+  if (!log.length) { el.innerHTML = '<div class="log-empty">No loads recorded yet.</div>'; return; }
+  el.innerHTML = log.slice(0,20).map(e => `
+    <div class="log-entry">
+      <div class="le-top">
+        <div class="le-main">${e.crop} · ${e.binName}</div>
+        <div class="le-bu">${(e.bushels||0).toLocaleString()} bu</div>
+      </div>
+      <div class="le-meta">
+        <div class="le-chip">🌾 <strong>${e.field}</strong></div>
+        <div class="le-chip">🚛 <strong>${e.truck}</strong></div>
+        ${e.moisture?`<div class="le-chip">💧 <strong>${e.moisture}%</strong></div>`:''}
+        ${e.testWeight?`<div class="le-chip">⚖️ <strong>${e.testWeight} lbs</strong></div>`:''}
+        ${e.temp?`<div class="le-chip">🌡 <strong>${e.temp}°F</strong></div>`:''}
+        <div class="le-chip">#<strong>${e.ticketNum}</strong></div>
+        <div class="le-chip">${new Date(e.recorded).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</div>
+      </div>
+      ${e.notes?`<div style="font-size:11px;color:var(--text-l);margin-top:4px;font-style:italic">${e.notes}</div>`:''}
+    </div>`).join('');
+}
+
+function clearLog() {
+  if (confirm('Clear local load log? Sheet data is not affected.')) {
+    log = [];
+    localStorage.setItem('cwfLoadLog', JSON.stringify(log));
+    renderLog();
   }
 }
 
-function recordLoadTicket(data) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-
-  // 1. Write to LoadTickets sheet
-  const ltSheet = ss.getSheetByName("LoadTickets");
-  const lastRow = ltSheet.getLastRow() + 1;
-  ltSheet.getRange(lastRow, 1, 1, 14).setValues([[
-    new Date(),
-    data.ticketNum   || "",
-    data.dateTime    || "",
-    data.truck       || "",
-    data.crop        || "",
-    data.field       || "",
-    data.netWeight   || 0,
-    data.bushels     || 0,
-    data.moisture    || "",
-    data.testWeight  || "",
-    data.temp        || "",
-    data.binName     || "",
-    data.binId       || "",
-    data.notes       || ""
-  ]]);
-  ltSheet.getRange(lastRow, 1).setNumberFormat("M/d/yyyy h:mm");
-  ltSheet.getRange(lastRow, 7, 1, 2).setNumberFormat("#,##0");
-
-  // Alternating row color
-  if (lastRow % 2 === 0) {
-    ltSheet.getRange(lastRow, 1, 1, 14).setBackground("#F0F4FB");
-  }
-
-  // 2. Update Bins sheet — add bushels to destination bin
-  if (data.binId && data.bushels > 0) {
-    recordMovement(
-      data.binId,
-      "Add",
-      data.bushels,
-      data.crop,
-      null,
-      data.field,      // fromTo = field of origin
-      "",
-      `Load ticket #${data.ticketNum} · ${data.truck} · ${data.field}`
-    );
-  }
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
 }
+
+init();
+</script>
+</body>
+</html>
