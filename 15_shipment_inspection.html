@@ -181,16 +181,16 @@ function setToteResult(val) {
   document.getElementById('corrective-box').className = val === 'Fail' ? 'corrective-box show' : 'corrective-box';
 }
 
-// Pull lot numbers from WarehouseGrading tab, column D
+// Pull lot numbers from WarehouseGrading tab, column E
 async function loadLotNumbers() {
   const sel = document.getElementById('s-lot');
   try {
     const res = await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`);
     const rows = await res.json();
-    // Column D = index 3. Skip header row.
+    // Column E = index 4. Skip header row.
     const lots = new Set();
     for (let r = 1; r < rows.length; r++) {
-      const lot = rows[r][3];
+      const lot = rows[r][4];
       if (lot !== undefined && lot !== null && String(lot).trim() !== '') lots.add(String(lot).trim());
     }
     const sorted = Array.from(lots).sort();
