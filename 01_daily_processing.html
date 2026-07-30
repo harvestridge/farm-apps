@@ -423,7 +423,7 @@ function buildReview() {
 }
 
 // ── Shared send helper ──
-async function sendRows(rows, btnId) {
+async function sendRows(rows, btnId, tabName) {
   const btn = document.getElementById(btnId);
   if(btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
   try {
@@ -432,7 +432,7 @@ async function sendRows(rows, btnId) {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tab: 'Daily Processing Log', headers: item.headers, row: item.row })
+        body: JSON.stringify({ tab: tabName, headers: item.headers, row: item.row })
       });
     }
     showToast('✓ Submitted to Google Sheets!', false);
@@ -483,7 +483,7 @@ async function submitPreOp() {
       document.getElementById(`comment-preop-list-${i}`)?.value || ''
     ]
   }));
-  await sendRows(rows, 'btn-submit-preop');
+  await sendRows(rows, 'btn-submit-preop', 'DP-PreOp');
 }
 
 // ── Submit Magnets ──
@@ -496,7 +496,7 @@ async function submitMagnets() {
     headers: h,
     row: [ts, date, op, 'Magnets', roundLabel, label, magnetData[magnetRound][i] || document.getElementById(`mag-${i}`)?.value || '']
   }));
-  await sendRows(rows, 'btn-submit-magnets');
+  await sendRows(rows, 'btn-submit-magnets', 'DP-Magnets');
 }
 
 // ── Submit Production Line ──
@@ -514,7 +514,7 @@ async function submitProd(line) {
     const taskVal = taskSel === 'Other' ? (g('task-other') || 'Other') : taskSel;
     rows.push({ headers: h, row: [ts, date, op, 'Production', lineName, taskVal, g('start'), g('end'), g('pkglot'), g('prodlot'), g('begtote'), g('endtote'), g('totaltotes'), g('toteweight'), g('lbs'), g('init'), g('comments')] });
   });
-  await sendRows(rows, `btn-submit-prod${line}`);
+  await sendRows(rows, `btn-submit-prod${line}`, 'DP-Production');
 }
 
 // ── Submit Knives ──
@@ -531,7 +531,7 @@ async function submitKnives() {
       document.getElementById(`knotpresent-${i}`)?.classList.contains('na-active') ? 'Not Present' : ''
     ]
   }));
-  await sendRows(rows, 'btn-submit-knives');
+  await sendRows(rows, 'btn-submit-knives', 'DP-Knives');
 }
 
 // ── Submit Post-Op ──
@@ -548,7 +548,7 @@ async function submitPostOp() {
       document.getElementById(`comment-postop-list-${i}`)?.value || ''
     ]
   }));
-  await sendRows(rows, 'btn-submit-postop');
+  await sendRows(rows, 'btn-submit-postop', 'DP-PostOp');
 }
 
 function showToast(msg, isError) {
