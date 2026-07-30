@@ -84,7 +84,7 @@ textarea{resize:none;}
     <select id="technician">
       <option value="">Select Technician</option>
       <option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
-          <option>Mike</option>
+          <option>Mike</option><option>Mel</option>
     </select>
   </div>
 </div>
@@ -603,7 +603,7 @@ function showEquipDetail(equip, contentId, submitFn, mode) {
   <div class="card"><div class="card-head">Manager Sign-Off</div><div style="padding:14px 16px;">
     <div class="field-group"><div class="field-label">General Notes</div><textarea id="general-notes-${equip.id}" rows="2" placeholder="Any additional notes for this equipment..."></textarea></div>
     <div class="field-group"><div class="field-label">Verified By</div><select id="verified-by-${equip.id}"><option value="">Select manager</option><option>Tyler</option><option>Allen</option><option>Andy</option><option>Tim</option><option>Aaron</option>
-          <option>Mike</option></select></div>
+          <option>Mike</option><option>Mel</option></select></div>
   </div></div>
   <button class="submit-btn" onclick="${submitFn}('${equip.id}')">Submit to Google Sheets</button>`;
 
