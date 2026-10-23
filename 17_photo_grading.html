@@ -135,7 +135,10 @@ table.res td.num{font-weight:600;}
         <div class="field-group"><div class="field-label">No. 4 %</div><input type="number" step="0.01" id="a-no4"></div>
         <div class="field-group"><div class="field-label">No. 8 %</div><input type="number" step="0.01" id="a-no8"></div>
         <div class="field-group"><div class="field-label">No. 12 %</div><input type="number" step="0.01" id="a-no12"></div>
-        <div class="field-group"><div class="field-label">No. 18 + pan %</div><input type="number" step="0.01" id="a-no18pan"></div>
+        <div class="field-group"><div class="field-label">No. 18 %</div><input type="number" step="0.01" id="a-no18"></div>
+      </div>
+      <div class="field-group"><div class="field-label">Dust / meal in pan?</div>
+        <select id="a-dust"><option value="">Select...</option><option value="YES">Yes, visible (out of spec)</option><option value="no">No</option></select>
       </div>
       <div class="two-col">
         <div class="field-group"><div class="field-label">Hulls attached %</div><input type="number" step="0.01" id="a-hulls"></div>
@@ -154,7 +157,7 @@ table.res td.num{font-weight:600;}
 
 <script>
 const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const SCREENS=[['no4','No. 4'],['no8','No. 8'],['no12','No. 12'],['no18pan','No. 18 + pan']];
+const SCREENS=[['no4','No. 4'],['no8','No. 8'],['no12','No. 12'],['no18','No. 18']];
 let mode=2, photos={}, recent={};
 
 function labels(){return mode===2?['A','B']:['A1','A2','B1','B2'];}
@@ -199,17 +202,17 @@ async function gradeNow(){
   btn.disabled=false;document.getElementById('busy').style.display='none';
 }
 
-function limText(l){return l.max!=null?`≤ ${l.max}`:`≥ ${l.min}`;}
-function pillText(s){return s==='pass'?'In spec':s==='close'?'Near limit':'Out';}
+function limText(l){return !l?'—':l.max!=null?`≤ ${l.max}`:`≥ ${l.min}`;}
+function pillText(s){return s==='pass'?'In spec':s==='close'?'Near limit':s==='flag'?'Out':'';}
 function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 function showResult(d){
   const r=d.result,j=d.judged,cls=j.worst==='pass'&&!j.darkParticle?'pass':j.worst==='flag'?'flag':'close';
-  let h=`<div class="overall ${cls}">${esc(j.overall)}<div class="meta">${esc(d.gradeId)} · confidence ${esc(r.confidence)} · dust ${esc(r.dust_level)}</div></div>`;
+  let h=`<div class="overall ${cls}">${esc(j.overall)}<div class="meta">${esc(d.gradeId)} · confidence ${esc(r.confidence)}</div></div>`;
   h+=`<table class="res"><tr><th>Screen</th><th>Estimate</th><th>Range</th><th>Spec</th><th></th></tr>`;
   SCREENS.forEach(([k,n])=>{const rg=(r.ranges&&r.ranges[k])||['',''];
-    h+=`<tr><td>${n}</td><td class="num">${Number(r.screens[k]).toFixed(1)}%</td><td>${rg[0]}–${rg[1]}</td><td>${limText(d.limits[k])}</td><td><span class="pill ${j.perScreen[k]}">${pillText(j.perScreen[k])}</span></td></tr>`;});
-  h+=`</table>`;
+    h+=`<tr><td>${n}</td><td class="num">${Number(r.screens[k]).toFixed(1)}%</td><td>${rg[0]}–${rg[1]}</td><td>${limText(d.limits[k])}</td><td>${j.perScreen[k]==='none'?'':`<span class="pill ${j.perScreen[k]}">${pillText(j.perScreen[k])}</span>`}</td></tr>`;});
+  h+=`<tr><td>Dust / meal</td><td class="num">${r.dust_visible?'Visible':'None seen'}</td><td colspan="2">${esc(r.dust_note||'')}</td><td><span class="pill ${r.dust_visible?'flag':'pass'}">${r.dust_visible?'Out':'In spec'}</span></td></tr></table>`;
   const flags=r.quality_flags||[];
   if(flags.length){h+=`<div class="field-label" style="margin-top:14px;">Quality flags</div>`;
     flags.forEach(f=>{h+=`<div class="flag-item${f.type==='dark_particle'?' dark':''}"><b>${esc(f.type.replace(/_/g,' '))}</b>, ${esc(f.location)}. ${esc(f.note)}</div>`;});}
@@ -227,7 +230,7 @@ async function loadRecent(){
     if(!rows.length){sel.innerHTML='<option value="">No photo grades yet</option>';return;}
     const H=rows[0];const ix=n=>H.indexOf(n);
     rows.slice(1).reverse().slice(0,40).forEach(r=>{recent[r[ix('Grade ID')]]={product:r[ix('Product')],lot:r[ix('Lot')],totes:r[ix('Totes')],
-      est:{no4:+r[ix('Est No4')],no8:+r[ix('Est No8')],no12:+r[ix('Est No12')],no18pan:+r[ix('Est No18+Pan')]}};});
+      dust:r[ix('Dust Visible')],est:{no4:+r[ix('Est No4')],no8:+r[ix('Est No8')],no12:+r[ix('Est No12')],no18:+r[ix('Est No18')]}};});
     sel.innerHTML='<option value="">Select a photo grade...</option>'+Object.entries(recent).map(([id,g])=>`<option value="${esc(id)}">${esc(g.lot)} ${g.totes?'('+esc(g.totes)+')':''} — ${esc(g.product)} — ${esc(id)}</option>`).join('');
   }catch(e){sel.innerHTML='<option value="">Could not load grades. Pull to refresh.</option>';}
 }
@@ -239,12 +242,15 @@ async function saveActual(){
   const id=document.getElementById('act-id').value,g=recent[id];
   if(!g){toast('Pick the photo grade first.',true);return;}
   const a=readActuals();if(!a){toast('Enter all four screen numbers.',true);return;}
+  const dustA=document.getElementById('a-dust').value;if(!dustA){toast('Answer the dust question.',true);return;}
   const miss={};SCREENS.forEach(([k])=>miss[k]=+(g.est[k]-a[k]).toFixed(2));
   let mh=`<table class="res" style="margin-bottom:10px;"><tr><th>Screen</th><th>Photo</th><th>Actual</th><th>Miss</th></tr>`;
   SCREENS.forEach(([k,n])=>{const m=miss[k];mh+=`<tr><td>${n}</td><td>${g.est[k].toFixed(1)}</td><td>${a[k].toFixed(2)}</td><td class="${Math.abs(m)>2?'miss-pos':'miss-ok'}">${m>0?'+':''}${m}</td></tr>`;});
+  const dustMatch=(String(g.dust||'').toUpperCase()==='YES')===(dustA==='YES');
+  mh+=`<tr><td>Dust</td><td>${esc(g.dust||'?')}</td><td>${dustA}</td><td class="${dustMatch?'miss-ok':'miss-pos'}">${dustMatch?'Match':'Missed'}</td></tr>`;
   document.getElementById('miss-box').innerHTML=mh+'</table>';
-  const headers=['Grade ID','Entered','Product','Lot','Totes','Actual No4','Actual No8','Actual No12','Actual No18+Pan','Miss No4','Miss No8','Miss No12','Miss No18+Pan','Hulls Attached','Entered By','Notes'];
-  const row=[id,new Date().toLocaleString(),g.product,g.lot,g.totes,a.no4,a.no8,a.no12,a.no18pan,miss.no4,miss.no8,miss.no12,miss.no18pan,
+  const headers=['Grade ID','Entered','Product','Lot','Totes','Actual No4','Actual No8','Actual No12','Actual No18','Actual Dust','Miss No4','Miss No8','Miss No12','Miss No18','Dust Match','Hulls Attached','Entered By','Notes'];
+  const row=[id,new Date().toLocaleString(),g.product,g.lot,g.totes,a.no4,a.no8,a.no12,a.no18,dustA,miss.no4,miss.no8,miss.no12,miss.no18,dustMatch?'yes':'no',
     document.getElementById('a-hulls').value,document.getElementById('a-by').value,document.getElementById('a-notes').value];
   const btn=document.getElementById('act-btn');btn.disabled=true;
   try{const t=await (await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({tab:'PG-Actuals',headers,row})})).text();
