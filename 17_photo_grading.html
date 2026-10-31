@@ -1,273 +1,294 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Harvest Ridge – Photo Grading</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--green:#2d6a2d;--green-pale:#e8f3e8;--gold:#c8960c;--gold-pale:#fbf3dc;--red:#c0392b;--red-pale:#fbe9e7;--bg:#f4f1eb;--card:#fff;--border:#d6cfc4;--text:#1a1a1a;--muted:#6b6b6b;--radius:12px;}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
-.app-header{background:var(--green);color:white;padding:16px 20px 12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25);}
-.app-header h1{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1.5px;line-height:1;}
-.app-header h1 a{color:white;text-decoration:none;}
-.app-header .sub{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
-.content{padding:16px;max-width:680px;margin:0 auto;}
-.card{background:var(--card);border-radius:var(--radius);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;}
-.card-head{padding:12px 16px;background:var(--green-pale);border-bottom:1px solid var(--border);font-size:13px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:.5px;}
-.card-body{padding:14px 16px;}
-.field-group{margin-bottom:13px;}
-.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-input[type=text],input[type=number],select,textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;background:white;}
-input:focus,select:focus,textarea:focus{border-color:var(--green);}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.section-note{font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 12px;background:#f9f7f4;border-radius:8px;border-left:3px solid var(--gold);line-height:1.5;}
-.calib-banner{display:none;font-size:12px;font-weight:600;color:#7a5a00;background:var(--gold-pale);border:1px solid var(--gold);border-radius:8px;padding:8px 12px;margin-bottom:12px;}
-.seg{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-.seg button{flex:1;padding:10px;border:none;background:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;}
-.seg button.on{background:var(--green);color:white;}
-.steps{font-size:13px;line-height:1.6;padding-left:18px;color:var(--text);margin-bottom:12px;}
-.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.slot{position:relative;border:1.5px dashed var(--border);border-radius:10px;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#faf8f4;cursor:pointer;overflow:hidden;}
-.slot.filled{border-style:solid;border-color:var(--green);}
-.slot img{width:100%;height:100%;object-fit:cover;}
-.slot .tag{position:absolute;top:6px;left:6px;background:var(--green);color:white;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;padding:1px 8px;border-radius:5px;}
-.slot .hint{font-size:12px;color:var(--muted);text-align:center;padding:0 8px;}
-.slot input{display:none;}
-.submit-btn{width:100%;padding:14px;background:var(--green);color:white;border:none;border-radius:var(--radius);font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;cursor:pointer;margin-top:4px;}
-.submit-btn:disabled{background:#aaa;cursor:not-allowed;}
-.busy{display:none;align-items:center;gap:10px;font-size:13px;color:var(--muted);padding:12px 2px;}
-.spin{width:18px;height:18px;border:2.5px solid var(--green-pale);border-top-color:var(--green);border-radius:50%;animation:sp 0.9s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg);}}
-.overall{border-radius:10px;padding:12px 14px;margin-bottom:12px;font-weight:600;font-size:15px;}
-.overall.pass{background:var(--green-pale);color:var(--green);}
-.overall.close{background:var(--gold-pale);color:#7a5a00;}
-.overall.flag{background:var(--red-pale);color:var(--red);}
-.overall .meta{font-size:12px;font-weight:400;margin-top:3px;opacity:.85;}
-table.res{width:100%;border-collapse:collapse;font-size:13px;}
-table.res th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;text-align:left;padding:6px 4px;border-bottom:1.5px solid var(--green-pale);}
-table.res td{padding:8px 4px;border-bottom:0.5px solid #f0ece6;}
-table.res td.num{font-weight:600;}
-.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:100px;}
-.pill.pass{background:var(--green-pale);color:var(--green);}
-.pill.close{background:var(--gold-pale);color:#7a5a00;}
-.pill.flag{background:var(--red-pale);color:var(--red);}
-.flag-item{font-size:13px;padding:8px 10px;border-radius:8px;background:#f9f7f4;margin-bottom:6px;line-height:1.45;}
-.flag-item.dark{background:var(--red-pale);}
-.flag-item b{font-weight:600;}
-.summary{font-size:13px;line-height:1.55;margin-top:10px;}
-.small{font-size:12px;color:var(--muted);margin-top:8px;}
-.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.miss-pos{color:var(--red);font-weight:600;}
-.miss-ok{color:var(--green);font-weight:600;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:white;padding:12px 24px;border-radius:100px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
-.toast.show{opacity:1;}
-.toast.error{background:var(--red);}
-</style>
-</head>
-<body>
+// ===================== PhotoGrade.gs =====================
+// HRP Photo Grading backend. Called from doPost when data.action === 'gradePhoto'.
+// Setup: Project Settings > Script Properties >
+//   ANTHROPIC_API_KEY = your Claude API key   (required)
+//   CLAUDE_MODEL      = claude-sonnet-5-5     (optional; try claude-opus-5-5 for tougher calls)
 
-<div class="app-header">
-  <h1><a href="https://harvestridge.github.io/farm-apps/00_home.html">Harvest Ridge</a></h1>
-  <div class="sub">Photo Grading</div>
-</div>
+const PG_TAB = 'PG-Log';
+const PG_FOLDER_NAME = 'HRP Photo Grades';
 
-<div class="content">
-  <div class="section-note">Photo grading is a screening check. The sieve grade is still the official result. When the app says "run screens," run them before shipping.</div>
+// ---- Product specs (edit here when specs change) ----
+const PG_SPECS = {
+  COSB: {
+    name: 'Organic soybean pieces (COSB)',
+    status: 'live',
+    limits: { no4: { max: 10 }, no8: { min: 70 }, no12: { max: 10 }, no18: { max: 5 }, hulls: { max: 1 } }
+  },
+  HOSB: {
+    name: 'Organic soybean halves (HOSB)',
+    status: 'calibrating',
+    // Halves grading sheet + HCI COA: No. 4 75% min, No. 8 20% max, No. 12 5% max. No No. 18 limit.
+    limits: { no4: { min: 75 }, no8: { max: 20 }, no12: { max: 5 }, no18: null, hulls: { max: 1 } }
+  }
+};
 
-  <div class="card">
-    <div class="card-head">Step 1 — Sample</div>
-    <div class="card-body">
-      <div class="field-group">
-        <div class="field-label">Product</div>
-        <select id="product" onchange="onProduct()">
-          <option value="COSB">Soybean pieces (COSB)</option>
-          <option value="HOSB">Soybean halves (HOSB)</option>
-        </select>
-      </div>
-      <div class="calib-banner" id="calib-banner">Halves are in calibration. Estimates are logged for training and are not for release decisions. Enter the actual grade in Step 4 after sieving.</div>
-      <div class="two-col">
-        <div class="field-group"><div class="field-label">Lot #</div><input type="text" id="lot" list="lot-list" placeholder="COSB26-205"><datalist id="lot-list"></datalist></div>
-        <div class="field-group"><div class="field-label">Totes</div><input type="text" id="totes" placeholder="1-5"></div>
-      </div>
-      <div class="field-group"><div class="field-label">Graded by</div>
-        <select id="graded-by"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option><option>Mike</option><option>Mel</option></select>
-      </div>
-    </div>
-  </div>
+// Dust / meal (pan): yes-or-no for BOTH products. Any visible = out of spec.
 
-  <div class="card">
-    <div class="card-head">Step 2 — Photos</div>
-    <div class="card-body">
-      <ol class="steps">
-        <li>Shake the bag, then pour all of it onto the grading mat, bottom fines included.</li>
-        <li>Spread one layer with small gaps. Keep the ruler and sieve squares in view.</li>
-        <li>Phone flat, directly overhead, no flash, no shadow.</li>
-      </ol>
-      <div class="field-group">
-        <div class="field-label">Photos</div>
-        <div class="seg"><button id="m2" class="on" onclick="setMode(2)">2 photos (A, B)</button><button id="m4" onclick="setMode(4)">4 photos (borderline)</button></div>
-      </div>
-      <div class="photo-grid" id="photo-grid"></div>
-    </div>
-  </div>
+// ---- Grading guide: everything learned in calibration ----
+const PG_GUIDE = `You are grading dehulled organic soybean samples for Harvest Ridge Processing from overhead photos.
 
-  <button class="submit-btn" id="grade-btn" onclick="gradeNow()">Grade sample</button>
-  <div class="busy" id="busy"><div class="spin"></div><span id="busy-text">Grading... this takes 20 to 40 seconds.</span></div>
+EQUIPMENT
+- Sieve stack: US standard ASTM E11 sieves, No. 4 (4.75 mm) on top, No. 8 (2.36 mm), No. 12 (1.70 mm), No. 18 (1.00 mm), pan.
+- Report % retained on No. 4, No. 8, No. 12 and No. 18 by weight.
+- Dust / meal (what would land in the pan) is NOT a percentage. A few scattered crumbs and specks are normal and acceptable: dust_visible = false. Crumbs larger than the No. 18 reference square (1 mm) are No. 18 material, not dust. Set dust_visible = true ONLY when there is an obvious film, streaks or drifts of fine powdery meal that would clearly pile up in the pan. When unsure, answer false and describe what you see in dust_note.
+- Photos are taken on a printed grading mat with a cm/mm ruler and actual-size white squares for each sieve opening (No. 4 = 4.75 mm, No. 8 = 2.36 mm, No. 12 = 1.70 mm, No. 18 = 1.00 mm). Use them as your size reference.
 
-  <div class="card" id="result-card" style="display:none;">
-    <div class="card-head">Step 3 — Result</div>
-    <div class="card-body" id="result-body"></div>
-  </div>
+SIZING RULES (learned from blind tests against real sieve results)
+- Intact, full-round cotyledon halves stay on No. 4. Thick chunks can also stay on No. 4.
+- Chipped or partial halves and chunks between about 2.4 and 4.7 mm land on No. 8.
+- Choppy, chip-heavy samples really do carry more No. 12 (6-8%). Past estimates ran 2-3 points LOW on No. 12 for choppy lots - do not discount small chips.
+- A sample can look full of halves and still be low on No. 4 (COSB25-232 was 1.9%). Count only intact, full-round halves and thick chunks as No. 4.
+- Pieces between about 1.0 and 1.7 mm go to No. 18.
+- Weight matters: a few large pieces outweigh many small ones. Estimate by weight, not by count.
 
-  <div class="card">
-    <div class="card-head">Step 4 — Enter actual grade</div>
-    <div class="card-body">
-      <div class="section-note">After the sample is sieved, enter the real numbers here. Each entry tells the app how far off it was, which is how it gets more accurate.</div>
-      <div class="field-group"><div class="field-label">Photo grade</div>
-        <select id="act-id" onchange="onActPick()"><option value="">Loading recent grades...</option></select>
-      </div>
-      <div class="act-grid">
-        <div class="field-group"><div class="field-label">No. 4 %</div><input type="number" step="0.01" id="a-no4"></div>
-        <div class="field-group"><div class="field-label">No. 8 %</div><input type="number" step="0.01" id="a-no8"></div>
-        <div class="field-group"><div class="field-label">No. 12 %</div><input type="number" step="0.01" id="a-no12"></div>
-        <div class="field-group"><div class="field-label">No. 18 %</div><input type="number" step="0.01" id="a-no18"></div>
-      </div>
-      <div class="field-group"><div class="field-label">Dust / meal in pan?</div>
-        <select id="a-dust"><option value="">Select...</option><option value="YES">Yes, visible (out of spec)</option><option value="no">No</option></select>
-      </div>
-      <div class="two-col">
-        <div class="field-group"><div class="field-label">Hulls attached %</div><input type="number" step="0.01" id="a-hulls"></div>
-        <div class="field-group"><div class="field-label">Entered by</div>
-          <select id="a-by"><option value="">Select...</option><option>Adrianna</option><option>Tiffany</option><option>Mike</option><option>Mel</option></select>
-        </div>
-      </div>
-      <div class="field-group"><div class="field-label">Notes</div><input type="text" id="a-notes" placeholder="Anything the photo missed"></div>
-      <div id="miss-box"></div>
-      <button class="submit-btn" id="act-btn" onclick="saveActual()">Save actual grade</button>
-    </div>
-  </div>
-</div>
+CALIBRATION REFERENCES (COSB pieces; No.4 / No.8 / No.12 / No.18 including pan)
+- COSB25-L40: 7.51 / 89.83 / 2.34 / 0.30. Clean: mostly halves and big chips, a few crumbs, no powder.
+- COSB26-202: 7.68 / 89.64 / 1.72 / 0.96. Typical: crumbs plus occasional small-chip clusters.
+- COSB26-201: 6.15 / 89.44 / 3.78 / 0.64.
+- COSB25-232: 1.9 / 89.9 / 6.5 / 1.69. Choppy: few intact halves, lots of small chips.
+- COSB25-234: 6.85 / 82.45 / 8.4 / 2.25. Very choppy; closest to the No. 12 limit.
+- COSB26-205: 5.44 / 90.57 / 3.51 / 0.49.
+- Tote #11: 6.93 / 81.56 / 7.14 / 1.86 on No. 18 plus 2.49 pan. Visible meal: dust_visible would be true.
+Typical miss so far: No. 4 about 2.7 pts, No. 8 about 2.6, No. 12 about 1.9, No. 18 about 0.9. Set ranges at least this wide.
 
-<div class="toast" id="toast"></div>
+HALVES RULES (HOSB only)
+- Intact or nearly intact cotyledon halves (round or oval, about 5-7 mm across) stay on No. 4. In an HOSB sample this is normally about 80% by weight.
+- Only clearly broken pieces (about a third of a half or smaller) go to No. 8. No. 12 is small chips only.
+- Do NOT apply the COSB pieces numbers to halves.
+CALIBRATION REFERENCES (HOSB halves; No.4 / No.8 / No.12)
+- HOSB25-231: 86.4 / 13.5 / 0.02.
+- HOSB25-232: 83.5 / 15.6 / 0.83.
+- HOSB25-234: 82.65 / 16.1 / 1.25.
+- HOSB25-235: 80.44 / 17.8 / 1.75.
 
-<script>
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbyt-uIpn_8halewmHanICU6fhxta-vzvxdfRbYal_kyDKa6KsBVQ2FAX70vKcLnmi-s5g/exec";
-const SCREENS=[['no4','No. 4'],['no8','No. 8'],['no12','No. 12'],['no18','No. 18']];
-let mode=2, photos={}, recent={};
+HULLS ATTACHED (estimate a percentage)
+- Spec for both products: under 1%. Your lots typically run 0.15-0.75% (pieces about 0.15-0.45%, halves about 0.17-0.75%).
+- Estimate the share of pieces that still carry tan or pink seed coat, as a % of the sample. A handful of hull-attached pieces in a full mat is about 0.2-0.4%; a dozen or more is approaching 1%.
 
-function labels(){return mode===2?['A','B']:['A1','A2','B1','B2'];}
-function setMode(m){mode=m;document.getElementById('m2').classList.toggle('on',m===2);document.getElementById('m4').classList.toggle('on',m===4);photos={};renderSlots();}
-function renderSlots(){
-  const g=document.getElementById('photo-grid');g.innerHTML='';
-  labels().forEach(l=>{
-    const d=document.createElement('label');d.className='slot'+(photos[l]?' filled':'');
-    d.innerHTML=`<span class="tag">${l}</span>${photos[l]?`<img src="${photos[l]}" alt="Photo ${l}">`:`<span class="hint">Tap to take photo ${l}</span>`}<input type="file" accept="image/*" capture="environment">`;
-    d.querySelector('input').addEventListener('change',async ev=>{
-      const f=ev.target.files[0];if(!f)return;
-      try{photos[l]=await shrink(f);renderSlots();}catch(e){toast('Could not read that photo. Try again.',true);}
+QUALITY CHECKS
+- hull_attached: pieces with tan or pink seed coat still attached.
+- loose_hull: thin, papery, translucent flakes.
+- off_color: green, dark, stained or speckled pieces.
+- dark_particle: anything black or dark that is not soybean (possible weed seed, dirt, insect part). Zero tolerance for insects and animal parts - always report.
+- whole_bean: intact whole beans (rare; halves are not whole beans).
+Give each flag a location (photo label and position, ruler mark if visible).
+
+PHOTO QUALITY
+Report problems that reduce confidence: shadows, glare, blur, pieces stacked or touching, too far away, ruler or sieve squares missing.
+
+OUTPUT
+Respond with ONLY a JSON object, no other text, in exactly this shape:
+{
+  "screens": {"no4": number, "no8": number, "no12": number, "no18": number},
+  "ranges": {"no4": [low, high], "no8": [low, high], "no12": [low, high], "no18": [low, high]},
+  "hulls_attached": number,
+  "hulls_range": [low, high],
+  "dust_visible": true | false,
+  "dust_note": "where you see meal or powder, or 'none seen'",
+  "confidence": "low" | "medium" | "high",
+  "quality_flags": [{"type": "hull_attached|loose_hull|off_color|dark_particle|whole_bean|other", "location": "string", "note": "string"}],
+  "photo_issues": ["string"],
+  "summary": "one or two plain sentences for the grader"
+}
+Keep each note short (under 20 words). Use no double-quote characters inside text values.
+The four screen numbers should add up to about 100.`;
+
+// ---------- Entry point (called from doPost) ----------
+function handleGradePhoto(data) {
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = props.getProperty('ANTHROPIC_API_KEY');
+    if (!key) return pgJson({ ok: false, error: 'ANTHROPIC_API_KEY is not set in Script Properties.' });
+    const model = props.getProperty('CLAUDE_MODEL') || 'claude-sonnet-5-5';
+
+    const spec = PG_SPECS[data.product];
+    if (!spec) return pgJson({ ok: false, error: 'Unknown product: ' + data.product });
+    if (!data.photos || !data.photos.length) return pgJson({ ok: false, error: 'No photos received.' });
+
+    const bias = pgRecentBias(data.product);
+    const result = pgAskClaude(key, model, data, spec, bias);
+    const judged = pgJudge(result, spec);
+    const gradeId = 'PG-' + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyyMMdd-HHmmss');
+
+    let links = '';
+    try { links = pgSavePhotos(gradeId, data.photos); } catch (err) { links = 'Photo save error: ' + err.message; }
+
+    const flagsText = (result.quality_flags || []).map(f => `${f.type} (${f.location}): ${f.note}`).join(' | ');
+    const r = result.ranges || {};
+    const rng = k => (r[k] ? r[k].join('-') : '');
+    pgAppend(PG_TAB,
+      ['Grade ID', 'Timestamp', 'Product', 'Lot', 'Totes', 'Graded By', 'Photo Mode',
+       'Est No4', 'Est No8', 'Est No12', 'Est No18',
+       'Range No4', 'Range No8', 'Range No12', 'Range No18',
+       'Est Hulls Attached', 'Range Hulls', 'Dust Visible', 'Dust Note', 'Confidence', 'Overall', 'Quality Flags', 'Photo Issues', 'Summary', 'Photo Links', 'Model', 'Bias Applied'],
+      [gradeId, new Date(), data.product, data.lot || '', "'" + (data.totes || ''), data.gradedBy || '', data.mode || '',
+       result.screens.no4, result.screens.no8, result.screens.no12, result.screens.no18,
+       rng('no4'), rng('no8'), rng('no12'), rng('no18'),
+       result.hulls_attached != null ? result.hulls_attached : '', (result.hulls_range || []).join('-'),
+       result.dust_visible ? 'YES' : 'no', result.dust_note || '', result.confidence || '', judged.overall, flagsText,
+       (result.photo_issues || []).join(' | '), result.summary || '', links, model, bias || 'none (fewer than 3 actuals)']);
+
+    return pgJson({ ok: true, gradeId: gradeId, product: data.product, specStatus: spec.status,
+                    limits: spec.limits, result: result, judged: judged });
+  } catch (err) {
+    console.error('PhotoGrade failed: ' + err.message);
+    return pgJson({ ok: false, error: err.message });
+  }
+}
+
+// ---------- Claude call ----------
+function pgAskClaude(key, model, data, spec, bias) {
+  const content = [];
+  data.photos.forEach(p => {
+    content.push({ type: 'text', text: 'Photo ' + p.label + ':' });
+    content.push({ type: 'image', source: { type: 'base64', media_type: p.mime || 'image/jpeg', data: p.b64 } });
+  });
+  const lim = spec.limits;
+  const specText = `Product: ${spec.name}. Spec: No. 4 ${pgLimText(lim.no4)}, No. 8 ${pgLimText(lim.no8)}, No. 12 ${pgLimText(lim.no12)}, No. 18 ${lim.no18 ? pgLimText(lim.no18) : 'no limit'}. Dust/meal: any visible is out of spec.` +
+    (data.product === 'HOSB' ? ' This is a HALVES product: use the HALVES RULES and HOSB references, not the COSB pieces numbers. A typical HOSB sample is about 80% No. 4, 15-18% No. 8 and 1-2% No. 12.' : ' This is a PIECES product: use the COSB rules and references.');
+  content.push({ type: 'text', text: `${specText}\nLot: ${data.lot || 'unknown'}. Totes: ${data.totes || 'unknown'}. Grade this sample and return the JSON.` + (bias ? '\n\n' + bias : '') });
+
+  const payload = { model: model, max_tokens: 4000, system: PG_GUIDE, messages: [{ role: 'user', content: content }] };
+  let lastErr = '';
+  // Two tries: if the reply is cut off or malformed, ask once more.
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+      method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+      payload: JSON.stringify(payload)
     });
-    g.appendChild(d);
+    if (res.getResponseCode() !== 200) throw new Error('Claude API ' + res.getResponseCode() + ': ' + res.getContentText().slice(0, 300));
+    const body = JSON.parse(res.getContentText());
+    const text = body.content.filter(c => c.type === 'text').map(c => c.text).join('');
+    try {
+      const s = text.indexOf('{'), e = text.lastIndexOf('}');
+      if (s < 0 || e < 0) throw new Error('no JSON in reply');
+      const out = JSON.parse(text.slice(s, e + 1));
+      if (!out.screens) throw new Error('reply missing screens');
+      return out;
+    } catch (err) {
+      lastErr = err.message + (body.stop_reason === 'max_tokens' ? ' (reply was cut off)' : '');
+      console.error('PhotoGrade attempt ' + attempt + ' bad JSON: ' + lastErr + ' | ' + text.slice(0, 300));
+    }
+  }
+  throw new Error('Claude reply could not be read after 2 tries: ' + lastErr);
+}
+
+// ---------- Learning: average miss from recent actual grades ----------
+// Reads the last 15 PG-Actuals rows for this product. Needs at least 3.
+function pgRecentBias(product) {
+  try {
+    const sh = SpreadsheetApp.openById(SHEET_ID).getSheetByName('PG-Actuals');
+    if (!sh || sh.getLastRow() < 2) return '';
+    const vals = sh.getDataRange().getValues();
+    const H = vals[0];
+    const col = names => { for (const n of names) { const i = H.indexOf(n); if (i >= 0) return i; } return -1; };
+    const iP = col(['Product']);
+    const keys = { no4: col(['Miss No4']), no8: col(['Miss No8']), no12: col(['Miss No12']), no18: col(['Miss No18', 'Miss No18+Pan']), hulls: col(['Miss Hulls']) };
+    const iDust = col(['Dust Match']);
+    if (iP < 0 || keys.no4 < 0) return '';
+    // Skip setup-error rows: any screen missed by more than 15 points.
+    const sane = r => Object.keys(keys).every(k => keys[k] < 0 || r[keys[k]] === '' || Math.abs(Number(r[keys[k]])) <= 15);
+    const rows = vals.slice(1).filter(r => r[iP] === product && r[keys.no4] !== '' && !isNaN(Number(r[keys.no4])) && sane(r)).slice(-15);
+    if (rows.length < 3) return '';
+    const names = { no4: 'No. 4', no8: 'No. 8', no12: 'No. 12', no18: 'No. 18', hulls: 'Hulls attached' };
+    const parts = [];
+    Object.keys(keys).forEach(k => {
+      if (keys[k] < 0) return;
+      const nums = rows.map(r => r[keys[k]]).filter(v => v !== '' && !isNaN(Number(v))).map(Number);
+      if (!nums.length) return;
+      const avg = nums.reduce((a, b) => a + b, 0) / nums.length;
+      const min = k === 'hulls' ? 0.05 : 0.3;
+      if (Math.abs(avg) >= min) parts.push(`${names[k]} ran ${Math.abs(avg).toFixed(k === 'hulls' ? 2 : 1)} pts ${avg > 0 ? 'HIGH' : 'LOW'}`);
+    });
+    let dustTxt = '';
+    if (iDust >= 0) {
+      const d = rows.map(r => r[iDust]).filter(v => v === 'yes' || v === 'no');
+      const missed = d.filter(v => v === 'no').length;
+      if (missed) dustTxt = ` The dust call disagreed with the sieve result in ${missed} of ${d.length} lots.`;
+    }
+    if (!parts.length && !dustTxt) return `RECENT ACCURACY (${product}, last ${rows.length} lots): estimates have been on target; no correction needed.`;
+    return `RECENT ACCURACY (${product}, last ${rows.length} lots with sieve results; miss = your estimate minus actual): ${parts.join('; ')}.${dustTxt} Correct for these biases in this estimate: if a screen ran HIGH, estimate it lower; if it ran LOW, estimate it higher.`;
+  } catch (e) {
+    console.error('pgRecentBias: ' + e.message);
+    return '';
+  }
+}
+
+// Run from the editor to see what the app will tell Claude right now.
+function pgShowBias() {
+  Logger.log('COSB: ' + (pgRecentBias('COSB') || 'not enough actuals yet (need 3)'));
+  Logger.log('HOSB: ' + (pgRecentBias('HOSB') || 'not enough actuals yet (need 3)'));
+}
+
+function pgLimText(l) { return l.max != null ? `max ${l.max}%` : `min ${l.min}%`; }
+
+// ---------- Pass / close / flag ----------
+function pgJudge(result, spec) {
+  const per = {};
+  let worst = 'pass';
+  const rank = { pass: 0, close: 1, flag: 2 };
+  ['no4', 'no8', 'no12', 'no18'].forEach(k => {
+    const est = Number(result.screens[k]);
+    const rg = (result.ranges && result.ranges[k]) || [est, est];
+    const lim = spec.limits[k];
+    if (!lim) { per[k] = 'none'; return; }
+    let st = 'pass';
+    if (lim.max != null) { if (est > lim.max) st = 'flag'; else if (Number(rg[1]) > lim.max) st = 'close'; }
+    else if (lim.min != null) { if (est < lim.min) st = 'flag'; else if (Number(rg[0]) < lim.min) st = 'close'; }
+    per[k] = st;
+    if (rank[st] > rank[worst]) worst = st;
   });
+  if (spec.limits.hulls && result.hulls_attached != null) {
+    const h = Number(result.hulls_attached), hr = result.hulls_range || [h, h];
+    per.hulls = h > spec.limits.hulls.max ? 'flag' : Number(hr[1]) > spec.limits.hulls.max ? 'close' : 'pass';
+    if (rank[per.hulls] > rank[worst]) worst = per.hulls;
+  }
+  const flags = result.quality_flags || [];
+  const darkParticle = flags.some(f => f.type === 'dark_particle');
+  const dust = result.dust_visible === true;
+  if (dust) worst = 'flag';
+  let overall = dust ? 'Out of spec - dust/meal visible'
+              : worst === 'flag' ? 'Run screens - likely out of spec'
+              : worst === 'close' ? 'Run screens - near a limit'
+              : 'Looks in spec';
+  if (darkParticle) overall += '; pull dark particle';
+  if (spec.status === 'calibrating') overall = 'Calibrating - ' + overall;
+  return { perScreen: per, worst: worst, darkParticle: darkParticle, dust: dust, overall: overall };
 }
-function shrink(file,maxSide=1568,q=0.85){
-  return new Promise((res,rej)=>{
-    const img=new Image(),url=URL.createObjectURL(file);
-    img.onload=()=>{const s=Math.min(1,maxSide/Math.max(img.width,img.height));const c=document.createElement('canvas');
-      c.width=Math.round(img.width*s);c.height=Math.round(img.height*s);c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-      URL.revokeObjectURL(url);res(c.toDataURL('image/jpeg',q));};
-    img.onerror=rej;img.src=url;
+
+// ---------- Drive + Sheet helpers ----------
+function pgSavePhotos(gradeId, photos) {
+  const it = DriveApp.getFoldersByName(PG_FOLDER_NAME);
+  const folder = it.hasNext() ? it.next() : DriveApp.createFolder(PG_FOLDER_NAME);
+  return photos.map(p => {
+    const blob = Utilities.newBlob(Utilities.base64Decode(p.b64), p.mime || 'image/jpeg', `${gradeId}_${p.label}.jpg`);
+    return folder.createFile(blob).getUrl();
+  }).join(' ');
+}
+
+function pgAppend(tab, headers, row) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  let sheet = ss.getSheetByName(tab);
+  if (!sheet) sheet = ss.insertSheet(tab);
+  if (sheet.getLastRow() === 0) { sheet.appendRow(headers); sheet.appendRow(row); return; }
+  const cur = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  headers.forEach(h => { if (!cur.includes(h)) { sheet.getRange(1, cur.length + 1).setValue(h); cur.push(h); } });
+  sheet.appendRow(cur.map(h => { const i = headers.indexOf(h); return i >= 0 ? row[i] : ''; }));
+}
+
+function pgJson(o) {
+  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ---------- Run this once from the editor to test your key ----------
+function pgTestKey() {
+  const props = PropertiesService.getScriptProperties();
+  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { 'x-api-key': props.getProperty('ANTHROPIC_API_KEY'), 'anthropic-version': '2023-06-01' },
+    payload: JSON.stringify({ model: props.getProperty('CLAUDE_MODEL') || 'claude-sonnet-5-5', max_tokens: 20,
+      messages: [{ role: 'user', content: 'Reply with the word ready.' }] })
   });
+  Logger.log(res.getResponseCode() + ' ' + res.getContentText());
 }
-function onProduct(){document.getElementById('calib-banner').style.display=document.getElementById('product').value==='HOSB'?'block':'none';}
-
-async function gradeNow(){
-  const L=labels();
-  if(!document.getElementById('lot').value.trim()){toast('Enter the lot number first.',true);return;}
-  if(L.some(l=>!photos[l])){toast(`Take all ${L.length} photos first.`,true);return;}
-  const btn=document.getElementById('grade-btn');btn.disabled=true;document.getElementById('busy').style.display='flex';
-  const payload={action:'gradePhoto',product:document.getElementById('product').value,lot:document.getElementById('lot').value.trim(),
-    totes:document.getElementById('totes').value.trim(),gradedBy:document.getElementById('graded-by').value,mode:`${L.length} photos`,
-    photos:L.map(l=>({label:l,mime:'image/jpeg',b64:photos[l].split(',')[1]}))};
-  try{
-    const r=await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(payload)});
-    const data=JSON.parse(await r.text());
-    if(!data.ok)throw new Error(data.error||'Grading failed');
-    showResult(data);toast('Graded and logged');loadRecent();
-  }catch(e){toast('Grading failed: '+e.message,true);}
-  btn.disabled=false;document.getElementById('busy').style.display='none';
-}
-
-function limText(l){return !l?'—':l.max!=null?`≤ ${l.max}`:`≥ ${l.min}`;}
-function pillText(s){return s==='pass'?'In spec':s==='close'?'Near limit':s==='flag'?'Out':'';}
-function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-
-function showResult(d){
-  const r=d.result,j=d.judged,cls=j.worst==='pass'&&!j.darkParticle?'pass':j.worst==='flag'?'flag':'close';
-  let h=`<div class="overall ${cls}">${esc(j.overall)}<div class="meta">${esc(d.gradeId)} · confidence ${esc(r.confidence)}</div></div>`;
-  h+=`<table class="res"><tr><th>Screen</th><th>Estimate</th><th>Range</th><th>Spec</th><th></th></tr>`;
-  SCREENS.forEach(([k,n])=>{const rg=(r.ranges&&r.ranges[k])||['',''];
-    h+=`<tr><td>${n}</td><td class="num">${Number(r.screens[k]).toFixed(1)}%</td><td>${rg[0]}–${rg[1]}</td><td>${limText(d.limits[k])}</td><td>${j.perScreen[k]==='none'?'':`<span class="pill ${j.perScreen[k]}">${pillText(j.perScreen[k])}</span>`}</td></tr>`;});
-  h+=`<tr><td>Dust / meal</td><td class="num">${r.dust_visible?'Visible':'None seen'}</td><td colspan="2">${esc(r.dust_note||'')}</td><td><span class="pill ${r.dust_visible?'flag':'pass'}">${r.dust_visible?'Out':'In spec'}</span></td></tr></table>`;
-  const flags=r.quality_flags||[];
-  if(flags.length){h+=`<div class="field-label" style="margin-top:14px;">Quality flags</div>`;
-    flags.forEach(f=>{h+=`<div class="flag-item${f.type==='dark_particle'?' dark':''}"><b>${esc(f.type.replace(/_/g,' '))}</b>, ${esc(f.location)}. ${esc(f.note)}</div>`;});}
-  if(r.summary)h+=`<div class="summary">${esc(r.summary)}</div>`;
-  if((r.photo_issues||[]).length)h+=`<div class="small">Photo issues: ${esc(r.photo_issues.join('; '))}</div>`;
-  document.getElementById('result-body').innerHTML=h;
-  const c=document.getElementById('result-card');c.style.display='block';c.scrollIntoView({behavior:'smooth'});
-}
-
-async function loadRecent(){
-  const sel=document.getElementById('act-id');
-  try{
-    const rows=JSON.parse(await (await fetch(`${SCRIPT_URL}?tab=PG-Log`)).text());
-    recent={};
-    if(!rows.length){sel.innerHTML='<option value="">No photo grades yet</option>';return;}
-    const H=rows[0];const ix=n=>H.indexOf(n);
-    rows.slice(1).reverse().slice(0,40).forEach(r=>{recent[r[ix('Grade ID')]]={product:r[ix('Product')],lot:r[ix('Lot')],totes:r[ix('Totes')],
-      dust:r[ix('Dust Visible')],est:{no4:+r[ix('Est No4')],no8:+r[ix('Est No8')],no12:+r[ix('Est No12')],no18:+r[ix('Est No18')]}};});
-    sel.innerHTML='<option value="">Select a photo grade...</option>'+Object.entries(recent).map(([id,g])=>`<option value="${esc(id)}">${esc(g.lot)} ${g.totes?'('+esc(g.totes)+')':''} — ${esc(g.product)} — ${esc(id)}</option>`).join('');
-  }catch(e){sel.innerHTML='<option value="">Could not load grades. Pull to refresh.</option>';}
-}
-function onActPick(){document.getElementById('miss-box').innerHTML='';}
-
-function readActuals(){const a={};let ok=true;SCREENS.forEach(([k])=>{const v=parseFloat(document.getElementById('a-'+k).value);if(isNaN(v))ok=false;a[k]=v;});return ok?a:null;}
-
-async function saveActual(){
-  const id=document.getElementById('act-id').value,g=recent[id];
-  if(!g){toast('Pick the photo grade first.',true);return;}
-  const a=readActuals();if(!a){toast('Enter all four screen numbers.',true);return;}
-  const dustA=document.getElementById('a-dust').value;if(!dustA){toast('Answer the dust question.',true);return;}
-  const miss={};SCREENS.forEach(([k])=>miss[k]=+(g.est[k]-a[k]).toFixed(2));
-  let mh=`<table class="res" style="margin-bottom:10px;"><tr><th>Screen</th><th>Photo</th><th>Actual</th><th>Miss</th></tr>`;
-  SCREENS.forEach(([k,n])=>{const m=miss[k];mh+=`<tr><td>${n}</td><td>${g.est[k].toFixed(1)}</td><td>${a[k].toFixed(2)}</td><td class="${Math.abs(m)>2?'miss-pos':'miss-ok'}">${m>0?'+':''}${m}</td></tr>`;});
-  const dustMatch=(String(g.dust||'').toUpperCase()==='YES')===(dustA==='YES');
-  mh+=`<tr><td>Dust</td><td>${esc(g.dust||'?')}</td><td>${dustA}</td><td class="${dustMatch?'miss-ok':'miss-pos'}">${dustMatch?'Match':'Missed'}</td></tr>`;
-  document.getElementById('miss-box').innerHTML=mh+'</table>';
-  const headers=['Grade ID','Entered','Product','Lot','Totes','Actual No4','Actual No8','Actual No12','Actual No18','Actual Dust','Miss No4','Miss No8','Miss No12','Miss No18','Dust Match','Hulls Attached','Entered By','Notes'];
-  const row=[id,new Date().toLocaleString(),g.product,g.lot,g.totes,a.no4,a.no8,a.no12,a.no18,dustA,miss.no4,miss.no8,miss.no12,miss.no18,dustMatch?'yes':'no',
-    document.getElementById('a-hulls').value,document.getElementById('a-by').value,document.getElementById('a-notes').value];
-  const btn=document.getElementById('act-btn');btn.disabled=true;
-  try{const t=await (await fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify({tab:'PG-Actuals',headers,row})})).text();
-    if(!t.includes('Saved'))throw new Error(t);toast('Actual grade saved');}
-  catch(e){toast('Save failed: '+e.message,true);}
-  btn.disabled=false;
-}
-
-async function loadLots(){
-  try{const rows=JSON.parse(await (await fetch(`${SCRIPT_URL}?tab=WarehouseGrading`)).text());
-    const seen=new Set();const dl=document.getElementById('lot-list');
-    rows.slice(1).reverse().forEach(r=>{const lot=r[3];if(lot&&!seen.has(lot)&&/SB/i.test(lot)){seen.add(lot);const o=document.createElement('option');o.value=lot;dl.appendChild(o);}});
-  }catch(e){}
-}
-function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show'+(err?' error':'');setTimeout(()=>t.className='toast',3500);}
-
-renderSlots();loadLots();loadRecent();
-</script>
-</body>
-</html>
